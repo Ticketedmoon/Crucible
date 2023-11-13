@@ -1,8 +1,9 @@
-#include <iostream>
+#include "../include/game_engine.h"
 
 int main()
 {
-    std::cout << "Project Setup!" << '\n';
+    GameEngine engine;
+    engine.startGameLoop();
 
     return 0;
 }
