@@ -6,14 +6,14 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <utility>
+#include "vec2.h"
 
-class Component
+namespace Component
 {
-    public:
-        enum Type
-        {
-            COUNT = 0
-        };
+    struct CTransform
+    {
+        Vec2 position;
+    };
 };
 
 #endif //CRUCIBLE_COMPONENT_H

@@ -32,12 +32,20 @@ void GameplayScene::render()
 
 void GameplayScene::performAction(Action& action)
 {
+    if (Action::Mode::RELEASE == action.getMode())
+    {
+        return;
+    }
 
+    if (Action::Type::SCENE_EXIT == action.getType())
+    {
+        gameEngine.window.close();
+    }
 }
 
 void GameplayScene::registerActions()
 {
-
+    registerActionType(sf::Keyboard::Key::Escape, Action::Type::SCENE_EXIT);
 }
 
 void GameplayScene::registerSystems()

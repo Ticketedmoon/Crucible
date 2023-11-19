@@ -73,11 +73,6 @@ void GameEngine::handleInput()
     sf::Event event{};
     while (window.pollEvent(event))
     {
-        if (event.type == sf::Event::Closed)
-        {
-            window.close();
-        }
-
         if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased)
         {
             std::shared_ptr<Scene>& scene = gameScenes[currentScene];

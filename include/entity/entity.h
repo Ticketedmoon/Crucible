@@ -12,36 +12,31 @@
 
 #include "component.h"
 
-const uint8_t TOTAL_COMPONENTS = static_cast<uint8_t>(Component::Type::COUNT);
-
 class Entity
 {
     public:
         friend class EntityManager;
 
-        void addComponent(Component::Type type, const std::shared_ptr<Component>& component);
-        void removeComponent(Component::Type componentType);
-        [[nodiscard]] bool hasComponent(Component::Type componentType) const;
-        [[nodiscard]] bool hasComponents(const std::vector<Component::Type>& componentTypes) const;
-        std::shared_ptr<Component> getComponentByType(Component::Type componentType);
+        template <typename T>
+        [[nodiscard]] bool hasComponent() const;
+
+        template <typename T>
+        [[nodiscard]] bool hasComponents(std::vector<T> components) const;
+
+        template <typename T, typename... TArgs>
+        void addComponent(TArgs&&... mArgs);
+
+        template <typename T>
+        T& getComponent();
+
+        template <typename T>
+        void removeComponent();
+
 
     public:
         enum class Type
         {
             PLAYER,
-            ENEMY_GOOMBA,
-            WEAPON_PISTOL,
-            WEAPON_SHOTGUN,
-            WEAPON_SNIPER,
-            BULLET,
-            GROUND,
-            BRICK,
-            MARBLE,
-            BUSH,
-            CLOUD,
-            HILL,
-            PIPE,
-            QUESTION_BLOCK,
             NONE
         };
 
@@ -58,7 +53,7 @@ class Entity
         Type m_type;
         bool m_isAlive;
 
-        std::array<std::shared_ptr<Component>, TOTAL_COMPONENTS> m_components;
+        std::tuple<Component::CTransform> m_components;
 
 };
 

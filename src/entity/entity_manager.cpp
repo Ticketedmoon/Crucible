@@ -37,7 +37,8 @@ void EntityManager::removeDeadEntities(std::vector<std::shared_ptr<Entity>>& ent
     entities.erase(callback, entities.end());
 }
 
-std::vector<std::shared_ptr<Entity>> EntityManager::getEntitiesByComponentTypes(const std::vector<Component::Type>& componentTypes)
+template <typename T>
+std::vector<std::shared_ptr<Entity>> EntityManager::getEntitiesByComponentTypes(const std::vector<T>& componentTypes)
 {
     std::ranges::filter_view filteredEntities = m_entities | std::ranges::views::filter([componentTypes](std::shared_ptr<Entity>& e) {
         return e->hasComponents(componentTypes);

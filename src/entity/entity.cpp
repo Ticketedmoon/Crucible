@@ -4,36 +4,46 @@ Entity::Entity(size_t id, Entity::Type type) : m_id(id), m_type(type), m_isAlive
 {
 }
 
-void Entity::addComponent(Component::Type type, const std::shared_ptr<Component>& component)
+template <typename T, typename... TArgs>
+void Entity::addComponent(TArgs&&... mArgs)
 {
-    m_components[type] = component;
+    T& component = getComponent<T>();
+    component = T(std::forward<TArgs>(mArgs)...);
+    component.has = true;
+    return component;
 }
 
-bool Entity::hasComponent(const Component::Type componentType) const
+template <typename T>
+bool Entity::hasComponent() const
 {
-    auto index = static_cast<uint8_t>(componentType);
-    return m_components[index] != nullptr;
+    return getComponent<T>().has();
 }
 
-void Entity::removeComponent(const Component::Type componentType)
+template<typename T>
+bool Entity::hasComponents(std::vector<T> components) const
 {
-    auto index = static_cast<uint8_t>(componentType);
-    m_components[index] = nullptr;
+    for (T component: components)
+    {
+        if (!hasComponent<T>(component))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
-bool Entity::hasComponents(const std::vector<Component::Type>& componentTypes) const
+template <typename T>
+T& Entity::getComponent()
 {
-    return std::ranges::all_of(componentTypes.cbegin(), componentTypes.cend(),
-            [this](const Component::Type componentType) {
-                int index = static_cast<int>(componentType);
-                return m_components[index] != nullptr;
-            });
+    return std::get<T>(m_components);
 }
 
-std::shared_ptr<Component> Entity::getComponentByType(const Component::Type componentType)
+template <typename T>
+void Entity::removeComponent()
 {
-    auto index = static_cast<uint8_t>(componentType);
-    return m_components[index];
+    T& component = getComponent<T>();
+    component.has = false;
+    std::remove<T>(m_components);
 }
 
 size_t Entity::getId() const

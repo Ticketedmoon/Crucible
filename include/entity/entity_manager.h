@@ -16,7 +16,9 @@ class EntityManager
     public:
         void update();
         std::shared_ptr<Entity>& addEntity(Entity::Type type);
-        std::vector<std::shared_ptr<Entity>> getEntitiesByComponentTypes(const std::vector<Component::Type>& componentTypes);
+
+        template <typename T>
+        std::vector<std::shared_ptr<Entity>> getEntitiesByComponentTypes(const std::vector<T>& componentTypes);
         std::vector<std::shared_ptr<Entity>>& getEntitiesByType(Entity::Type type);
         void destroyAllEntities();
 
