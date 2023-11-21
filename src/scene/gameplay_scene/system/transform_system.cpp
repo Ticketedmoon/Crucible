@@ -15,19 +15,19 @@ void TransformSystem::execute()
             auto& controllable = e->getComponent<Component::CControllable>();
             if (controllable.isMovingLeft)
             {
-                cTransform.position.x -= 1;
+                cTransform.position.x -= 2;
             }
             if (controllable.isMovingRight)
             {
-                cTransform.position.x += 1;
+                cTransform.position.x += 2;
             }
             if (controllable.isMovingUp)
             {
-                cTransform.position.y -= 1;
+                cTransform.position.y -= 2;
             }
             if (controllable.isMovingDown)
             {
-                cTransform.position.y += 1;
+                cTransform.position.y += 2;
             }
         }
     }
