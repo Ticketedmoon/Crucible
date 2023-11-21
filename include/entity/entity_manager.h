@@ -9,18 +9,25 @@
 #include <unordered_map>
 #include <memory>
 #include <cassert>
-#include "entity.h"
+#include "entity.hpp"
 
 class EntityManager
 {
     public:
         void update();
         std::shared_ptr<Entity>& addEntity(Entity::Type type);
+        std::vector<std::shared_ptr<Entity>> getEntities();
 
         template <typename T>
-        std::vector<std::shared_ptr<Entity>> getEntitiesByComponentTypes(const std::vector<T>& componentTypes);
-        std::vector<std::shared_ptr<Entity>>& getEntitiesByType(Entity::Type type);
-        void destroyAllEntities();
+        std::vector<std::shared_ptr<Entity>> getEntitiesByComponentType()
+        {
+            std::ranges::filter_view filteredEntities = m_entities | std::ranges::views::filter([](std::shared_ptr<Entity>& e) {
+                return e->hasComponent<T>();
+            });
+            return std::vector(filteredEntities.begin(), filteredEntities.end());
+        };
+
+        bool hasEntityWithType(Entity::Type type);
 
     private:
         static void removeDeadEntities(std::vector<std::shared_ptr<Entity>>& entities);

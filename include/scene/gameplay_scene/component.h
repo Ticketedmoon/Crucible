@@ -13,6 +13,33 @@ namespace Component
     struct CTransform
     {
         Vec2 position;
+
+        bool has{};
+    };
+
+    struct CControllable
+    {
+        bool isMovingUp;
+        bool isMovingDown;
+        bool isMovingLeft;
+        bool isMovingRight;
+
+        bool has;
+    };
+
+    struct CCollision
+    {
+        bool isCollidingUp;
+        bool isCollidingDown;
+        bool isCollidingLeft;
+        bool isCollidingRight;
+    };
+
+    struct CRectangleShape
+    {
+        sf::RectangleShape shape;
+
+        bool has{};
     };
 };
 

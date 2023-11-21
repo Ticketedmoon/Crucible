@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef CRUCIBLE_RENDER_SYSTEM_H
-#define CRUCIBLE_RENDER_SYSTEM_H
+#ifndef CRUCIBLE_TRANSFORM_SYSTEM_H
+#define CRUCIBLE_TRANSFORM_SYSTEM_H
 
 #include <cmath>
 #include <cassert>
@@ -18,14 +18,13 @@
 class TransformSystem : public System
 {
     public:
-        explicit TransformSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager);
+        explicit TransformSystem(EntityManager& entityManager);
 
         void execute() override;
 
     private:
-        sf::RenderTarget& m_renderTarget;
         EntityManager& m_entityManager;
 };
 
 
-#endif //CRUCIBLE_RENDER_SYSTEM_H
+#endif //CRUCIBLE_TRANSFORM_SYSTEM_H

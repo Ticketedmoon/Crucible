@@ -14,9 +14,20 @@ void RenderSystem::execute()
 
 void RenderSystem::drawEntities()
 {
-    sf::RectangleShape shape({200, 200});
-    shape.setPosition(20, 20);
-    m_renderTarget.draw(shape);
+    std::vector<std::shared_ptr<Entity>> entities = m_entityManager.getEntities();
+    for (const std::shared_ptr<Entity>& e : entities)
+    {
+        if (e->hasComponent<Component::CRectangleShape>())
+        {
+            auto& cRectangleShape = e->getComponent<Component::CRectangleShape>();
+            if (e->hasComponent<Component::CTransform>())
+            {
+                const Component::CTransform& cTransform = e->getComponent<Component::CTransform>();
+                cRectangleShape.shape.setPosition(cTransform.position.x, cTransform.position.y);
+            }
+            m_renderTarget.draw(cRectangleShape.shape);
+        }
+    }
 }
 
 void RenderSystem::drawGuiData()

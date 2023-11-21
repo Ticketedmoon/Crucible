@@ -1,7 +1,9 @@
-#include <cmath>
+#pragma once
 
 #ifndef CRUCIBLE_VEC2_H
 #define CRUCIBLE_VEC2_H
+
+#include <cmath>
 
 class Vec2
 {

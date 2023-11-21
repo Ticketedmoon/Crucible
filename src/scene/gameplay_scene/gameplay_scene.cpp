@@ -1,6 +1,7 @@
 #include "gameplay_scene.h"
 
-GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine)
+GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
+    m_entitySpawner(m_entityManager)
 {
     m_renderTexture.create(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT);
     m_renderSprite.setTexture(m_renderTexture.getTexture());
@@ -8,6 +9,13 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine)
 
     registerActions();
     registerSystems();
+
+    // TODO move this to be config driven
+    m_entitySpawner.spawnPlayer();
+    m_entitySpawner.spawnWall({150, 150}, {100, 100});
+    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH-150, 150}, {100, 100});
+    m_entitySpawner.spawnWall({150, Crucible::WINDOW_HEIGHT-150}, {100, 100});
+    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH-150, Crucible::WINDOW_HEIGHT-150}, {100, 100});
 }
 
 void GameplayScene::update()
@@ -32,24 +40,60 @@ void GameplayScene::render()
 
 void GameplayScene::performAction(Action& action)
 {
-    if (Action::Mode::RELEASE == action.getMode())
-    {
-        return;
-    }
-
     if (Action::Type::SCENE_EXIT == action.getType())
     {
+        if (action.getMode() == Action::Mode::RELEASE)
+        {
+            return;
+        }
         gameEngine.window.close();
+    }
+
+    std::vector<std::shared_ptr<Entity>> controllableEntities = m_entityManager.getEntitiesByComponentType<Component::CControllable>();
+    for (std::shared_ptr<Entity>& e : controllableEntities)
+    {
+        auto& cControllable = e->getComponent<Component::CControllable>();
+        if (Action::Type::MOVE_LEFT == action.getType())
+        {
+            cControllable.isMovingLeft = action.getMode() == Action::Mode::PRESS;
+        }
+
+        if (Action::Type::MOVE_RIGHT == action.getType())
+        {
+            cControllable.isMovingRight = action.getMode() == Action::Mode::PRESS;
+        }
+
+        if (Action::Type::MOVE_UP == action.getType())
+        {
+            cControllable.isMovingUp = action.getMode() == Action::Mode::PRESS;
+        }
+
+        if (Action::Type::MOVE_DOWN == action.getType())
+        {
+            cControllable.isMovingDown = action.getMode() == Action::Mode::PRESS;
+        }
     }
 }
 
 void GameplayScene::registerActions()
 {
+    // Escape
     registerActionType(sf::Keyboard::Key::Escape, Action::Type::SCENE_EXIT);
+
+    // Movement
+    registerActionType(sf::Keyboard::Key::Left, Action::Type::MOVE_LEFT);
+    registerActionType(sf::Keyboard::Key::Right, Action::Type::MOVE_RIGHT);
+    registerActionType(sf::Keyboard::Key::Up, Action::Type::MOVE_UP);
+    registerActionType(sf::Keyboard::Key::Down, Action::Type::MOVE_DOWN);
 }
 
 void GameplayScene::registerSystems()
 {
+    m_systemManager.registerSystem(
+            std::make_shared<TransformSystem>(m_renderTexture, m_entityManager), SystemManager::SystemType::UPDATE);
+    m_systemManager.registerSystem(
+            std::make_shared<CollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+
     m_systemManager.registerSystem(
             std::make_shared<RenderSystem>(m_renderTexture, m_entityManager), SystemManager::SystemType::RENDER);
 }

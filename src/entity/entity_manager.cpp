@@ -26,6 +26,11 @@ std::shared_ptr<Entity>& EntityManager::addEntity(Entity::Type type)
     return m_entitiesToAdd.back();
 }
 
+std::vector<std::shared_ptr<Entity>> EntityManager::getEntities()
+{
+    return m_entities;
+}
+
 void EntityManager::removeDeadEntities(std::vector<std::shared_ptr<Entity>>& entities)
 {
     const auto& callback = std::remove_if(
@@ -37,25 +42,8 @@ void EntityManager::removeDeadEntities(std::vector<std::shared_ptr<Entity>>& ent
     entities.erase(callback, entities.end());
 }
 
-template <typename T>
-std::vector<std::shared_ptr<Entity>> EntityManager::getEntitiesByComponentTypes(const std::vector<T>& componentTypes)
+bool EntityManager::hasEntityWithType(Entity::Type type)
 {
-    std::ranges::filter_view filteredEntities = m_entities | std::ranges::views::filter([componentTypes](std::shared_ptr<Entity>& e) {
-        return e->hasComponents(componentTypes);
-    });
-    std::vector<std::shared_ptr<Entity>> entities = std::vector(filteredEntities.begin(), filteredEntities.end());
-    return entities;
-}
+    return !m_entitiesByType[type].empty();
 
-std::vector<std::shared_ptr<Entity>>& EntityManager::getEntitiesByType(Entity::Type type)
-{
-    return m_entitiesByType[type];
-}
-
-void EntityManager::destroyAllEntities()
-{
-    m_entities.clear();
-    m_entitiesToAdd.clear();
-    m_entitiesByType.clear();
-    m_totalEntities = 0;
 }
