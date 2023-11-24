@@ -13,21 +13,23 @@ void TransformSystem::execute()
         if (e->hasComponent<Component::CControllable>())
         {
             auto& controllable = e->getComponent<Component::CControllable>();
+            float SPEED = 2.0f;
+
             if (controllable.isMovingLeft)
             {
-                cTransform.position.x -= 2;
+                cTransform.position.x -= SPEED;
             }
             if (controllable.isMovingRight)
             {
-                cTransform.position.x += 2;
+                cTransform.position.x += SPEED;
             }
             if (controllable.isMovingUp)
             {
-                cTransform.position.y -= 2;
+                cTransform.position.y -= SPEED;
             }
             if (controllable.isMovingDown)
             {
-                cTransform.position.y += 2;
+                cTransform.position.y += SPEED;
             }
         }
     }

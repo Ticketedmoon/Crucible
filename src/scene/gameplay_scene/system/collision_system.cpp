@@ -11,10 +11,13 @@ void CollisionSystem::execute()
     for (const std::shared_ptr<Entity>& entity : entities)
     {
         auto& entityRectangleShape = entity->getComponent<Component::CRectangleShape>();
+        auto& entityTransform = entity->getComponent<Component::CTransform>();
+
         for (const std::shared_ptr<Entity>& otherEntity : entities)
         {
             if (entity->getId() == otherEntity->getId())
             {
+                // @Refactor: Can we do this a better way?
                 continue;
             }
             auto& otherEntityRectangleShape = otherEntity->getComponent<Component::CRectangleShape>();
@@ -29,31 +32,27 @@ void CollisionSystem::execute()
                 if (manifold.y == 1)
                 {
                     // Bottom Collision
-                    auto& entityTransform = entity->getComponent<Component::CTransform>();
-                    entityTransform.position = {entityTransform.position.x, entityTransform.position.y-overlap.height};
+                    entityTransform.position.y -= overlap.height;
                 }
-
                 if (manifold.y == -1)
                 {
                     // Top Collision
-                    auto& entityTransform = entity->getComponent<Component::CTransform>();
-                    entityTransform.position = {entityTransform.position.x, entityTransform.position.y+overlap.height};
+                    entityTransform.position.y += overlap.height;
                 }
 
                 if (manifold.x == 1)
                 {
                     // Left Collision
-                    auto& entityTransform = entity->getComponent<Component::CTransform>();
-                    entityTransform.position = {entityTransform.position.x-overlap.width, entityTransform.position.y};
+                    entityTransform.position.x -= overlap.width;
                 }
-                else if (manifold.x == -1)
+                if (manifold.x == -1)
                 {
                     // Right Collision
-                    auto& entityTransform = entity->getComponent<Component::CTransform>();
-                    entityTransform.position = {entityTransform.position.x+overlap.width, entityTransform.position.y};
+                    entityTransform.position.x += overlap.width;
                 }
             }
         }
+        entityRectangleShape.shape.setPosition(entityTransform.position.x, entityTransform.position.y);
     }
 }
 
