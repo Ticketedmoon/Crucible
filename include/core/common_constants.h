@@ -21,6 +21,13 @@ namespace Crucible
 
     static const inline float DEFAULT_SFX_VOLUME = 50.0f;
     static const inline float JUMP_SFX_VOLUME = 5.0f;
+
+    enum class EntityType
+    {
+        PLAYER,
+        WALL,
+        NONE
+    };
 }
 
 #endif //CRUCIBLE_COMMON_CONSTANTS_H

@@ -9,34 +9,45 @@
 #include <unordered_map>
 #include <memory>
 #include <cassert>
-#include "entity.hpp"
+#include "entity.h"
 
 class EntityManager
 {
     public:
         void update();
-        std::shared_ptr<Entity>& addEntity(Entity::Type type);
-        std::vector<std::shared_ptr<Entity>> getEntities();
+        Entity addEntity(Crucible::EntityType type);
+        std::vector<Entity> getEntities();
 
-        template <typename T>
-        std::vector<std::shared_ptr<Entity>> getEntitiesByComponentType()
+        template<typename T>
+        std::vector<Entity> getEntitiesByComponentType()
         {
-            std::ranges::filter_view filteredEntities = m_entities | std::ranges::views::filter([](std::shared_ptr<Entity>& e) {
-                return e->hasComponent<T>();
-            });
+            std::ranges::filter_view filteredEntities = m_entities |
+                    std::ranges::views::filter([](Entity& e) {
+                        return e.hasComponent<T>();
+                    });
             return std::vector(filteredEntities.begin(), filteredEntities.end());
         };
 
-        bool hasEntityWithType(Entity::Type type);
+        // TODO is this needed?
+        template<typename T>
+        std::vector<T> getActiveComponentGroupForEntities()
+        {
+            std::vector<T> activeComponents;
+            std::vector<T> componentGroup = EntityMemoryPool::instance().getComponents<T>();
+            for (T component : componentGroup)
+            {
+                if (component.has)
+                {
+                    activeComponents.emplace_back(component);
+                }
+            }
+            return activeComponents;
+        }
 
     private:
-        static void removeDeadEntities(std::vector<std::shared_ptr<Entity>>& entities);
-
-    private:
-        size_t m_totalEntities = 0;
-        std::vector<std::shared_ptr<Entity>> m_entities;
-        std::vector<std::shared_ptr<Entity>> m_entitiesToAdd; // Holds enemies to add each frame, will be added to m_entities on next frame update
-        std::unordered_map<Entity::Type, std::vector<std::shared_ptr<Entity>>> m_entitiesByType;
+        std::vector<Entity> m_entities;
+        std::vector<Entity> m_entitiesToAdd; // Holds enemies to add each frame, will be added to m_entities on next frame update
+        std::unordered_map<Crucible::EntityType, std::vector<Entity>> m_entitiesByType;
 
 };
 

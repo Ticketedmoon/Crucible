@@ -1,6 +1,6 @@
-#include "entity/entity.hpp"
+#include "entity/entity.h"
 
-Entity::Entity(size_t id, Entity::Type type) : m_id(id), m_type(type), m_isAlive(true)
+Entity::Entity(size_t id) : m_id(id)
 {
 }
 
@@ -9,17 +9,7 @@ size_t Entity::getId() const
     return m_id;
 }
 
-Entity::Type Entity::getType()
-{
-    return m_type;
-}
-
-bool Entity::isAlive() const
-{
-    return m_isAlive;
-}
-
 void Entity::destroy()
 {
-    m_isAlive = false;
+    EntityMemoryPool::instance().removeEntity(m_id);
 }

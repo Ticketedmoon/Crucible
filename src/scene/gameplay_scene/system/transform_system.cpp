@@ -6,31 +6,38 @@ TransformSystem::TransformSystem(EntityManager& entityManager) : m_entityManager
 
 void TransformSystem::execute()
 {
-    std::vector<std::shared_ptr<Entity>> entities = m_entityManager.getEntities();
-    for (const std::shared_ptr<Entity>& e : entities)
+    std::vector<Entity> entities = m_entityManager.getEntities();
+    for (const Entity entity : entities)
     {
-        auto& cTransform = e->getComponent<Component::CTransform>();
-        if (e->hasComponent<Component::CControllable>())
-        {
-            auto& controllable = e->getComponent<Component::CControllable>();
-            float SPEED = 2.0f;
+        auto& cTransform = entity.getComponent<Component::CTransform>();
 
-            if (controllable.isMovingLeft)
-            {
-                cTransform.position.x -= SPEED;
-            }
-            if (controllable.isMovingRight)
-            {
-                cTransform.position.x += SPEED;
-            }
-            if (controllable.isMovingUp)
-            {
-                cTransform.position.y -= SPEED;
-            }
-            if (controllable.isMovingDown)
-            {
-                cTransform.position.y += SPEED;
-            }
+        // @Refactor: Should we do this elsewhere?
+        if (entity.hasComponent<Component::CControllable>())
+        {
+            resolveControllerMovementForEntity(entity, cTransform);
         }
+    }
+}
+
+void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform) const
+{
+    auto& controllable = e.getComponent<Component::CControllable>();
+    float SPEED = 2.0f;
+
+    if (controllable.isMovingLeft)
+    {
+        cTransform.position.x -= SPEED;
+    }
+    if (controllable.isMovingRight)
+    {
+        cTransform.position.x += SPEED;
+    }
+    if (controllable.isMovingUp)
+    {
+        cTransform.position.y -= SPEED;
+    }
+    if (controllable.isMovingDown)
+    {
+        cTransform.position.y += SPEED;
     }
 }

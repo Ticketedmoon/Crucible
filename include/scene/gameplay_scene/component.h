@@ -33,6 +33,8 @@ namespace Component
         bool isCollidingDown;
         bool isCollidingLeft;
         bool isCollidingRight;
+
+        bool has;
     };
 
     struct CRectangleShape
@@ -41,6 +43,6 @@ namespace Component
 
         bool has{};
     };
-};
+}
 
 #endif //CRUCIBLE_COMPONENT_H

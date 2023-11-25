@@ -23,6 +23,9 @@ class TransformSystem : public System
         void execute() override;
 
     private:
+        void resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform) const;
+
+    private:
         EntityManager& m_entityManager;
 };
 

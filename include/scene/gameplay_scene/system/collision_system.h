@@ -22,6 +22,9 @@ class CollisionSystem : public System
     private:
         static bool isCollidingAABB(const Component::CRectangleShape& entityRect,
                 const Component::CRectangleShape& otherEntityRect, sf::FloatRect& overlap);
+        void resolveCollision(const Component::CRectangleShape& entityRectangleShape,
+                Component::CTransform& entityTransform, const Component::CRectangleShape& otherEntityRectangleShape,
+                const sf::FloatRect& overlap);
         sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
 
     private:

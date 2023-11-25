@@ -49,10 +49,10 @@ void GameplayScene::performAction(Action& action)
         gameEngine.window.close();
     }
 
-    std::vector<std::shared_ptr<Entity>> controllableEntities = m_entityManager.getEntitiesByComponentType<Component::CControllable>();
-    for (std::shared_ptr<Entity>& e : controllableEntities)
+    std::vector<Entity> controllableEntities = m_entityManager.getEntitiesByComponentType<Component::CControllable>();
+    for (const Entity& e : controllableEntities)
     {
-        auto& cControllable = e->getComponent<Component::CControllable>();
+        auto& cControllable = e.getComponent<Component::CControllable>();
         if (Action::Type::MOVE_LEFT == action.getType())
         {
             cControllable.isMovingLeft = action.getMode() == Action::Mode::PRESS;

@@ -14,12 +14,12 @@ void RenderSystem::execute()
 
 void RenderSystem::drawEntities()
 {
-    std::vector<std::shared_ptr<Entity>> entities = m_entityManager.getEntities();
-    for (const std::shared_ptr<Entity>& e : entities)
+    std::vector<Entity> entities = m_entityManager.getEntities();
+    for (const Entity e : entities)
     {
-        if (e->hasComponent<Component::CRectangleShape>())
+        if (e.hasComponent<Component::CRectangleShape>())
         {
-            auto& cRectangleShape = e->getComponent<Component::CRectangleShape>();
+            auto& cRectangleShape = e.getComponent<Component::CRectangleShape>();
             m_renderTarget.draw(cRectangleShape.shape);
         }
     }
