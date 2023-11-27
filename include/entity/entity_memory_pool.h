@@ -17,7 +17,7 @@ typedef std::tuple<
 std::vector<Component::CTransform>,
 std::vector<Component::CControllable>,
 std::vector<Component::CCollision>,
-std::vector<Component::CRectangleShape>
+std::vector<Component::CShape>
 > EntityComponentVectorTuple;
 
 static size_t MAX_NUM_ENTITIES = 100;

@@ -17,10 +17,10 @@ void RenderSystem::drawEntities()
     std::vector<Entity> entities = m_entityManager.getEntities();
     for (const Entity e : entities)
     {
-        if (e.hasComponent<Component::CRectangleShape>())
+        if (e.hasComponent<Component::CShape>())
         {
-            auto& cRectangleShape = e.getComponent<Component::CRectangleShape>();
-            m_renderTarget.draw(cRectangleShape.shape);
+            auto& cShape = e.getComponent<Component::CShape>();
+            m_renderTarget.draw(cShape.vertices);
         }
     }
 }

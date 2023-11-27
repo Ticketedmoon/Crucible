@@ -37,9 +37,9 @@ namespace Component
         bool has;
     };
 
-    struct CRectangleShape
+    struct CShape
     {
-        sf::RectangleShape shape;
+        sf::VertexArray vertices = sf::VertexArray(sf::LineStrip, 5);
 
         bool has{};
     };
