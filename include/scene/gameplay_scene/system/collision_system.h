@@ -20,10 +20,10 @@ class CollisionSystem : public System
         void execute() override;
 
     private:
-        static bool isCollidingAABB(const Component::CRectangleShape& entityRect,
-                const Component::CRectangleShape& otherEntityRect, sf::FloatRect& overlap);
-        void resolveCollision(const Component::CRectangleShape& entityRectangleShape,
-                Component::CTransform& entityTransform, const Component::CRectangleShape& otherEntityRectangleShape,
+        static bool isCollidingAABB(const Component::CShape& entityRect,
+                const Component::CShape& otherEntityRect, sf::FloatRect& overlap);
+        void resolveCollision(const Component::CShape& entityRectangleShape,
+                Component::CTransform& entityTransform, const Component::CShape& otherEntityRectangleShape,
                 const sf::FloatRect& overlap);
         sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
 

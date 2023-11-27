@@ -15,11 +15,15 @@ void EntitySpawner::spawnPlayer()
     e.addComponent<Component::CTransform>(position);
 
     Vec2 dimensions{50, 50};
-    sf::RectangleShape shape({dimensions.x, dimensions.y});
-    shape.setOrigin(dimensions.x / 2, dimensions.y / 2);
-    shape.setPosition({position.x, position.y});
 
-    e.addComponent<Component::CRectangleShape>(shape);
+    sf::VertexArray points(sf::LinesStrip, 5);
+    points[0].position = sf::Vector2f(position.x - dimensions.x/2, position.y - dimensions.y/2);
+    points[1].position = sf::Vector2f(position.x + dimensions.x/2, position.y - dimensions.y/2);
+    points[2].position = sf::Vector2f(position.x + dimensions.x/2, position.y + dimensions.y/2);
+    points[3].position = sf::Vector2f(position.x - dimensions.x/2, position.y + dimensions.y/2);
+    points[4].position = sf::Vector2f(position.x - dimensions.x/2, position.y - dimensions.y/2);
+
+    e.addComponent<Component::CShape>(points);
 }
 
 void EntitySpawner::spawnWall(Vec2 position, Vec2 dimensions)
@@ -28,10 +32,13 @@ void EntitySpawner::spawnWall(Vec2 position, Vec2 dimensions)
 
     e.addComponent<Component::CTransform>(position);
 
-    sf::RectangleShape shape({dimensions.x, dimensions.y});
-    shape.setOrigin(dimensions.x / 2, dimensions.y / 2);
-    shape.setPosition({position.x, position.y});
-    shape.setFillColor(sf::Color::Blue);
+    sf::VertexArray points(sf::LinesStrip, 5);
+    points[0].position = sf::Vector2f(position.x - dimensions.x/2, position.y - dimensions.y/2);
+    points[1].position = sf::Vector2f(position.x + dimensions.x/2, position.y - dimensions.y/2);
+    points[2].position = sf::Vector2f(position.x + dimensions.x/2, position.y + dimensions.y/2);
+    points[3].position = sf::Vector2f(position.x - dimensions.x/2, position.y + dimensions.y/2);
+    points[4].position = sf::Vector2f(position.x - dimensions.x/2, position.y - dimensions.y/2);
+    //shape.setFillColor(sf::Color::Blue);
 
-    e.addComponent<Component::CRectangleShape>(shape);
+    e.addComponent<Component::CShape>(points);
 }
