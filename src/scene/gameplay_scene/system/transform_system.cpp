@@ -1,4 +1,3 @@
-#include <iostream>
 #include "transform_system.h"
 
 TransformSystem::TransformSystem(EntityManager& entityManager) : m_entityManager(entityManager)
@@ -19,16 +18,30 @@ void TransformSystem::execute()
             resolveControllerMovementForEntity(entity, entityTransform);
         }
 
-        float xDiff = std::abs(entityRectangleShape.vertices[0].position.x - entityRectangleShape.vertices[1].position.x) / 2;
-        float yDiff = std::abs(entityRectangleShape.vertices[0].position.y - entityRectangleShape.vertices[2].position.y) / 2;
+        if (entity.hasComponent<Component::CLightSource>())
+        {
+            auto& lightSource = entity.getComponent<Component::CLightSource>();
+            float yDiff = std::abs(entityRectangleShape.vertices[0].position.y - entityRectangleShape.vertices[2].position.y) / 2;
+            lightSource.vertices[0].position = {entityTransform.position.x, entityTransform.position.y - yDiff};
+            lightSource.vertices[1].position = {entityTransform.position.x, 0};
+        }
 
-        // Update rect based on transform points
-        entityRectangleShape.vertices[0].position = { entityTransform.position.x - xDiff, entityTransform.position.y - yDiff };
-        entityRectangleShape.vertices[1].position = { entityTransform.position.x + xDiff, entityTransform.position.y - yDiff };
-        entityRectangleShape.vertices[2].position = { entityTransform.position.x + xDiff, entityTransform.position.y + yDiff };
-        entityRectangleShape.vertices[3].position = { entityTransform.position.x - xDiff, entityTransform.position.y + yDiff };
-        entityRectangleShape.vertices[4].position = { entityTransform.position.x - xDiff, entityTransform.position.y - yDiff };
+        updateVertexPositionsForEntity(entityTransform, entityRectangleShape);
     }
+}
+
+void TransformSystem::updateVertexPositionsForEntity(const Component::CTransform& entityTransform,
+        Component::CShape& entityRectangleShape) const
+{
+    float xDiff = std::abs(entityRectangleShape.vertices[0].position.x - entityRectangleShape.vertices[1].position.x) / 2;
+    float yDiff = std::abs(entityRectangleShape.vertices[0].position.y - entityRectangleShape.vertices[2].position.y) / 2;
+
+    // Update rect based on transform points
+    entityRectangleShape.vertices[0].position = { entityTransform.position.x - xDiff, entityTransform.position.y - yDiff };
+    entityRectangleShape.vertices[1].position = { entityTransform.position.x + xDiff, entityTransform.position.y - yDiff };
+    entityRectangleShape.vertices[2].position = { entityTransform.position.x + xDiff, entityTransform.position.y + yDiff };
+    entityRectangleShape.vertices[3].position = { entityTransform.position.x - xDiff, entityTransform.position.y + yDiff };
+    entityRectangleShape.vertices[4].position = { entityTransform.position.x - xDiff, entityTransform.position.y - yDiff };
 }
 
 void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform) const

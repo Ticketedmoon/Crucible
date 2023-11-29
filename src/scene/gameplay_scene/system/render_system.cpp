@@ -1,3 +1,4 @@
+#include <iostream>
 #include "render_system.h"
 
 RenderSystem::RenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager)
@@ -21,6 +22,11 @@ void RenderSystem::drawEntities()
         {
             auto& cShape = e.getComponent<Component::CShape>();
             m_renderTarget.draw(cShape.vertices);
+        }
+        if (e.hasComponent<Component::CLightSource>())
+        {
+            auto& cLightSource = e.getComponent<Component::CLightSource>();
+            m_renderTarget.draw(cLightSource.vertices);
         }
     }
 }

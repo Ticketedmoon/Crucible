@@ -4,8 +4,8 @@
 #define CRUCIBLE_COMPONENT_H
 
 #include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
 #include <utility>
+#include <SFML/Graphics/VertexArray.hpp>
 #include "vec2.h"
 
 namespace Component
@@ -40,6 +40,13 @@ namespace Component
     struct CShape
     {
         sf::VertexArray vertices = sf::VertexArray(sf::LineStrip, 5);
+
+        bool has{};
+    };
+
+    struct CLightSource
+    {
+        sf::VertexArray vertices = sf::VertexArray(sf::LineStrip, 2);
 
         bool has{};
     };
