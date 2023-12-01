@@ -12,18 +12,33 @@ void TransformSystem::execute()
         auto& entityTransform = entity.getComponent<Component::CTransform>();
         auto& entityRectangleShape = entity.getComponent<Component::CShape>();
 
+        bool isMoving;
+
         // @Refactor: Should we do this elsewhere?
         if (entity.hasComponent<Component::CControllable>())
         {
-            resolveControllerMovementForEntity(entity, entityTransform);
+            isMoving = resolveControllerMovementForEntity(entity, entityTransform);
         }
 
         if (entity.hasComponent<Component::CLightSource>())
         {
             auto& lightSource = entity.getComponent<Component::CLightSource>();
+
+            if (isMoving)
+            {
+                lightSource.lightVertices.clear();
+            }
+
             float yDiff = std::abs(entityRectangleShape.vertices[0].position.y - entityRectangleShape.vertices[2].position.y) / 2;
-            lightSource.vertices[0].position = {entityTransform.position.x, entityTransform.position.y - yDiff};
-            lightSource.vertices[1].position = {entityTransform.position.x, 0};
+            lightSource.rayVertices[0].position = {entityTransform.position.x, entityTransform.position.y - yDiff};
+
+            sf::Vector2f& lightSourceRayEndPosition = lightSource.rayVertices[1].position;
+
+            lightSourceRayEndPosition.x = entityTransform.position.x;
+            if (lightSourceRayEndPosition.y > 0)
+            {
+                lightSourceRayEndPosition.y -= 10;
+            }
         }
 
         updateVertexPositionsForEntity(entityTransform, entityRectangleShape);
@@ -44,7 +59,7 @@ void TransformSystem::updateVertexPositionsForEntity(const Component::CTransform
     entityRectangleShape.vertices[4].position = { entityTransform.position.x - xDiff, entityTransform.position.y - yDiff };
 }
 
-void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform) const
+bool TransformSystem::resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform)
 {
     auto& controllable = e.getComponent<Component::CControllable>();
     float SPEED = 2.0f;
@@ -65,4 +80,6 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
     {
         cTransform.position.y += SPEED;
     }
+
+    return controllable.isMovingLeft || controllable.isMovingRight || controllable.isMovingUp || controllable.isMovingDown;
 }

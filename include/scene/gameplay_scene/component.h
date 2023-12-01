@@ -46,7 +46,9 @@ namespace Component
 
     struct CLightSource
     {
-        sf::VertexArray vertices = sf::VertexArray(sf::LineStrip, 2);
+        sf::VertexArray rayVertices = sf::VertexArray(sf::LineStrip, 2);
+
+        sf::VertexArray lightVertices = sf::VertexArray(sf::LineStrip, 2);
 
         bool has{};
     };

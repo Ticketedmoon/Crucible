@@ -21,7 +21,7 @@ void EntitySpawner::spawnPlayer()
 
     sf::VertexArray lightSourceVertices(sf::LineStrip, 2);
     lightSourceVertices[0].position = sf::Vector2f(position.x, position.y - dimensions.y / 2);
-    lightSourceVertices[1].position = sf::Vector2f(position.x, 0);
+    lightSourceVertices[1].position = sf::Vector2f(position.x, position.y - dimensions.y / 2);
 
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CTransform>(position);

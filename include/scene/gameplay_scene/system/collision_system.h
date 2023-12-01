@@ -12,6 +12,12 @@
 #include "system.h"
 #include "entity_manager.h"
 
+struct Intersect
+{
+    bool result{};
+    Vec2 pos;
+};
+
 class CollisionSystem : public System
 {
     public:
@@ -29,6 +35,8 @@ class CollisionSystem : public System
         static sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
         static void applyCollisionManifoldToTransform(Component::CTransform& entityTransform, const sf::FloatRect& overlap,
                 const Vec2& result);
+        static float crossProduct(Vec2 a, Vec2 b);
+        Intersect isLineIntersecting(Vec2 vertexA, Vec2 vertexB, Vec2 vertexC, Vec2 vertexD);
 
     private:
         EntityManager& m_entityManager;

@@ -23,7 +23,7 @@ class TransformSystem : public System
         void execute() override;
 
     private:
-        void resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform) const;
+        static bool resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform);
         void updateVertexPositionsForEntity(const Component::CTransform& entityTransform,
                 Component::CShape& entityRectangleShape) const;
 
