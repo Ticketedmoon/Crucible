@@ -19,14 +19,14 @@ void EntitySpawner::spawnPlayer()
     vertices[3].position = sf::Vector2f(position.x - dimensions.x/2, position.y + dimensions.y/2);
     vertices[4].position = sf::Vector2f(position.x - dimensions.x/2, position.y - dimensions.y/2);
 
-    sf::VertexArray lightSourceVertices(sf::LineStrip, 2);
-    lightSourceVertices[0].position = sf::Vector2f(position.x, position.y - dimensions.y / 2);
-    lightSourceVertices[1].position = sf::Vector2f(position.x, position.y - dimensions.y / 2);
+    sf::VertexArray rayVertices(sf::LineStrip, 2);
+    rayVertices[0].position = sf::Vector2f(position.x, position.y - dimensions.y / 2);
+    rayVertices[1].position = sf::Vector2f(position.x, position.y - dimensions.y / 2);
 
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CTransform>(position);
     e.addComponent<Component::CShape>(vertices);
-    e.addComponent<Component::CLightSource>(lightSourceVertices);
+    e.addComponent<Component::CLightSource>(rayVertices);
 }
 
 void EntitySpawner::spawnWall(Vec2 position, Vec2 dimensions)

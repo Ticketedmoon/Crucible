@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <string_view>
+#include "vec2.h"
 
 namespace Crucible
 {
@@ -27,6 +28,12 @@ namespace Crucible
         PLAYER,
         WALL,
         NONE
+    };
+
+    struct LightRayIntersect
+    {
+        bool result{};
+        Vec2 pos;
     };
 }
 

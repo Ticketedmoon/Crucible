@@ -25,13 +25,6 @@ void CollisionSystem::execute()
 
             if (entity.hasComponent<Component::CLightSource>())
             {
-                // Better solution
-                // Add 'lightSourceSystem' or similar.
-                // In the logic below, add all 'Interesct' objects that hit the line segment to list.
-                // Sort the list based on closest to player position and take the first item.
-                //   > - the player x, player y and take closet to 0
-                // Append that items vertices value to the lightVertices array.
-
                 // @Refactor: Clean all of this up.
                 auto& lightSource = entity.getComponent<Component::CLightSource>();
                 Vec2 lightSourceRayStartPos = {lightSource.rayVertices[0].position.x, lightSource.rayVertices[0].position.y};
@@ -51,60 +44,30 @@ void CollisionSystem::execute()
 
                 sf::Color otherShapeColour = sf::Color::White;
 
-                Intersect lineIntersectA = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosA, shapeLineEndPosA);
-                Intersect lineIntersectB = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosB, shapeLineEndPosB);
-                Intersect lineIntersectC = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosC, shapeLineEndPosC);
-                Intersect lineIntersectD = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosD, shapeLineEndPosD);
+                Crucible::LightRayIntersect lineIntersectA = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosA, shapeLineEndPosA);
+                Crucible::LightRayIntersect lineIntersectB = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosB, shapeLineEndPosB);
+                Crucible::LightRayIntersect lineIntersectC = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosC, shapeLineEndPosC);
+                Crucible::LightRayIntersect lineIntersectD = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosD, shapeLineEndPosD);
 
                 if (lineIntersectD.result)
                 {
-                    otherShapeColour = sf::Color::Red;
-
-                    if (lightSource.lightVertices.getVertexCount() == 0)
-                    {
-                        lightSource.lightVertices.append(sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
-                        lightSource.lightVertices.append(sf::Vertex({lineIntersectD.pos.x, lineIntersectD.pos.y}, sf::Color::Blue));
-                    }
+                    otherShapeColour = sf::Color::Green;
+                    lightSource.lightRayIntersects.emplace_back(lineIntersectD);
                 }
                 else if (lineIntersectC.result)
                 {
-                    otherShapeColour = sf::Color::Red;
-                    if (lightSource.lightVertices.getVertexCount() == 0)
-                    {
-                        lightSource.lightVertices.append(
-                                sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
-                        lightSource.lightVertices.append(
-                                sf::Vertex({lineIntersectC.pos.x, lineIntersectC.pos.y}, sf::Color::Blue));
-                    }
+                    otherShapeColour = sf::Color::Green;
+                    lightSource.lightRayIntersects.emplace_back(lineIntersectC);
                 }
                 else if (lineIntersectB.result)
                 {
-                    otherShapeColour = sf::Color::Red;
-
-                    if (lightSource.lightVertices.getVertexCount() == 0)
-                    {
-                        lightSource.lightVertices.append(
-                                sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
-                        lightSource.lightVertices.append(
-                                sf::Vertex({lineIntersectB.pos.x, lineIntersectB.pos.y}, sf::Color::Blue));
-                    }
+                    otherShapeColour = sf::Color::Green;
+                    lightSource.lightRayIntersects.emplace_back(lineIntersectB);
                 }
                 else if (lineIntersectA.result)
                 {
-                    otherShapeColour = sf::Color::Red;
-
-                    if (lightSource.lightVertices.getVertexCount() == 0)
-                    {
-                        lightSource.lightVertices.append(
-                                sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
-                        lightSource.lightVertices.append(
-                                sf::Vertex({lineIntersectA.pos.x, lineIntersectA.pos.y}, sf::Color::Blue));
-                    }
-                }
-
-                for (int i = 0; i < otherEntityRectangleShape.vertices.getVertexCount(); i++)
-                {
-                    otherEntityRectangleShape.vertices[i].color = otherShapeColour;
+                    otherShapeColour = sf::Color::Green;
+                    lightSource.lightRayIntersects.emplace_back(lineIntersectA);
                 }
             }
 
@@ -123,7 +86,7 @@ bool CollisionSystem::isCollidingAABB(const Component::CShape& entityRect,
     return entityRect.vertices.getBounds().intersects(otherEntityRect.vertices.getBounds(), overlap);
 }
 
-Intersect CollisionSystem::isLineIntersecting(Vec2 vertexA, Vec2 vertexB, Vec2 vertexC, Vec2 vertexD)
+Crucible::LightRayIntersect CollisionSystem::isLineIntersecting(Vec2 vertexA, Vec2 vertexB, Vec2 vertexC, Vec2 vertexD)
 {
     Vec2 r = (vertexB - vertexA);
     Vec2 s = (vertexD - vertexC);

@@ -7,6 +7,7 @@
 #include <utility>
 #include <SFML/Graphics/VertexArray.hpp>
 #include "vec2.h"
+#include "common_constants.h"
 
 namespace Component
 {
@@ -48,7 +49,9 @@ namespace Component
     {
         sf::VertexArray rayVertices = sf::VertexArray(sf::LineStrip, 2);
 
-        sf::VertexArray lightVertices = sf::VertexArray(sf::LineStrip, 2);
+        sf::VertexArray lightVertices = sf::VertexArray(sf::LineStrip, 0);
+
+        std::vector<Crucible::LightRayIntersect> lightRayIntersects;
 
         bool has{};
     };

@@ -14,6 +14,7 @@
 #include "render_system.h"
 #include "transform_system.h"
 #include "collision_system.h"
+#include "lighting_system.h"
 
 #include "entity_manager.h"
 #include "system_manager.h"

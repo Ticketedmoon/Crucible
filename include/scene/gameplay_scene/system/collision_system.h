@@ -11,12 +11,7 @@
 
 #include "system.h"
 #include "entity_manager.h"
-
-struct Intersect
-{
-    bool result{};
-    Vec2 pos;
-};
+#include "common_constants.h"
 
 class CollisionSystem : public System
 {
@@ -36,7 +31,7 @@ class CollisionSystem : public System
         static void applyCollisionManifoldToTransform(Component::CTransform& entityTransform, const sf::FloatRect& overlap,
                 const Vec2& result);
         static float crossProduct(Vec2 a, Vec2 b);
-        Intersect isLineIntersecting(Vec2 vertexA, Vec2 vertexB, Vec2 vertexC, Vec2 vertexD);
+        static Crucible::LightRayIntersect isLineIntersecting(Vec2 vertexA, Vec2 vertexB, Vec2 vertexC, Vec2 vertexD);
 
     private:
         EntityManager& m_entityManager;

@@ -29,6 +29,10 @@ void RenderSystem::drawEntities()
             {
                 m_renderTarget.draw(cLightSource.lightVertices);
             }
+            else
+            {
+                m_renderTarget.draw(cLightSource.rayVertices);
+            }
         }
     }
 }
