@@ -25,6 +25,13 @@ void CollisionSystem::execute()
 
             if (entity.hasComponent<Component::CLightSource>())
             {
+                // Better solution
+                // Add 'lightSourceSystem' or similar.
+                // In the logic below, add all 'Interesct' objects that hit the line segment to list.
+                // Sort the list based on closest to player position and take the first item.
+                //   > - the player x, player y and take closet to 0
+                // Append that items vertices value to the lightVertices array.
+
                 // @Refactor: Clean all of this up.
                 auto& lightSource = entity.getComponent<Component::CLightSource>();
                 Vec2 lightSourceRayStartPos = {lightSource.rayVertices[0].position.x, lightSource.rayVertices[0].position.y};
@@ -52,26 +59,47 @@ void CollisionSystem::execute()
                 if (lineIntersectD.result)
                 {
                     otherShapeColour = sf::Color::Red;
-                    lightSource.lightVertices.append(sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
-                    lightSource.lightVertices.append(sf::Vertex({lineIntersectD.pos.x, lineIntersectD.pos.y}, sf::Color::Blue));
+
+                    if (lightSource.lightVertices.getVertexCount() == 0)
+                    {
+                        lightSource.lightVertices.append(sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
+                        lightSource.lightVertices.append(sf::Vertex({lineIntersectD.pos.x, lineIntersectD.pos.y}, sf::Color::Blue));
+                    }
                 }
                 else if (lineIntersectC.result)
                 {
                     otherShapeColour = sf::Color::Red;
-                    lightSource.lightVertices.append(sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
-                    lightSource.lightVertices.append(sf::Vertex({lineIntersectC.pos.x, lineIntersectC.pos.y}, sf::Color::Blue));
+                    if (lightSource.lightVertices.getVertexCount() == 0)
+                    {
+                        lightSource.lightVertices.append(
+                                sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
+                        lightSource.lightVertices.append(
+                                sf::Vertex({lineIntersectC.pos.x, lineIntersectC.pos.y}, sf::Color::Blue));
+                    }
                 }
                 else if (lineIntersectB.result)
                 {
                     otherShapeColour = sf::Color::Red;
-                    lightSource.lightVertices.append(sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
-                    lightSource.lightVertices.append(sf::Vertex({lineIntersectB.pos.x, lineIntersectB.pos.y}, sf::Color::Blue));
+
+                    if (lightSource.lightVertices.getVertexCount() == 0)
+                    {
+                        lightSource.lightVertices.append(
+                                sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
+                        lightSource.lightVertices.append(
+                                sf::Vertex({lineIntersectB.pos.x, lineIntersectB.pos.y}, sf::Color::Blue));
+                    }
                 }
                 else if (lineIntersectA.result)
                 {
                     otherShapeColour = sf::Color::Red;
-                    lightSource.lightVertices.append(sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
-                    lightSource.lightVertices.append(sf::Vertex({lineIntersectA.pos.x, lineIntersectA.pos.y}, sf::Color::Blue));
+
+                    if (lightSource.lightVertices.getVertexCount() == 0)
+                    {
+                        lightSource.lightVertices.append(
+                                sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Blue));
+                        lightSource.lightVertices.append(
+                                sf::Vertex({lineIntersectA.pos.x, lineIntersectA.pos.y}, sf::Color::Blue));
+                    }
                 }
 
                 for (int i = 0; i < otherEntityRectangleShape.vertices.getVertexCount(); i++)
