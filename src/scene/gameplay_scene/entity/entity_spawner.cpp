@@ -20,8 +20,8 @@ void EntitySpawner::spawnPlayer()
     vertices[4].position = sf::Vector2f(position.x - dimensions.x/2, position.y - dimensions.y/2);
 
     sf::VertexArray rayVertices(sf::LineStrip, 2);
-    rayVertices[0].position = sf::Vector2f(position.x, position.y - dimensions.y / 2);
-    rayVertices[1].position = sf::Vector2f(position.x, position.y - dimensions.y / 2);
+    rayVertices[0] = sf::Vertex({position.x, position.y - dimensions.y / 2}, sf::Color::Yellow);
+    rayVertices[1] = sf::Vertex({position.x, position.y - dimensions.y / 2}, sf::Color::Yellow);
 
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CTransform>(position);

@@ -50,7 +50,10 @@ void LightingSystem::execute()
         entityLightSource.lightVertices.clear();
 
         // Add that item to lightVertices array.
-        entityLightSource.lightVertices.append(sf::Vertex({cTransform.position.x, cTransform.position.y}, sf::Color::Red));
-        entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.pos.x, closestIntersect.pos.y}, sf::Color::Red));
+        Component::CShape entityRectangleShape = entity.getComponent<Component::CShape>();
+        float yDiff = std::abs(entityRectangleShape.vertices[0].position.y - entityRectangleShape.vertices[2].position.y) / 2;
+
+        entityLightSource.lightVertices.append(sf::Vertex({cTransform.position.x, cTransform.position.y - yDiff}, sf::Color::Yellow));
+        entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.pos.x, closestIntersect.pos.y}, sf::Color::Yellow));
     }
 }
