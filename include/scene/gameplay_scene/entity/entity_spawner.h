@@ -4,6 +4,8 @@
 #define CRUCIBLE_ENTITY_SPAWNER_H
 
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <iostream>
+
 #include "system.h"
 #include "entity_manager.h"
 #include "common_constants.h"

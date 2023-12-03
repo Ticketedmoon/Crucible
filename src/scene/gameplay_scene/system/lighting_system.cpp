@@ -18,7 +18,6 @@ void LightingSystem::execute()
 
         auto& entityLightSource = entity.getComponent<Component::CLightSource>();
         auto& entityTransform = entity.getComponent<Component::CTransform>();
-        auto& entityRectangleShape = entity.getComponent<Component::CShape>();
 
         // Clear current light vertices
         entityLightSource.lightVertices.clear();
