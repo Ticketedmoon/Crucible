@@ -35,10 +35,10 @@ void LightingSystem::execute()
             // Note: This will only work for 1 hit, if we want multiple ray hits we'll need a more scalable solution around
             //       sorting nearest objects and such - add this later.
             Crucible::LightRayIntersect closestIntersect = entityLightSource.lightRayIntersects[lineIndex][0];
-            double distToPlayer = entityTransform.position.dist(entityLightSource.lightRayIntersects[lineIndex][0].pos);
+            double distToPlayer = entityTransform.position.dist(entityLightSource.lightRayIntersects[lineIndex][0].collisionPoint);
             for (Crucible::LightRayIntersect intersect: entityLightSource.lightRayIntersects[lineIndex])
             {
-                double nextDistToPlayer = entityTransform.position.dist(intersect.pos);
+                double nextDistToPlayer = entityTransform.position.dist(intersect.collisionPoint);
                 if (nextDistToPlayer < distToPlayer)
                 {
                     distToPlayer = nextDistToPlayer;
@@ -51,7 +51,8 @@ void LightingSystem::execute()
 
             // Add that item to lightVertices array.
             entityLightSource.lightVertices.append(sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow));
-            entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.pos.x, closestIntersect.pos.y}, sf::Color::Yellow));
+            entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.nearestShapeVertices[0].x, closestIntersect.nearestShapeVertices[0].y}, sf::Color::Yellow));
+            entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.nearestShapeVertices[1].x, closestIntersect.nearestShapeVertices[1].y}, sf::Color::Yellow));
         }
     }
 }

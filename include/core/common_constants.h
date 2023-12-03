@@ -28,8 +28,11 @@ namespace Crucible
 
     struct LightRayIntersect
     {
-        bool result{};
-        Vec2 pos;
+        bool hasIntersection{};
+
+        Vec2 collisionPoint;
+
+        std::array<Vec2, 2> nearestShapeVertices;
     };
 }
 
