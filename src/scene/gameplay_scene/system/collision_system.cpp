@@ -27,7 +27,6 @@ void CollisionSystem::execute()
             if (CollisionSystem::isCollidingAABB(entityRectangleShape, otherEntityRectangleShape, overlap))
             {
                 resolveCollision(entityRectangleShape, entityTransform, otherEntityRectangleShape, otherEntityTransform, overlap);
-                continue;
             }
 
             if (entity.hasComponent<Component::CLightSource>())

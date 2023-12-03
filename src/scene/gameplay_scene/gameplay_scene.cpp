@@ -95,11 +95,11 @@ void GameplayScene::registerActions()
 void GameplayScene::registerSystems()
 {
     m_systemManager.registerSystem(
-            std::make_shared<LightingSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
-    m_systemManager.registerSystem(
             std::make_shared<TransformSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
             std::make_shared<CollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+    m_systemManager.registerSystem(
+            std::make_shared<LightingSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
 
     m_systemManager.registerSystem(
             std::make_shared<RenderSystem>(m_renderTexture, m_entityManager), SystemManager::SystemType::RENDER);

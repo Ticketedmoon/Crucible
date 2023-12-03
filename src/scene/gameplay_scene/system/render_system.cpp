@@ -25,14 +25,7 @@ void RenderSystem::drawEntities()
         if (e.hasComponent<Component::CLightSource>())
         {
             auto& cLightSource = e.getComponent<Component::CLightSource>();
-            if (cLightSource.lightVertices.getVertexCount() > 0)
-            {
-                m_renderTarget.draw(cLightSource.lightVertices);
-            }
-            else
-            {
-                m_renderTarget.draw(cLightSource.rayVertices);
-            }
+            m_renderTarget.draw(cLightSource.lightVertices);
         }
     }
 }
