@@ -41,6 +41,18 @@ void CollisionSystem::execute()
                     checkForLightIntersectWithShape(lightSource, otherEntityRectangleShape, lineIndex, 2, 3);
                     checkForLightIntersectWithShape(lightSource, otherEntityRectangleShape, lineIndex, 1, 2);
                     checkForLightIntersectWithShape(lightSource, otherEntityRectangleShape, lineIndex, 0, 1);
+
+                    // TODO Issue is here with window border collision.
+                    //      This needs to be aware of objects in front.
+                    //      How to do this?
+                    //      Rather than hardcode the vec2 corners of the window, we need to cast rays in a spiral around
+                    //      the borders, connecting each two points as a triangle fan.
+
+                    // Check for light intersect with window border
+                    checkForLightIntersectWithWindowBorder(lightSource, lineIndex, Vec2(0, 0), Vec2(Crucible::WINDOW_WIDTH, 0));
+                    checkForLightIntersectWithWindowBorder(lightSource, lineIndex, Vec2(0, Crucible::WINDOW_HEIGHT), Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+                    checkForLightIntersectWithWindowBorder(lightSource, lineIndex, Vec2(0, 0), Vec2(0, Crucible::WINDOW_HEIGHT));
+                    checkForLightIntersectWithWindowBorder(lightSource, lineIndex, Vec2(Crucible::WINDOW_WIDTH, 0), Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
                 }
             }
         }
