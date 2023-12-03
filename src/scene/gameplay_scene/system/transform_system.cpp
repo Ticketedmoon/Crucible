@@ -30,7 +30,7 @@ void TransformSystem::execute()
             lightSourceRayEndPosition.x = entityTransform.position.x;
             if (lightSourceRayEndPosition.y > 0)
             {
-                lightSourceRayEndPosition.y -= 10;
+                lightSourceRayEndPosition.y -= 100;
             }
         }
 

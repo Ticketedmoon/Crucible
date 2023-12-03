@@ -38,6 +38,12 @@ void CollisionSystem::execute()
                 checkForLightIntersectWithShape(lightSource,otherEntityRectangleShape, 2, 3);
                 checkForLightIntersectWithShape(lightSource,otherEntityRectangleShape, 1, 2);
                 checkForLightIntersectWithShape(lightSource,otherEntityRectangleShape, 0, 1);
+
+                // Check for light intersect with window border
+                checkForLightIntersectWithWindowBorder(lightSource, Vec2(0, 0), Vec2(Crucible::WINDOW_WIDTH, 0));
+                checkForLightIntersectWithWindowBorder(lightSource, Vec2(0, 0), Vec2(0, Crucible::WINDOW_HEIGHT));
+                checkForLightIntersectWithWindowBorder(lightSource, Vec2(0, Crucible::WINDOW_HEIGHT), Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+                checkForLightIntersectWithWindowBorder(lightSource, Vec2(Crucible::WINDOW_WIDTH, 0), Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
             }
         }
     }
@@ -85,6 +91,19 @@ void CollisionSystem::checkForLightIntersectWithShape(Component::CLightSource& l
                             otherEntityRectangleShape.vertices[shapeLineEndIndex].position.y};
 
     Crucible::LightRayIntersect lightRayIntersect = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPos, shapeLineEndPos);
+    if (lightRayIntersect.result)
+    {
+        lightSource.lightRayIntersects.emplace_back(lightRayIntersect);
+    }
+}
+
+void CollisionSystem::checkForLightIntersectWithWindowBorder(Component::CLightSource& lightSource,
+        Vec2 windowBorderPosX, Vec2 windowBorderPosY)
+{
+    Vec2 lightSourceRayStartPos = {lightSource.rayVertices[0].position.x, lightSource.rayVertices[0].position.y};
+    Vec2 lightSourceRayEndPos = {lightSource.rayVertices[1].position.x, lightSource.rayVertices[1].position.y};
+
+    Crucible::LightRayIntersect lightRayIntersect = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, windowBorderPosX, windowBorderPosY);
     if (lightRayIntersect.result)
     {
         lightSource.lightRayIntersects.emplace_back(lightRayIntersect);

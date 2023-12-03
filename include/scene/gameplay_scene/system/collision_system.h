@@ -29,11 +29,16 @@ class CollisionSystem : public System
                 const Component::CShape& otherEntityRectangleShape, const Component::CTransform& otherEntityTransform,
                 const sf::FloatRect& overlap);
 
-        void checkForLightIntersectWithShape(
+        static void checkForLightIntersectWithShape(
                 Component::CLightSource& lightSource,
                 Component::CShape otherEntityRectangleShape,
                 size_t shapeLineStartIndex,
                 size_t shapeLineEndIndex);
+
+        static void checkForLightIntersectWithWindowBorder(
+                Component::CLightSource& lightSource,
+                Vec2 windowBorderPosX,
+                Vec2 windowBorderPosY);
 
         static sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
 
