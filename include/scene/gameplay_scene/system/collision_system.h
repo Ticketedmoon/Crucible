@@ -23,14 +23,27 @@ class CollisionSystem : public System
     private:
         static bool isCollidingAABB(const Component::CShape& entityRect,
                 const Component::CShape& otherEntityRect, sf::FloatRect& overlap);
+
         static void resolveCollision(
                 const Component::CShape& entityRectangleShape, Component::CTransform& entityTransform,
                 const Component::CShape& otherEntityRectangleShape, const Component::CTransform& otherEntityTransform,
                 const sf::FloatRect& overlap);
+
+        void checkForLightIntersectWithShape(
+                Component::CLightSource& lightSource,
+                Component::CShape otherEntityRectangleShape,
+                size_t shapeLineStartIndex,
+                size_t shapeLineEndIndex);
+
         static sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
-        static void applyCollisionManifoldToTransform(Component::CTransform& entityTransform, const sf::FloatRect& overlap,
+
+        static void applyCollisionManifoldToTransform(
+                Component::CTransform& entityTransform,
+                const sf::FloatRect& overlap,
                 const Vec2& result);
+
         static float crossProduct(Vec2 a, Vec2 b);
+
         static Crucible::LightRayIntersect isLineIntersecting(Vec2 vertexA, Vec2 vertexB, Vec2 vertexC, Vec2 vertexD);
 
     private:

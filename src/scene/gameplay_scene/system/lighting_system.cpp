@@ -7,13 +7,6 @@ LightingSystem::LightingSystem(EntityManager& entityManager) : m_entityManager(e
 
 void LightingSystem::execute()
 {
-    // Add 'lightSourceSystem' or similar.
-    // In the logic below, add all 'LightRayIntersect' objects that hit the line segment to list.
-    // Sort the list based on closest to player position and take the first item.
-    //   > - the player x, player y and take closet to 0
-    // Append that items vertices value to the lightVertices array.
-
-
     std::vector<Entity> entities = m_entityManager.getEntities();
     for (const Entity entity : entities)
     {
@@ -23,6 +16,10 @@ void LightingSystem::execute()
         }
 
         auto& entityLightSource = entity.getComponent<Component::CLightSource>();
+
+        // Clear current light vertices
+        entityLightSource.lightVertices.clear();
+
         if (entityLightSource.lightRayIntersects.empty())
         {
             continue;
@@ -45,9 +42,8 @@ void LightingSystem::execute()
             }
         }
 
-        // Clear current vertices and intersects if present
+        // Clear intersects after finding closest intersect.
         entityLightSource.lightRayIntersects.clear();
-        entityLightSource.lightVertices.clear();
 
         // Add that item to lightVertices array.
         Component::CShape entityRectangleShape = entity.getComponent<Component::CShape>();

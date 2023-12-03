@@ -23,58 +23,22 @@ void CollisionSystem::execute()
             auto& otherEntityRectangleShape = otherEntity.getComponent<Component::CShape>();
             auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
 
-            if (entity.hasComponent<Component::CLightSource>())
-            {
-                // @Refactor: Clean all of this up.
-                auto& lightSource = entity.getComponent<Component::CLightSource>();
-                Vec2 lightSourceRayStartPos = {lightSource.rayVertices[0].position.x, lightSource.rayVertices[0].position.y};
-                Vec2 lightSourceRayEndPos = {lightSource.rayVertices[1].position.x, lightSource.rayVertices[1].position.y};
-
-                Vec2 shapeLineStartPosA = {otherEntityRectangleShape.vertices[0].position.x, otherEntityRectangleShape.vertices[0].position.y};
-                Vec2 shapeLineEndPosA = {otherEntityRectangleShape.vertices[1].position.x, otherEntityRectangleShape.vertices[1].position.y};
-
-                Vec2 shapeLineStartPosB = {otherEntityRectangleShape.vertices[1].position.x, otherEntityRectangleShape.vertices[1].position.y};
-                Vec2 shapeLineEndPosB = {otherEntityRectangleShape.vertices[2].position.x, otherEntityRectangleShape.vertices[2].position.y};
-
-                Vec2 shapeLineStartPosC = {otherEntityRectangleShape.vertices[2].position.x, otherEntityRectangleShape.vertices[2].position.y};
-                Vec2 shapeLineEndPosC = {otherEntityRectangleShape.vertices[3].position.x, otherEntityRectangleShape.vertices[3].position.y};
-
-                Vec2 shapeLineStartPosD = {otherEntityRectangleShape.vertices[3].position.x, otherEntityRectangleShape.vertices[3].position.y};
-                Vec2 shapeLineEndPosD = {otherEntityRectangleShape.vertices[4].position.x, otherEntityRectangleShape.vertices[4].position.y};
-
-                sf::Color otherShapeColour = sf::Color::White;
-
-                Crucible::LightRayIntersect lineIntersectA = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosA, shapeLineEndPosA);
-                Crucible::LightRayIntersect lineIntersectB = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosB, shapeLineEndPosB);
-                Crucible::LightRayIntersect lineIntersectC = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosC, shapeLineEndPosC);
-                Crucible::LightRayIntersect lineIntersectD = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPosD, shapeLineEndPosD);
-
-                if (lineIntersectD.result)
-                {
-                    otherShapeColour = sf::Color::Green;
-                    lightSource.lightRayIntersects.emplace_back(lineIntersectD);
-                }
-                else if (lineIntersectC.result)
-                {
-                    otherShapeColour = sf::Color::Green;
-                    lightSource.lightRayIntersects.emplace_back(lineIntersectC);
-                }
-                else if (lineIntersectB.result)
-                {
-                    otherShapeColour = sf::Color::Green;
-                    lightSource.lightRayIntersects.emplace_back(lineIntersectB);
-                }
-                else if (lineIntersectA.result)
-                {
-                    otherShapeColour = sf::Color::Green;
-                    lightSource.lightRayIntersects.emplace_back(lineIntersectA);
-                }
-            }
-
             sf::FloatRect overlap;
             if (CollisionSystem::isCollidingAABB(entityRectangleShape, otherEntityRectangleShape, overlap))
             {
                 resolveCollision(entityRectangleShape, entityTransform, otherEntityRectangleShape, otherEntityTransform, overlap);
+                continue;
+            }
+
+            if (entity.hasComponent<Component::CLightSource>())
+            {
+                auto& lightSource = entity.getComponent<Component::CLightSource>();
+
+                // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.
+                checkForLightIntersectWithShape(lightSource,otherEntityRectangleShape, 3, 4);
+                checkForLightIntersectWithShape(lightSource,otherEntityRectangleShape, 2, 3);
+                checkForLightIntersectWithShape(lightSource,otherEntityRectangleShape, 1, 2);
+                checkForLightIntersectWithShape(lightSource,otherEntityRectangleShape, 0, 1);
             }
         }
     }
@@ -107,6 +71,25 @@ Crucible::LightRayIntersect CollisionSystem::isLineIntersecting(Vec2 vertexA, Ve
     }
 
     return {false, Vec2(0, 0)};
+}
+
+void CollisionSystem::checkForLightIntersectWithShape(Component::CLightSource& lightSource,
+        Component::CShape otherEntityRectangleShape, size_t shapeLineStartIndex, size_t shapeLineEndIndex)
+{
+    Vec2 lightSourceRayStartPos = {lightSource.rayVertices[0].position.x, lightSource.rayVertices[0].position.y};
+    Vec2 lightSourceRayEndPos = {lightSource.rayVertices[1].position.x, lightSource.rayVertices[1].position.y};
+
+    Vec2 shapeLineStartPos = {otherEntityRectangleShape.vertices[shapeLineStartIndex].position.x,
+                              otherEntityRectangleShape.vertices[shapeLineStartIndex].position.y};
+
+    Vec2 shapeLineEndPos = {otherEntityRectangleShape.vertices[shapeLineEndIndex].position.x,
+                            otherEntityRectangleShape.vertices[shapeLineEndIndex].position.y};
+
+    Crucible::LightRayIntersect lightRayIntersect = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPos, shapeLineEndPos);
+    if (lightRayIntersect.result)
+    {
+        lightSource.lightRayIntersects.emplace_back(lightRayIntersect);
+    }
 }
 
 float CollisionSystem::crossProduct(Vec2 a, Vec2 b)
