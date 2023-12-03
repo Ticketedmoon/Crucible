@@ -26,15 +26,13 @@ void GameplayScene::update()
 
 void GameplayScene::render()
 {
-    gameEngine.window.clear();
     m_renderTexture.clear(LEVEL_BACKGROUND_COLOR);
-
     m_systemManager.render();
-
     m_renderTexture.display();
     m_renderSprite.setTexture(m_renderTexture.getTexture());
-    gameEngine.window.draw(m_renderSprite, sf::RenderStates(sf::BlendAdd));
 
+    gameEngine.window.clear();
+    gameEngine.window.draw(m_renderSprite, sf::RenderStates(sf::BlendAdd));
     gameEngine.window.display();
 }
 
