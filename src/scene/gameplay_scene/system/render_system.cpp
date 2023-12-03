@@ -1,3 +1,4 @@
+#include <iostream>
 #include "render_system.h"
 
 RenderSystem::RenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager)
@@ -17,15 +18,17 @@ void RenderSystem::drawEntities()
     std::vector<Entity> entities = m_entityManager.getEntities();
     for (const Entity e : entities)
     {
+        if (e.hasComponent<Component::CLightSource>())
+        {
+            auto& cLightSource = e.getComponent<Component::CLightSource>();
+            sf::VertexArray& lightVertices = cLightSource.lightVertices;
+            std::cout << lightVertices.getVertexCount() << '\n';
+        }
+
         if (e.hasComponent<Component::CShape>())
         {
             auto& cShape = e.getComponent<Component::CShape>();
             m_renderTarget.draw(cShape.vertices);
-        }
-        if (e.hasComponent<Component::CLightSource>())
-        {
-            auto& cLightSource = e.getComponent<Component::CLightSource>();
-            m_renderTarget.draw(cLightSource.lightVertices);
         }
     }
 }

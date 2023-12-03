@@ -22,16 +22,24 @@ void TransformSystem::execute()
         {
             auto& lightSource = entity.getComponent<Component::CLightSource>();
 
+            // up
             float yDiff = std::abs(entityRectangleShape.vertices[0].position.y - entityRectangleShape.vertices[2].position.y) / 2;
             lightSource.rayVertices[0].position = {entityTransform.position.x, entityTransform.position.y - yDiff};
-
-            sf::Vector2f& lightSourceRayEndPosition = lightSource.rayVertices[1].position;
-
-            lightSourceRayEndPosition.x = entityTransform.position.x;
-            if (lightSourceRayEndPosition.y > 0)
+            lightSource.rayVertices[1].position.x = entityTransform.position.x;
+            if ( lightSource.rayVertices[1].position.y > 0)
             {
-                lightSourceRayEndPosition.y -= 100;
+                lightSource.rayVertices[1].position.y -= 100;
             }
+
+            // left
+            float xDiff = std::abs(entityRectangleShape.vertices[0].position.x - entityRectangleShape.vertices[1].position.x) / 2;
+            lightSource.rayVertices[2].position = {entityTransform.position.x - xDiff, entityTransform.position.y};
+
+            if ( lightSource.rayVertices[3].position.x > 0)
+            {
+                lightSource.rayVertices[3].position.x -= 100;
+            }
+            lightSource.rayVertices[3].position.y = entityTransform.position.y;
         }
 
         updateVertexPositionsForEntity(entityTransform, entityRectangleShape);

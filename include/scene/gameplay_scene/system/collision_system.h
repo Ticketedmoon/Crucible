@@ -32,11 +32,13 @@ class CollisionSystem : public System
         static void checkForLightIntersectWithShape(
                 Component::CLightSource& lightSource,
                 Component::CShape otherEntityRectangleShape,
+                size_t lineIndex,
                 size_t shapeLineStartIndex,
                 size_t shapeLineEndIndex);
 
         static void checkForLightIntersectWithWindowBorder(
                 Component::CLightSource& lightSource,
+                size_t lineIndex,
                 Vec2 windowBorderPosX,
                 Vec2 windowBorderPosY);
 

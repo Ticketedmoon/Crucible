@@ -40,18 +40,18 @@ namespace Component
 
     struct CShape
     {
-        sf::VertexArray vertices = sf::VertexArray(sf::LineStrip, 5);
+        sf::VertexArray vertices = sf::VertexArray(sf::LineStrip);
 
         bool has{};
     };
 
     struct CLightSource
     {
-        sf::VertexArray rayVertices = sf::VertexArray(sf::LineStrip, 2);
+        // Every 2 elements is a line, so to access the nth line, the index positions are: (v[i * 2], v[(i * 2) * 1])
+        sf::VertexArray rayVertices;
+        sf::VertexArray lightVertices;
 
-        sf::VertexArray lightVertices = sf::VertexArray(sf::LineStrip, 0);
-
-        std::vector<Crucible::LightRayIntersect> lightRayIntersects;
+        std::vector<std::vector<Crucible::LightRayIntersect>> lightRayIntersects;
 
         bool has{};
     };

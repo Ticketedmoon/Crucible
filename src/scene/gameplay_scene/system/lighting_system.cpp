@@ -23,33 +23,36 @@ void LightingSystem::execute()
         // Clear current light vertices
         entityLightSource.lightVertices.clear();
 
-        if (entityLightSource.lightRayIntersects.empty())
+        size_t totalLines = entityLightSource.rayVertices.getVertexCount() / 2;
+        for (int lineIndex = 0; lineIndex < totalLines; lineIndex++)
         {
-            continue;
-        }
 
-        // Find closest intersect point.
-        // Note: This will only work for 1 hit, if we want multiple ray hits we'll need a more scalable solution around
-        //       sorting nearest objects and such - add this later.
-        Crucible::LightRayIntersect closestIntersect = entityLightSource.lightRayIntersects.at(0);
-        double distToPlayer = entityTransform.position.dist(entityLightSource.lightRayIntersects.at(0).pos);
-        for (Crucible::LightRayIntersect intersect : entityLightSource.lightRayIntersects)
-        {
-            double nextDistToPlayer = entityTransform.position.dist(intersect.pos);
-            if (nextDistToPlayer < distToPlayer)
+            if (entityLightSource.lightRayIntersects[lineIndex].empty())
             {
-                distToPlayer = nextDistToPlayer;
-                closestIntersect = intersect;
+                continue;
             }
+
+            // Find closest intersect point.
+            // Note: This will only work for 1 hit, if we want multiple ray hits we'll need a more scalable solution around
+            //       sorting nearest objects and such - add this later.
+            Crucible::LightRayIntersect closestIntersect = entityLightSource.lightRayIntersects[lineIndex][0];
+            double distToPlayer = entityTransform.position.dist(entityLightSource.lightRayIntersects[lineIndex][0].pos);
+            for (Crucible::LightRayIntersect intersect: entityLightSource.lightRayIntersects[lineIndex])
+            {
+                double nextDistToPlayer = entityTransform.position.dist(intersect.pos);
+                if (nextDistToPlayer < distToPlayer)
+                {
+                    distToPlayer = nextDistToPlayer;
+                    closestIntersect = intersect;
+                }
+            }
+
+            // Clear intersects after finding closest intersect.
+            entityLightSource.lightRayIntersects[lineIndex].clear();
+
+            // Add that item to lightVertices array.
+            entityLightSource.lightVertices.append(sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow));
+            entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.pos.x, closestIntersect.pos.y}, sf::Color::Yellow));
         }
-
-        // Clear intersects after finding closest intersect.
-        entityLightSource.lightRayIntersects.clear();
-
-        // Add that item to lightVertices array.
-        float yDiff =
-                std::abs(entityRectangleShape.vertices[0].position.y - entityRectangleShape.vertices[2].position.y) / 2;
-        entityLightSource.lightVertices.append(sf::Vertex({entityTransform.position.x, entityTransform.position.y - yDiff}, sf::Color::Yellow));
-        entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.pos.x, closestIntersect.pos.y}, sf::Color::Yellow));
     }
 }
