@@ -22,7 +22,7 @@ void RenderSystem::drawEntities()
         {
             auto& cLightSource = e.getComponent<Component::CLightSource>();
             sf::VertexArray& lightVertices = cLightSource.lightVertices;
-            std::cout << lightVertices.getVertexCount() << '\n';
+            m_renderTarget.draw(&lightVertices[0], 4, sf::Lines);
         }
 
         if (e.hasComponent<Component::CShape>())
