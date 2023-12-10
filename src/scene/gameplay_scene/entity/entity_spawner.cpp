@@ -29,22 +29,16 @@ void EntitySpawner::spawnPlayer()
 
     // TODO put ray coords into separate file
 
-    // Up
+    // Cardinal Directions [Up, Down, Left, Right]
     rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, -rayGrowSpeed}, sf::Color::Yellow));
-    // Down
     rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, rayGrowSpeed}, sf::Color::Yellow));
-    // Left
     rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {-rayGrowSpeed, 0}, sf::Color::Yellow));
-    // Right
     rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {rayGrowSpeed, 0}, sf::Color::Yellow));
 
-    // Diagonal-Up-Left
+    // Diagonal Directions [Diagonal-Up-Left, Diagonal-Up-Right, Diagonal-Down-Left, Diagonal-Down-Right]
     rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {-rayGrowSpeed, -rayGrowSpeed}, sf::Color::Yellow));
-    // Diagonal-Up-Right
     rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {rayGrowSpeed, -rayGrowSpeed}, sf::Color::Yellow));
-    // Diagonal-Down-Left
     rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {-rayGrowSpeed, rayGrowSpeed}, sf::Color::Yellow));
-    // Diagonal-Down-Right
     rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {rayGrowSpeed, rayGrowSpeed}, sf::Color::Yellow));
 
     std::cout << "Found: [" << rayEndVertices.size() << "] light rays" << '\n';
