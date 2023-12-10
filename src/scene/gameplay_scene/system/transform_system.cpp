@@ -33,7 +33,7 @@ void TransformSystem::execute()
             for (Crucible::Vertex& v : lightSource.rayStartVertices)
             {
                 // Start rays to scale based off player position
-                v.position = entityTransform.position;
+                v.position = {entityTransform.position.x, entityTransform.position.y};
             }
             for (Crucible::Vertex& v : lightSource.rayEndVertices)
             {

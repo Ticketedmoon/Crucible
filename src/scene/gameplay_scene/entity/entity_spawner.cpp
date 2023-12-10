@@ -15,7 +15,7 @@ void EntitySpawner::spawnPlayer()
     std::vector<Crucible::Vertex> rayStartVertices;
     std::vector<Crucible::Vertex> rayEndVertices;
 
-    constexpr uint8_t rayGrowSpeed = 10;
+    constexpr uint8_t rayGrowSpeed = 100;
 
     // FIXME, can we reuse the same ray start vertex? It will always be the same originating point.
     rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
