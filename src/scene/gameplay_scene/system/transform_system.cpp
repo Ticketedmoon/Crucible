@@ -25,39 +25,20 @@ void TransformSystem::execute()
             // TODO: We should just scale the vectors not arbitrarily update x or y.
             //       This will enable us to apply rotations on lines and arbitrarily scale until a collision.
 
-            float xDiff = std::abs(entityRectangleShape.vertices[0].position.x - entityRectangleShape.vertices[1].position.x) / 2;
-            float yDiff = std::abs(entityRectangleShape.vertices[0].position.y - entityRectangleShape.vertices[2].position.y) / 2;
-
             // up
-            lightSource.rayVertices[0].position = {entityTransform.position.x, entityTransform.position.y - yDiff};
-            lightSource.rayVertices[1].position.x = entityTransform.position.x;
-            if ( lightSource.rayVertices[1].position.y > 0)
-            {
-                lightSource.rayVertices[1].position.y -= 100;
-            }
+            // in entity_spawner find vertex for vertex[1], so it points in directly.
+            // This system should only scale the vector until it reaches interesectionds);
 
-            // down
-            lightSource.rayVertices[2].position = {entityTransform.position.x, entityTransform.position.y + yDiff};
-            lightSource.rayVertices[3].position.x = entityTransform.position.x;
-            if ( lightSource.rayVertices[3].position.y < Crucible::WINDOW_HEIGHT)
+            // scale
+            for (Crucible::Vertex& v : lightSource.rayStartVertices)
             {
-                lightSource.rayVertices[3].position.y += 100;
+                // Start rays to scale based off player position
+                v.position = entityTransform.position;
             }
-
-            // left
-            lightSource.rayVertices[4].position = {entityTransform.position.x - xDiff, entityTransform.position.y};
-            lightSource.rayVertices[5].position.y = entityTransform.position.y;
-            if ( lightSource.rayVertices[5].position.x > 0)
+            for (Crucible::Vertex& v : lightSource.rayEndVertices)
             {
-                lightSource.rayVertices[5].position.x -= 100;
-            }
-
-            // right
-            lightSource.rayVertices[6].position = {entityTransform.position.x + xDiff, entityTransform.position.y};
-            lightSource.rayVertices[7].position.y = entityTransform.position.y;
-            if ( lightSource.rayVertices[7].position.x < Crucible::WINDOW_WIDTH)
-            {
-                lightSource.rayVertices[7].position.x += 100;
+                // end points can scale normally
+                v.position += v.increment;
             }
         }
 

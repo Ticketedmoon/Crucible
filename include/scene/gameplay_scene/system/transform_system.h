@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <cmath>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>

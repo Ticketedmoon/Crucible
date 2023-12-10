@@ -22,7 +22,7 @@ void LightingSystem::execute()
         // Clear current light vertices
         entityLightSource.lightVertices.clear();
 
-        size_t totalLines = entityLightSource.rayVertices.getVertexCount() / 2;
+        size_t totalLines = entityLightSource.rayStartVertices.size();
         for (int lineIndex = 0; lineIndex < totalLines; lineIndex++)
         {
 
@@ -50,9 +50,12 @@ void LightingSystem::execute()
             entityLightSource.lightRayIntersects[lineIndex].clear();
 
             // Add that item to lightVertices array.
-            entityLightSource.lightVertices.append(sf::Vertex({entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow));
-            entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.nearestShapeVertices[0].x, closestIntersect.nearestShapeVertices[0].y}, sf::Color::Yellow));
-            entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.nearestShapeVertices[1].x, closestIntersect.nearestShapeVertices[1].y}, sf::Color::Yellow));
+            entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
+            entityLightSource.lightVertices.append({{closestIntersect.collisionPoint.x, closestIntersect.collisionPoint.y}, sf::Color::Yellow});
+
+            // debug
+            //entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.nearestShapeVertices[0].x, closestIntersect.nearestShapeVertices[0].y}, sf::Color::Yellow));
+            //entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.nearestShapeVertices[1].x, closestIntersect.nearestShapeVertices[1].y}, sf::Color::Yellow));
         }
     }
 }

@@ -21,7 +21,9 @@ void RenderSystem::drawEntities()
         {
             auto& cLightSource = e.getComponent<Component::CLightSource>();
             sf::VertexArray& lightVertices = cLightSource.lightVertices;
-            m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::TriangleFan);
+            //m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::TriangleFan);
+            // debug
+            m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::Lines);
         }
 
         if (e.hasComponent<Component::CShape>())

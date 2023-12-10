@@ -31,7 +31,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
         controllableComponents.insert(controllableComponents.begin() + i, {{}, false});
         collisionComponents.insert(collisionComponents.begin() + i, {{}, false});
         rectShapeComponents.insert(rectShapeComponents.begin() + i, {{}, false});
-        lightSourceComponents.insert(lightSourceComponents.begin() + i, {{}, {}, {}, false});
+        lightSourceComponents.insert(lightSourceComponents.begin() + i, {{}, {}, {}, {}, false});
     }
 
     assert(std::tuple_size_v<EntityComponentVectorTuple> == TOTAL_RESERVED_COMPONENT_TYPE_GROUPS);

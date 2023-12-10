@@ -12,26 +12,42 @@ void EntitySpawner::spawnPlayer()
     Vec2 position{Crucible::WINDOW_WIDTH / 2.0f, Crucible::WINDOW_HEIGHT - 128};
     Vec2 dimensions{50, 50};
 
-    int TOTAL_LIGHT_RAYS = 4;
+    std::vector<Crucible::Vertex> rayStartVertices;
+    std::vector<Crucible::Vertex> rayEndVertices;
 
-    sf::VertexArray rayVertices = sf::VertexArray(sf::LineStrip, TOTAL_LIGHT_RAYS * 2);
+    constexpr uint8_t rayGrowSpeed = 10;
+
+    // FIXME, can we reuse the same ray start vertex? It will always be the same originating point.
+    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
+    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
+    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
+    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
+    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
+    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
+    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
+    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
+
+    // TODO put ray coords into separate file
 
     // Up
-    rayVertices[0] = sf::Vertex({position.x, position.y - dimensions.y / 2}, sf::Color::Yellow);
-    rayVertices[1] = sf::Vertex({position.x, position.y - dimensions.y / 2}, sf::Color::Yellow);
-
+    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, -rayGrowSpeed}, sf::Color::Yellow));
     // Down
-    rayVertices[2] = sf::Vertex({position.x, position.y + dimensions.y / 2}, sf::Color::Yellow);
-    rayVertices[3] = sf::Vertex({position.x, position.y + dimensions.y / 2}, sf::Color::Yellow);
-
+    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, rayGrowSpeed}, sf::Color::Yellow));
     // Left
-    rayVertices[4] = sf::Vertex({position.x - dimensions.x / 2, position.y}, sf::Color::Yellow);
-    rayVertices[5] = sf::Vertex({position.x - dimensions.x / 2, position.y}, sf::Color::Yellow);
-
+    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {-rayGrowSpeed, 0}, sf::Color::Yellow));
     // Right
-    rayVertices[6] = sf::Vertex({position.x + dimensions.x / 2, position.y}, sf::Color::Yellow);
-    rayVertices[7] = sf::Vertex({position.x + dimensions.x / 2, position.y}, sf::Color::Yellow);
-    std::cout << "Found: [" << rayVertices.getVertexCount()/2 << "] light rays" << '\n';
+    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {rayGrowSpeed, 0}, sf::Color::Yellow));
+
+    // Diagonal-Up-Left
+    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {-rayGrowSpeed, -rayGrowSpeed}, sf::Color::Yellow));
+    // Diagonal-Up-Right
+    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {rayGrowSpeed, -rayGrowSpeed}, sf::Color::Yellow));
+    // Diagonal-Down-Left
+    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {-rayGrowSpeed, rayGrowSpeed}, sf::Color::Yellow));
+    // Diagonal-Down-Right
+    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {rayGrowSpeed, rayGrowSpeed}, sf::Color::Yellow));
+
+    std::cout << "Found: [" << rayEndVertices.size() << "] light rays" << '\n';
 
     sf::VertexArray shapeVertices(sf::Quads);
     shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, sf::Color::Green));
@@ -40,13 +56,14 @@ void EntitySpawner::spawnPlayer()
     shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y + dimensions.y/2}, sf::Color::Green));
     shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, sf::Color::Green));
 
+    // FIXME temp magic num
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
-            std::vector<std::vector<Crucible::LightRayIntersect>>(TOTAL_LIGHT_RAYS, std::vector<Crucible::LightRayIntersect>());
+            std::vector<std::vector<Crucible::LightRayIntersect>>(8, std::vector<Crucible::LightRayIntersect>());
 
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CTransform>(position);
     e.addComponent<Component::CShape>(shapeVertices);
-    e.addComponent<Component::CLightSource>(rayVertices, sf::VertexArray(), defaultLightRayIntersects);
+    e.addComponent<Component::CLightSource>(rayStartVertices, rayEndVertices, sf::VertexArray(), defaultLightRayIntersects);
 }
 
 void EntitySpawner::spawnWall(Vec2 position, Vec2 dimensions)

@@ -9,6 +9,7 @@
 #include "system.h"
 #include "entity_manager.h"
 #include "common_constants.h"
+#include "vertex.h"
 
 class EntitySpawner
 {

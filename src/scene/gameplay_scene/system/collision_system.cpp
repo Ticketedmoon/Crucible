@@ -33,7 +33,7 @@ void CollisionSystem::execute()
             {
                 auto& lightSource = entity.getComponent<Component::CLightSource>();
 
-                size_t totalLines = lightSource.rayVertices.getVertexCount() / 2;
+                size_t totalLines = lightSource.rayStartVertices.size();
                 for (int lineIndex = 0; lineIndex < totalLines; lineIndex++)
                 {
                     // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.
@@ -93,11 +93,8 @@ void CollisionSystem::checkForLightIntersectWithShape(Component::CLightSource& l
         size_t lineIndex,
         size_t shapeLineStartIndex, size_t shapeLineEndIndex)
 {
-    size_t rayStartPositionIndex = lineIndex * 2;
-    size_t rayEndPositionIndex = (lineIndex * 2) + 1;
-
-    Vec2 lightSourceRayStartPos = {lightSource.rayVertices[rayStartPositionIndex].position.x, lightSource.rayVertices[rayStartPositionIndex].position.y};
-    Vec2 lightSourceRayEndPos = {lightSource.rayVertices[rayEndPositionIndex].position.x, lightSource.rayVertices[rayEndPositionIndex].position.y};
+    Vec2 lightSourceRayStartPos = {lightSource.rayStartVertices[lineIndex].position.x, lightSource.rayStartVertices[lineIndex].position.y};
+    Vec2 lightSourceRayEndPos = {lightSource.rayEndVertices[lineIndex].position.x, lightSource.rayEndVertices[lineIndex].position.y};
 
     Vec2 shapeLineStartPos = {otherEntityRectangleShape.vertices[shapeLineStartIndex].position.x,
                               otherEntityRectangleShape.vertices[shapeLineStartIndex].position.y};
@@ -117,11 +114,8 @@ void CollisionSystem::checkForLightIntersectWithWindowBorder(Component::CLightSo
         size_t lineIndex,
         Vec2 windowBorderPosX, Vec2 windowBorderPosY)
 {
-    size_t rayStartPositionIndex = lineIndex * 2;
-    size_t rayEndPositionIndex = (lineIndex * 2) + 1;
-
-    Vec2 lightSourceRayStartPos = {lightSource.rayVertices[rayStartPositionIndex].position.x, lightSource.rayVertices[rayStartPositionIndex].position.y};
-    Vec2 lightSourceRayEndPos = {lightSource.rayVertices[rayEndPositionIndex].position.x, lightSource.rayVertices[rayEndPositionIndex].position.y};
+    Vec2 lightSourceRayStartPos = {lightSource.rayStartVertices[lineIndex].position.x, lightSource.rayStartVertices[lineIndex].position.y};
+    Vec2 lightSourceRayEndPos = {lightSource.rayEndVertices[lineIndex].position.x, lightSource.rayEndVertices[lineIndex].position.y};
 
     Crucible::LightRayIntersect lightRayIntersect = isLineIntersecting(lightSourceRayStartPos, lightSourceRayEndPos, windowBorderPosX, windowBorderPosY);
     if (lightRayIntersect.hasIntersection)
