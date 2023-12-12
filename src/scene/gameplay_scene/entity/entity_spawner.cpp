@@ -10,36 +10,23 @@ void EntitySpawner::spawnPlayer()
     auto e = m_entityManager.addEntity(Crucible::EntityType::PLAYER);
 
     Vec2 position{Crucible::WINDOW_WIDTH / 2.0f, Crucible::WINDOW_HEIGHT - 128};
-    Vec2 dimensions{50, 50};
+    float PLAYER_SIZE = 50;
+    Vec2 dimensions{PLAYER_SIZE, PLAYER_SIZE};
 
     std::vector<Crucible::Vertex> rayStartVertices;
     std::vector<Crucible::Vertex> rayEndVertices;
 
-    constexpr uint8_t rayGrowSpeed = 100;
-
-    // FIXME, can we reuse the same ray start vertex? It will always be the same originating point.
-    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
-    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
-    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
-    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
-    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
-    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
-    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
-    rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
-
-    // TODO put ray coords into separate file
-
-    // Cardinal Directions [Up, Down, Left, Right]
-    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, -rayGrowSpeed}, sf::Color::Yellow));
-    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, rayGrowSpeed}, sf::Color::Yellow));
-    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {-rayGrowSpeed, 0}, sf::Color::Yellow));
-    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {rayGrowSpeed, 0}, sf::Color::Yellow));
-
-    // Diagonal Directions [Diagonal-Up-Left, Diagonal-Up-Right, Diagonal-Down-Left, Diagonal-Down-Right]
-    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {-rayGrowSpeed, -rayGrowSpeed}, sf::Color::Yellow));
-    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {rayGrowSpeed, -rayGrowSpeed}, sf::Color::Yellow));
-    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {-rayGrowSpeed, rayGrowSpeed}, sf::Color::Yellow));
-    rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {rayGrowSpeed, rayGrowSpeed}, sf::Color::Yellow));
+    int TOTAL_RAYS = 360;
+    for (int i = 0; i < TOTAL_RAYS; i++)
+    {
+        rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
+        double r = dimensions.x / 2;
+        constexpr double SCALE = 500.0f;
+        float x = position.x + (cos(i) * r * SCALE);
+        float y = position.y + (sin(i) * r * SCALE);
+        Vec2 xy = Vec2(x, y);
+        rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, xy, sf::Color::Yellow));
+    }
 
     std::cout << "Found: [" << rayEndVertices.size() << "] light rays" << '\n';
 
@@ -52,7 +39,7 @@ void EntitySpawner::spawnPlayer()
 
     // FIXME temp magic num
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
-            std::vector<std::vector<Crucible::LightRayIntersect>>(8, std::vector<Crucible::LightRayIntersect>());
+            std::vector<std::vector<Crucible::LightRayIntersect>>(TOTAL_RAYS, std::vector<Crucible::LightRayIntersect>());
 
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CTransform>(position);

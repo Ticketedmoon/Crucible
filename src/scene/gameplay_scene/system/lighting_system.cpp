@@ -22,40 +22,53 @@ void LightingSystem::execute()
         // Clear current light vertices
         entityLightSource.lightVertices.clear();
 
-        size_t totalLines = entityLightSource.rayStartVertices.size();
-        for (int lineIndex = 0; lineIndex < totalLines; lineIndex++)
+        addVerticesForLightCollisions(entityLightSource, entityTransform);
+    }
+}
+
+void LightingSystem::addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
+        const Component::CTransform& entityTransform) const
+{
+    size_t totalLines = entityLightSource.rayStartVertices.size();
+
+    for (int lineIndex = 0; lineIndex < totalLines; lineIndex += 2)
+    {
+        std::vector<Crucible::LightRayIntersect>& intersectListA = entityLightSource.lightRayIntersects[lineIndex];
+        std::vector<Crucible::LightRayIntersect>& intersectListB = entityLightSource.lightRayIntersects[lineIndex+1];
+        if (intersectListA.empty() || intersectListB.empty())
         {
+            continue;
+        }
 
-            if (entityLightSource.lightRayIntersects[lineIndex].empty())
-            {
-                continue;
-            }
+        // Find closest intersect point.
+        Crucible::LightRayIntersect closestIntersectA = findClosestIntersectForLine(entityTransform, intersectListA);
+        Crucible::LightRayIntersect closestIntersectB = findClosestIntersectForLine(entityTransform, intersectListB);
 
-            // Find closest intersect point.
-            // Note: This will only work for 1 hit, if we want multiple ray hits we'll need a more scalable solution around
-            //       sorting nearest objects and such - add this later.
-            Crucible::LightRayIntersect closestIntersect = entityLightSource.lightRayIntersects[lineIndex][0];
-            double distToPlayer = entityTransform.position.dist(entityLightSource.lightRayIntersects[lineIndex][0].collisionPoint);
-            for (Crucible::LightRayIntersect intersect: entityLightSource.lightRayIntersects[lineIndex])
-            {
-                double nextDistToPlayer = entityTransform.position.dist(intersect.collisionPoint);
-                if (nextDistToPlayer < distToPlayer)
-                {
-                    distToPlayer = nextDistToPlayer;
-                    closestIntersect = intersect;
-                }
-            }
+        // Clear intersects after finding closest intersect.
+        intersectListA.clear();
+        intersectListB.clear();
 
-            // Clear intersects after finding closest intersect.
-            entityLightSource.lightRayIntersects[lineIndex].clear();
+        // Add player position as starting vertex
+        entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
+        entityLightSource.lightVertices.append({{closestIntersectA.collisionPoint.x, closestIntersectA.collisionPoint.y}, sf::Color::Yellow});
+        entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
+        entityLightSource.lightVertices.append({{closestIntersectB.collisionPoint.x, closestIntersectB.collisionPoint.y}, sf::Color::Yellow});
+    }
+}
 
-            // Add that item to lightVertices array.
-            entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
-            entityLightSource.lightVertices.append({{closestIntersect.collisionPoint.x, closestIntersect.collisionPoint.y}, sf::Color::Yellow});
-
-            // debug
-            //entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.nearestShapeVertices[0].x, closestIntersect.nearestShapeVertices[0].y}, sf::Color::Yellow));
-            //entityLightSource.lightVertices.append(sf::Vertex({closestIntersect.nearestShapeVertices[1].x, closestIntersect.nearestShapeVertices[1].y}, sf::Color::Yellow));
+Crucible::LightRayIntersect LightingSystem::findClosestIntersectForLine(const Component::CTransform& entityTransform,
+        std::vector<Crucible::LightRayIntersect>& intersectList) const
+{
+    Crucible::LightRayIntersect closestIntersect = intersectList[0];
+    double distToPlayer = entityTransform.position.dist(intersectList[0].collisionPoint);
+    for (Crucible::LightRayIntersect intersect: intersectList)
+    {
+        double nextDistToPlayer = entityTransform.position.dist(intersect.collisionPoint);
+        if (nextDistToPlayer < distToPlayer)
+        {
+            distToPlayer = nextDistToPlayer;
+            closestIntersect = intersect;
         }
     }
+    return closestIntersect;
 }

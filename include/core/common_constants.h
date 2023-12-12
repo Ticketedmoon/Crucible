@@ -31,8 +31,6 @@ namespace Crucible
         bool hasIntersection{};
 
         Vec2 collisionPoint;
-
-        std::array<Vec2, 2> nearestShapeVertices;
     };
 }
 

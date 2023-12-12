@@ -29,18 +29,12 @@ class CollisionSystem : public System
                 const Component::CShape& otherEntityRectangleShape, const Component::CTransform& otherEntityTransform,
                 const sf::FloatRect& overlap);
 
-        static void checkForLightIntersectWithShape(
+        static bool checkForLightIntersectWithShape(
                 Component::CLightSource& lightSource,
                 Component::CShape otherEntityRectangleShape,
                 size_t lineIndex,
                 size_t shapeLineStartIndex,
                 size_t shapeLineEndIndex);
-
-        static void checkForLightIntersectWithWindowBorder(
-                Component::CLightSource& lightSource,
-                size_t lineIndex,
-                Vec2 windowBorderPosX,
-                Vec2 windowBorderPosY);
 
         static sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
 
@@ -51,7 +45,8 @@ class CollisionSystem : public System
 
         static float crossProduct(Vec2 a, Vec2 b);
 
-        static Crucible::LightRayIntersect isLineIntersecting(Vec2 vertexA, Vec2 vertexB, Vec2 vertexC, Vec2 vertexD);
+        static Crucible::LightRayIntersect isLineIntersecting(bool isShapeCollision,
+                Vec2 vertexA, Vec2 vertexB, Vec2 vertexC, Vec2 vertexD);
 
     private:
         EntityManager& m_entityManager;
