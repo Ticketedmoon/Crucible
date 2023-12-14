@@ -49,7 +49,7 @@ void TransformSystem::execute()
 void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform)
 {
     auto& controllable = e.getComponent<Component::CControllable>();
-    float SPEED = 2.0f;
+    float SPEED = 3.5f;
 
     if (controllable.isMovingLeft)
     {

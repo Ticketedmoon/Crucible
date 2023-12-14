@@ -21,10 +21,9 @@ void EntitySpawner::spawnPlayer()
     constexpr int DEGREE_INCREMENT = TOTAL_DEGREES_CIRCLE / TOTAL_RAYS;
     constexpr int RAY_SPEED = 1000;
 
-    for (int rayAngleDegrees = 0; rayAngleDegrees < TOTAL_DEGREES_CIRCLE; rayAngleDegrees+=DEGREE_INCREMENT)
+    for (int rayAngleDegrees = 0; rayAngleDegrees <= TOTAL_DEGREES_CIRCLE; rayAngleDegrees+=DEGREE_INCREMENT)
     {
         rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
-        std::cout << "Ray angle: " << rayAngleDegrees << '\n';
         double rayAngleRadians = degrees_to_radians(rayAngleDegrees);
         double x = std::cos(rayAngleRadians) * RAY_SPEED;
         double y = std::sin(rayAngleRadians) * RAY_SPEED;
@@ -43,7 +42,7 @@ void EntitySpawner::spawnPlayer()
 
     // FIXME temp magic num
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
-            std::vector<std::vector<Crucible::LightRayIntersect>>(TOTAL_RAYS, std::vector<Crucible::LightRayIntersect>());
+            std::vector<std::vector<Crucible::LightRayIntersect>>(TOTAL_RAYS + 1, std::vector<Crucible::LightRayIntersect>());
 
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CTransform>(position);

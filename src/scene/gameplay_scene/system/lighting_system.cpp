@@ -31,28 +31,24 @@ void LightingSystem::addVerticesForLightCollisions(Component::CLightSource& enti
 {
     size_t totalLines = entityLightSource.rayStartVertices.size();
 
-    for (int lineIndex = 0; lineIndex < totalLines; lineIndex += 2)
+    // Add player position as starting vertex
+    entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
+
+    for (int lineIndex = 0; lineIndex < totalLines; lineIndex++)
     {
-        std::vector<Crucible::LightRayIntersect>& intersectListA = entityLightSource.lightRayIntersects[lineIndex];
-        std::vector<Crucible::LightRayIntersect>& intersectListB = entityLightSource.lightRayIntersects[lineIndex+1];
-        if (intersectListA.empty() || intersectListB.empty())
+        std::vector<Crucible::LightRayIntersect>& intersectList = entityLightSource.lightRayIntersects[lineIndex];
+        if (intersectList.empty())
         {
             continue;
         }
 
         // Find closest intersect point.
-        Crucible::LightRayIntersect closestIntersectA = findClosestIntersectForLine(entityTransform, intersectListA);
-        Crucible::LightRayIntersect closestIntersectB = findClosestIntersectForLine(entityTransform, intersectListB);
+        Crucible::LightRayIntersect closestIntersect = findClosestIntersectForLine(entityTransform, intersectList);
 
         // Clear intersects after finding closest intersect.
-        intersectListA.clear();
-        intersectListB.clear();
+        intersectList.clear();
 
-        // Add player position as starting vertex
-        entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
-        entityLightSource.lightVertices.append({{closestIntersectA.collisionPoint.x, closestIntersectA.collisionPoint.y}, sf::Color::Yellow});
-        entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
-        entityLightSource.lightVertices.append({{closestIntersectB.collisionPoint.x, closestIntersectB.collisionPoint.y}, sf::Color::Yellow});
+        entityLightSource.lightVertices.append({{closestIntersect.collisionPoint.x, closestIntersect.collisionPoint.y}, sf::Color::Yellow});
     }
 }
 
