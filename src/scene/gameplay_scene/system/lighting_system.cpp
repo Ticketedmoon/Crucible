@@ -32,23 +32,55 @@ void LightingSystem::addVerticesForLightCollisions(Component::CLightSource& enti
     size_t totalLines = entityLightSource.rayStartVertices.size();
 
     // Add player position as starting vertex
-    entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
+    //entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
 
-    for (int lineIndex = 0; lineIndex < totalLines; lineIndex++)
+    for (int lineIndex = 0; lineIndex < totalLines-1; lineIndex+=2)
     {
-        std::vector<Crucible::LightRayIntersect>& intersectList = entityLightSource.lightRayIntersects[lineIndex];
-        if (intersectList.empty())
+        std::vector<Crucible::LightRayIntersect>& intersectListA = entityLightSource.lightRayIntersects[lineIndex];
+        std::vector<Crucible::LightRayIntersect>& intersectListB = entityLightSource.lightRayIntersects[lineIndex+1];
+        if (intersectListA.empty() || intersectListB.empty())
         {
             continue;
         }
 
         // Find closest intersect point.
-        Crucible::LightRayIntersect closestIntersect = findClosestIntersectForLine(entityTransform, intersectList);
+        Crucible::LightRayIntersect closestIntersectA = findClosestIntersectForLine(entityTransform, intersectListA);
+        Crucible::LightRayIntersect closestIntersectB = findClosestIntersectForLine(entityTransform, intersectListB);
+
+        entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
+        addVertexForTriangleFanLightSource(entityLightSource, closestIntersectB, closestIntersectA);
+
+        entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
+        addVertexForTriangleFanLightSource(entityLightSource, closestIntersectA, closestIntersectB);
 
         // Clear intersects after finding closest intersect.
-        intersectList.clear();
+        intersectListA.clear();
+        intersectListB.clear();
+    }
+}
 
-        entityLightSource.lightVertices.append({{closestIntersect.collisionPoint.x, closestIntersect.collisionPoint.y}, sf::Color::Yellow});
+// If B is colliding with any shape, take the nearest line segment corner to the previous rays end point.
+// Q: Do we base it off the previous rays collision point? Or corner point
+void LightingSystem::addVertexForTriangleFanLightSource(Component::CLightSource& entityLightSource,
+        const Crucible::LightRayIntersect& closestIntersectA,
+        const Crucible::LightRayIntersect& closestIntersectB) const
+{
+    if (closestIntersectB.isShapeIntersection)
+    {
+        double distToStartVertex = closestIntersectA.collisionPoint.dist(closestIntersectB.collidedLineStartVertex);
+        double distToEndVertex = closestIntersectA.collisionPoint.dist(closestIntersectB.collidedLineEndVertex);
+        if (distToStartVertex < distToEndVertex)
+        {
+            entityLightSource.lightVertices.append({{closestIntersectB.collidedLineStartVertex.x, closestIntersectB.collidedLineStartVertex.y}, sf::Color::Yellow});
+        }
+        else
+        {
+            entityLightSource.lightVertices.append({{closestIntersectB.collidedLineEndVertex.x, closestIntersectB.collidedLineEndVertex.y}, sf::Color::Yellow});
+        }
+    }
+    else
+    {
+        entityLightSource.lightVertices.append({{closestIntersectB.collisionPoint.x, closestIntersectB.collisionPoint.y}, sf::Color::Yellow});
     }
 }
 

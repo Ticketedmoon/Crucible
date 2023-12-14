@@ -16,7 +16,7 @@ void EntitySpawner::spawnPlayer()
     std::vector<Crucible::Vertex> rayStartVertices;
     std::vector<Crucible::Vertex> rayEndVertices;
 
-    constexpr int TOTAL_RAYS = 360;
+    constexpr int TOTAL_RAYS = 45;
     constexpr int TOTAL_DEGREES_CIRCLE = 360;
     assert(TOTAL_DEGREES_CIRCLE % TOTAL_RAYS == 0);
 

@@ -20,6 +20,9 @@ class LightingSystem : public System
 
     private:
         EntityManager& m_entityManager;
+        void addVertexForTriangleFanLightSource(Component::CLightSource& entityLightSource,
+                const Crucible::LightRayIntersect& closestIntersectA,
+                const Crucible::LightRayIntersect& closestIntersectB) const;
 };
 
 
