@@ -35,42 +35,42 @@ void CollisionSystem::execute()
 
                 for (int lineIndex = 0; lineIndex <  lightSource.rayStartVertices.size(); lineIndex++)
                 {
-                    // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.
-                    bool hasIntersectA = checkForLightIntersectWithShape(lightSource, otherEntityRectangleShape, lineIndex, 3, 4);
-                    bool hasIntersectB = checkForLightIntersectWithShape(lightSource, otherEntityRectangleShape, lineIndex, 2, 3);
-                    bool hasIntersectC = checkForLightIntersectWithShape(lightSource, otherEntityRectangleShape, lineIndex, 1, 2);
-                    bool hasIntersectD = checkForLightIntersectWithShape(lightSource, otherEntityRectangleShape, lineIndex, 0, 1);
+                    checkForLightIntersectWithShape(otherEntityRectangleShape, lightSource, lineIndex);
 
-                    bool isRayCollidingWithSideOfShape = hasIntersectA || hasIntersectB || hasIntersectC || hasIntersectD;
-                    if (isRayCollidingWithSideOfShape)
-                    {
-                        continue;
-                    }
-
-                    Vec2 lightSourceRayStartPos = {lightSource.rayStartVertices[lineIndex].position.x, lightSource.rayStartVertices[lineIndex].position.y};
-                    Vec2 lightSourceRayEndPos = {lightSource.rayEndVertices[lineIndex].position.x, lightSource.rayEndVertices[lineIndex].position.y};
-                    Crucible::LightRayIntersect windowBorderIntersectionA = isLineIntersecting(false, lightSourceRayStartPos, lightSourceRayEndPos, Vec2(0, 0), Vec2(Crucible::WINDOW_WIDTH, 0));
-                    Crucible::LightRayIntersect windowBorderIntersectionB = isLineIntersecting(false, lightSourceRayStartPos, lightSourceRayEndPos, Vec2(0, Crucible::WINDOW_HEIGHT), Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
-                    Crucible::LightRayIntersect windowBorderIntersectionC = isLineIntersecting(false, lightSourceRayStartPos, lightSourceRayEndPos, Vec2(0, 0), Vec2(0, Crucible::WINDOW_HEIGHT));
-                    Crucible::LightRayIntersect windowBorderIntersectionD = isLineIntersecting(false, lightSourceRayStartPos, lightSourceRayEndPos, Vec2(Crucible::WINDOW_WIDTH, 0), Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
-                    if (windowBorderIntersectionA.hasIntersection)
-                    {
-                        lightSource.lightRayIntersects[lineIndex].emplace_back(windowBorderIntersectionA);
-                    }
-                    if (windowBorderIntersectionB.hasIntersection)
-                    {
-                        lightSource.lightRayIntersects[lineIndex].emplace_back(windowBorderIntersectionB);
-                    }
-                    if (windowBorderIntersectionC.hasIntersection)
-                    {
-                        lightSource.lightRayIntersects[lineIndex].emplace_back(windowBorderIntersectionC);
-                    }
-                    else if (windowBorderIntersectionD.hasIntersection)
-                    {
-                        lightSource.lightRayIntersects[lineIndex].emplace_back(windowBorderIntersectionD);
-                    }
+                    checkForLightIntersectWithWindowBorderSide(lightSource, lineIndex, Vec2(0, 0), Vec2(Crucible::WINDOW_WIDTH, 0));
+                    checkForLightIntersectWithWindowBorderSide(lightSource, lineIndex, Vec2(0, Crucible::WINDOW_HEIGHT), Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+                    checkForLightIntersectWithWindowBorderSide(lightSource, lineIndex, Vec2(0, 0), Vec2(0, Crucible::WINDOW_HEIGHT));
+                    checkForLightIntersectWithWindowBorderSide(lightSource, lineIndex, Vec2(Crucible::WINDOW_WIDTH, 0), Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
                 }
             }
+        }
+    }
+}
+
+void CollisionSystem::checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource, int lineIndex,
+        Vec2 windowBorderVertexA, Vec2 windowBorderVertexB)
+{
+    Vec2 rayStartPos = {lightSource.rayStartVertices[lineIndex].position.x, lightSource.rayStartVertices[lineIndex].position.y};
+    Vec2 rayEndPos = {lightSource.rayEndVertices[lineIndex].position.x, lightSource.rayEndVertices[lineIndex].position.y};
+    Crucible::LightRayIntersect windowBorderIntersectionA = isLineIntersecting(false, rayStartPos, rayEndPos, windowBorderVertexA, windowBorderVertexB);
+    if (windowBorderIntersectionA.hasIntersection)
+    {
+        std::vector<Crucible::LightRayIntersect>& intersects = lightSource.lightRayIntersects[lineIndex];
+        intersects.emplace_back(windowBorderIntersectionA);
+    }
+}
+
+void CollisionSystem::checkForLightIntersectWithShape(Component::CShape& otherEntityShape,
+        Component::CLightSource& lightSource, int lineIndex)
+{
+    // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.
+    size_t vertexCount = otherEntityShape.vertices.getVertexCount();
+    for (int i = 0; i < vertexCount-1; i++)
+    {
+        bool hasIntersect = checkForLightIntersectWithShapeSide(lightSource, otherEntityShape,lineIndex, i, i + 1);
+        if (hasIntersect)
+        {
+            return;
         }
     }
 }
@@ -99,13 +99,15 @@ Crucible::LightRayIntersect CollisionSystem::isLineIntersecting(bool isShapeColl
         float collisionVertexX = vertexA.x + (t * r.x);
         float collisionVertexY = vertexA.y + (t * r.y);
         const Vec2& collisionVector = Vec2(collisionVertexX, collisionVertexY);
-        return {true, collisionVector};
+        const Vec2& vertexNearestRayCollision = collisionVector.dist(vertexC) < collisionVector.dist(vertexD) ? vertexC : vertexD;
+        const Vec2& modifiedCollisionVector = isShapeCollision ? vertexNearestRayCollision : collisionVector;
+        return {true, modifiedCollisionVector};
     }
 
     return {false, Vec2(0, 0)};
 }
 
-bool CollisionSystem::checkForLightIntersectWithShape(Component::CLightSource& lightSource,
+bool CollisionSystem::checkForLightIntersectWithShapeSide(Component::CLightSource& lightSource,
         Component::CShape otherEntityRectangleShape,
         size_t lineIndex,
         size_t shapeLineStartIndex, size_t shapeLineEndIndex)
@@ -128,7 +130,7 @@ bool CollisionSystem::checkForLightIntersectWithShape(Component::CLightSource& l
 
 float CollisionSystem::crossProduct(Vec2 a, Vec2 b)
 {
-    return a.x * b.y - b.x * a.y;;
+    return a.x * b.y - b.x * a.y;
 }
 
 void CollisionSystem::resolveCollision(

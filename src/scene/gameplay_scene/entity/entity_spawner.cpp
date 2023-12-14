@@ -18,6 +18,8 @@ void EntitySpawner::spawnPlayer()
 
     constexpr int TOTAL_RAYS = 360;
     constexpr int TOTAL_DEGREES_CIRCLE = 360;
+    assert(TOTAL_DEGREES_CIRCLE % TOTAL_RAYS == 0);
+
     constexpr int DEGREE_INCREMENT = TOTAL_DEGREES_CIRCLE / TOTAL_RAYS;
     constexpr int RAY_SPEED = 1000;
 
