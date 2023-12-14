@@ -20,6 +20,9 @@ class EntitySpawner
         void spawnWall(Vec2 position, Vec2 dimensions);
 
     private:
+        double degrees_to_radians(double y);
+
+    private:
         EntityManager& m_entityManager;
 };
 
