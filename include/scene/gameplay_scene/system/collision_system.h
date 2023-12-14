@@ -36,9 +36,9 @@ class CollisionSystem : public System
                 size_t shapeLineStartIndex,
                 size_t shapeLineEndIndex);
 
-        void checkForLightIntersectWithShape(Component::CShape& otherEntityShape,
+        static void checkForLightIntersectWithShape(Component::CShape& otherEntityShape,
                 Component::CLightSource& lightSource, int lineIndex);
-        void checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource, int lineIndex,
+        static void checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource, int lineIndex,
                 Vec2 windowBorderVertexA, Vec2 windowBorderVertexB);
 
         static sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);

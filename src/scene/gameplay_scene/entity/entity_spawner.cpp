@@ -36,11 +36,11 @@ void EntitySpawner::spawnPlayer()
     std::cout << "Found: [" << rayEndVertices.size() << "] light rays" << '\n';
 
     sf::VertexArray shapeVertices(sf::Quads);
-    shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, sf::Color::Green));
-    shapeVertices.append(sf::Vertex({position.x + dimensions.x/2, position.y - dimensions.y/2}, sf::Color::Green));
-    shapeVertices.append(sf::Vertex({position.x + dimensions.x/2, position.y + dimensions.y/2}, sf::Color::Green));
-    shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y + dimensions.y/2}, sf::Color::Green));
-    shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, sf::Color::Green));
+    shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, {255,0,127}));
+    shapeVertices.append(sf::Vertex({position.x + dimensions.x/2, position.y - dimensions.y/2}, {255,0,127}));
+    shapeVertices.append(sf::Vertex({position.x + dimensions.x/2, position.y + dimensions.y/2}, {255,0,127}));
+    shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y + dimensions.y/2}, {255,0,127}));
+    shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, {255,0,127}));
 
     // FIXME temp magic num
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =

@@ -98,10 +98,17 @@ Crucible::LightRayIntersect CollisionSystem::isLineIntersecting(bool isShapeColl
     {
         float collisionVertexX = vertexA.x + (t * r.x);
         float collisionVertexY = vertexA.y + (t * r.y);
+
         const Vec2& collisionVector = Vec2(collisionVertexX, collisionVertexY);
-        const Vec2& vertexNearestRayCollision = collisionVector.dist(vertexC) < collisionVector.dist(vertexD) ? vertexC : vertexD;
-        const Vec2& modifiedCollisionVector = isShapeCollision ? vertexNearestRayCollision : collisionVector;
-        return {true, modifiedCollisionVector};
+        if (isShapeCollision)
+        {
+            const Vec2& vertexNearestRayCollision = collisionVector.dist(vertexC) < collisionVector.dist(vertexD) ? vertexC : vertexD;
+            return {true, vertexNearestRayCollision};
+        }
+        else
+        {
+            return {true, collisionVector};
+        }
     }
 
     return {false, Vec2(0, 0)};
