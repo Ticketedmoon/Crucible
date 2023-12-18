@@ -33,7 +33,7 @@ void CollisionSystem::execute()
             {
                 auto& lightSource = entity.getComponent<Component::CLightSource>();
 
-                for (int lineIndex = 0; lineIndex <  lightSource.rayStartVertices.size(); lineIndex++)
+                for (int lineIndex = 0; lineIndex <  lightSource.rays.size(); lineIndex++)
                 {
                     checkForLightIntersectWithShape(otherEntityRectangleShape, lightSource, lineIndex);
 
@@ -50,13 +50,13 @@ void CollisionSystem::execute()
 void CollisionSystem::checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource, int lineIndex,
         Vec2 windowBorderVertexA, Vec2 windowBorderVertexB)
 {
-    Vec2 rayStartPos = {lightSource.rayStartVertices[lineIndex].position.x, lightSource.rayStartVertices[lineIndex].position.y};
-    Vec2 rayEndPos = {lightSource.rayEndVertices[lineIndex].position.x, lightSource.rayEndVertices[lineIndex].position.y};
-    Crucible::LightRayIntersect windowBorderIntersectionA = isLineIntersecting(false, rayStartPos, rayEndPos, windowBorderVertexA, windowBorderVertexB);
-    if (windowBorderIntersectionA.hasIntersection)
+    Vec2 rayStartPos = {lightSource.rays[lineIndex].first.position.x, lightSource.rays[lineIndex].first.position.y};
+    Vec2 rayEndPos = {lightSource.rays[lineIndex].second.position.x, lightSource.rays[lineIndex].second.position.y};
+    Crucible::LightRayIntersect windowBorderIntersection = isLineIntersecting(false, rayStartPos, rayEndPos, windowBorderVertexA, windowBorderVertexB);
+    if (windowBorderIntersection.hasIntersection)
     {
         std::vector<Crucible::LightRayIntersect>& intersects = lightSource.lightRayIntersects[lineIndex];
-        intersects.emplace_back(windowBorderIntersectionA);
+        intersects.emplace_back(windowBorderIntersection);
     }
 }
 
@@ -111,15 +111,16 @@ bool CollisionSystem::checkForLightIntersectWithShapeSide(Component::CLightSourc
         size_t lineIndex,
         size_t shapeLineStartIndex, size_t shapeLineEndIndex)
 {
-    Vec2 lightSourceRayStartPos = {lightSource.rayStartVertices[lineIndex].position.x, lightSource.rayStartVertices[lineIndex].position.y};
-    Vec2 lightSourceRayEndPos = {lightSource.rayEndVertices[lineIndex].position.x, lightSource.rayEndVertices[lineIndex].position.y};
+    Vec2 lightSourceRayStartPos = {lightSource.rays[lineIndex].first.position.x, lightSource.rays[lineIndex].first.position.y};
+    Vec2 lightSourceRayEndPos = {lightSource.rays[lineIndex].second.position.x, lightSource.rays[lineIndex].second.position.y};
 
     sf::Vertex& otherShapeStartVert = otherEntityRectangleShape.vertices[shapeLineStartIndex];
     sf::Vertex& otherShapeEndVert = otherEntityRectangleShape.vertices[shapeLineEndIndex];
     Vec2 shapeLineStartPos{otherShapeStartVert.position.x, otherShapeStartVert.position.y};
     Vec2 shapeLineEndPos{otherShapeEndVert.position.x, otherShapeEndVert.position.y};
 
-    Crucible::LightRayIntersect shapeLightRayIntersection = isLineIntersecting(true, lightSourceRayStartPos, lightSourceRayEndPos, shapeLineStartPos, shapeLineEndPos);
+    Crucible::LightRayIntersect shapeLightRayIntersection = isLineIntersecting(true, lightSourceRayStartPos,
+            lightSourceRayEndPos, shapeLineStartPos, shapeLineEndPos);
 
     if (shapeLightRayIntersection.hasIntersection)
     {

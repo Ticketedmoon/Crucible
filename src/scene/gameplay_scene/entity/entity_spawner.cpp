@@ -13,8 +13,7 @@ void EntitySpawner::spawnPlayer()
     float PLAYER_SIZE = 50;
     Vec2 dimensions{PLAYER_SIZE, PLAYER_SIZE};
 
-    std::vector<Crucible::Vertex> rayStartVertices;
-    std::vector<Crucible::Vertex> rayEndVertices;
+    std::vector<std::pair<Crucible::Vertex, Crucible::Vertex>> rays;
 
     constexpr int TOTAL_RAYS = 45;
     constexpr int TOTAL_DEGREES_CIRCLE = 360;
@@ -25,15 +24,17 @@ void EntitySpawner::spawnPlayer()
 
     for (int rayAngleDegrees = 0; rayAngleDegrees <= TOTAL_DEGREES_CIRCLE; rayAngleDegrees+=DEGREE_INCREMENT)
     {
-        rayStartVertices.emplace_back(Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow));
         double rayAngleRadians = degrees_to_radians(rayAngleDegrees);
-        double x = std::cos(rayAngleRadians) * RAY_SPEED;
-        double y = std::sin(rayAngleRadians) * RAY_SPEED;
-        Vec2 rayDirectionVector = Vec2(x, y);
-        rayEndVertices.emplace_back(Crucible::Vertex({position.x, position.y}, rayDirectionVector, sf::Color::Yellow));
+        double rayDirX = std::cos(rayAngleRadians) * RAY_SPEED;
+        double rayDirY = std::sin(rayAngleRadians) * RAY_SPEED;
+        Vec2 rayDirectionVector = Vec2(rayDirX, rayDirY);
+        rays.emplace_back(
+                Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow),
+                Crucible::Vertex({position.x, position.y}, rayDirectionVector, sf::Color::Yellow)
+                );
     }
 
-    std::cout << "Found: [" << rayEndVertices.size() << "] light rays" << '\n';
+    std::cout << "Found: [" << rays.size() << "] light rays" << '\n';
 
     sf::VertexArray shapeVertices(sf::Quads);
     shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, {255,0,127}));
@@ -42,14 +43,13 @@ void EntitySpawner::spawnPlayer()
     shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y + dimensions.y/2}, {255,0,127}));
     shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, {255,0,127}));
 
-    // FIXME temp magic num
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
             std::vector<std::vector<Crucible::LightRayIntersect>>(TOTAL_RAYS + 1, std::vector<Crucible::LightRayIntersect>());
 
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CTransform>(position);
     e.addComponent<Component::CShape>(shapeVertices);
-    e.addComponent<Component::CLightSource>(rayStartVertices, rayEndVertices, sf::VertexArray(), defaultLightRayIntersects);
+    e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects);
 }
 
 void EntitySpawner::spawnWall(Vec2 position, Vec2 dimensions)

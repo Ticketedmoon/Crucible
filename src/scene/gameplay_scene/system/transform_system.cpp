@@ -30,15 +30,12 @@ void TransformSystem::execute()
             // This system should only scale the vector until it reaches interesectionds);
 
             // scale
-            for (Crucible::Vertex& v : lightSource.rayStartVertices)
+            for (std::pair<Crucible::Vertex, Crucible::Vertex>& v : lightSource.rays)
             {
                 // Start rays to scale based off player position
-                v.position = {entityTransform.position.x, entityTransform.position.y};
-            }
-            for (Crucible::Vertex& v : lightSource.rayEndVertices)
-            {
+                v.first.position = {entityTransform.position.x, entityTransform.position.y};
                 // end points can scale normally
-                v.position += v.increment;
+                v.second.position += v.second.increment;
             }
         }
 

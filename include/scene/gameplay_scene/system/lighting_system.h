@@ -11,18 +11,19 @@ class LightingSystem : public System
 {
     public:
         explicit LightingSystem(EntityManager& entityManager);
-        void addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
-                const Component::CTransform& entityTransform) const;
-        Crucible::LightRayIntersect findClosestIntersectForLine(const Component::CTransform& entityTransform,
-                std::vector<Crucible::LightRayIntersect>& intersectList) const;
 
         void execute() override;
 
     private:
-        EntityManager& m_entityManager;
+        void addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
+                const Component::CTransform& entityTransform) const;
         void addVertexForTriangleFanLightSource(Component::CLightSource& entityLightSource,
-                const Crucible::LightRayIntersect& closestIntersectA,
-                const Crucible::LightRayIntersect& closestIntersectB) const;
+                const Crucible::LightRayIntersect& closestIntersect) const;
+        Crucible::LightRayIntersect findClosestIntersectForLine(const Component::CTransform& entityTransform,
+                std::vector<Crucible::LightRayIntersect>& intersectList) const;
+
+    private:
+        EntityManager& m_entityManager;
 };
 
 
