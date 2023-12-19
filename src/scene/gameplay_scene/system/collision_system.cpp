@@ -67,10 +67,20 @@ void CollisionSystem::checkForLightIntersectWithShape(Component::CShape& otherEn
     size_t vertexCount = otherEntityShape.vertices.getVertexCount();
     for (int i = 0; i < vertexCount-1; i++)
     {
-        bool hasIntersect = checkForLightIntersectWithShapeSide(lightSource, otherEntityShape,lineIndex, i, i + 1);
-        if (hasIntersect)
+        Vec2 lightSourceRayStartPos = {lightSource.rays[lineIndex].first.position.x, lightSource.rays[lineIndex].first.position.y};
+        Vec2 lightSourceRayEndPos = {lightSource.rays[lineIndex].second.position.x, lightSource.rays[lineIndex].second.position.y};
+
+        sf::Vertex& otherShapeStartVert = otherEntityShape.vertices[i];
+        sf::Vertex& otherShapeEndVert = otherEntityShape.vertices[i+1];
+        Vec2 shapeLineStartPos{otherShapeStartVert.position.x, otherShapeStartVert.position.y};
+        Vec2 shapeLineEndPos{otherShapeEndVert.position.x, otherShapeEndVert.position.y};
+
+        Crucible::LightRayIntersect shapeLightRayIntersection = isLineIntersecting(true, lightSourceRayStartPos,
+                lightSourceRayEndPos, shapeLineStartPos, shapeLineEndPos);
+
+        if (shapeLightRayIntersection.hasIntersection)
         {
-            return;
+            lightSource.lightRayIntersects[lineIndex].emplace_back(shapeLightRayIntersection);
         }
     }
 }
@@ -104,28 +114,6 @@ Crucible::LightRayIntersect CollisionSystem::isLineIntersecting(bool isShapeColl
     }
 
     return {false, isShapeCollision, Vec2(0, 0), vertexC, vertexD};
-}
-
-bool CollisionSystem::checkForLightIntersectWithShapeSide(Component::CLightSource& lightSource,
-        Component::CShape otherEntityRectangleShape,
-        size_t lineIndex,
-        size_t shapeLineStartIndex, size_t shapeLineEndIndex)
-{
-    Vec2 lightSourceRayStartPos = {lightSource.rays[lineIndex].first.position.x, lightSource.rays[lineIndex].first.position.y};
-    Vec2 lightSourceRayEndPos = {lightSource.rays[lineIndex].second.position.x, lightSource.rays[lineIndex].second.position.y};
-
-    sf::Vertex& otherShapeStartVert = otherEntityRectangleShape.vertices[shapeLineStartIndex];
-    sf::Vertex& otherShapeEndVert = otherEntityRectangleShape.vertices[shapeLineEndIndex];
-    Vec2 shapeLineStartPos{otherShapeStartVert.position.x, otherShapeStartVert.position.y};
-    Vec2 shapeLineEndPos{otherShapeEndVert.position.x, otherShapeEndVert.position.y};
-
-    Crucible::LightRayIntersect shapeLightRayIntersection = isLineIntersecting(true, lightSourceRayStartPos,
-            lightSourceRayEndPos, shapeLineStartPos, shapeLineEndPos);
-
-    if (shapeLightRayIntersection.hasIntersection)
-    {
-        lightSource.lightRayIntersects[lineIndex].emplace_back(shapeLightRayIntersection);
-    }
 }
 
 float CollisionSystem::crossProduct(Vec2 a, Vec2 b)

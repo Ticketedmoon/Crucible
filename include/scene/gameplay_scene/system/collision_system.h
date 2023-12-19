@@ -29,13 +29,6 @@ class CollisionSystem : public System
                 const Component::CShape& otherEntityRectangleShape, const Component::CTransform& otherEntityTransform,
                 const sf::FloatRect& overlap);
 
-        static bool checkForLightIntersectWithShapeSide(
-                Component::CLightSource& lightSource,
-                Component::CShape otherEntityRectangleShape,
-                size_t lineIndex,
-                size_t shapeLineStartIndex,
-                size_t shapeLineEndIndex);
-
         static void checkForLightIntersectWithShape(Component::CShape& otherEntityShape,
                 Component::CLightSource& lightSource, int lineIndex);
         static void checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource, int lineIndex,

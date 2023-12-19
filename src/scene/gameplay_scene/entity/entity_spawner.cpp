@@ -15,7 +15,7 @@ void EntitySpawner::spawnPlayer()
 
     std::vector<std::pair<Crucible::Vertex, Crucible::Vertex>> rays;
 
-    constexpr int TOTAL_RAYS = 45;
+    constexpr int TOTAL_RAYS = 120;
     constexpr int TOTAL_DEGREES_CIRCLE = 360;
     assert(TOTAL_DEGREES_CIRCLE % TOTAL_RAYS == 0);
 
@@ -37,7 +37,7 @@ void EntitySpawner::spawnPlayer()
     std::cout << "Found: [" << rays.size() << "] light rays" << '\n';
 
     sf::VertexArray shapeVertices(sf::Quads);
-    sf::Color shapeColor = {255, 0, 127};
+    const sf::Color shapeColor = {255, 0, 127};
     shapeVertices.append(sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor));
     shapeVertices.append(sf::Vertex({position.x + dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor));
     shapeVertices.append(sf::Vertex({position.x + dimensions.x / 2, position.y + dimensions.y / 2}, shapeColor));
@@ -59,11 +59,12 @@ void EntitySpawner::spawnWall(Vec2 position, Vec2 dimensions)
     auto e = m_entityManager.addEntity(Crucible::EntityType::WALL);
 
     sf::VertexArray vertices(sf::Quads, 5);
-    vertices[0] = sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, sf::Color::Blue);
-    vertices[1] = sf::Vertex({position.x + dimensions.x / 2, position.y - dimensions.y / 2}, sf::Color::Blue);
-    vertices[2] = sf::Vertex({position.x + dimensions.x / 2, position.y + dimensions.y / 2}, sf::Color::Blue);
-    vertices[3] = sf::Vertex({position.x - dimensions.x / 2, position.y + dimensions.y / 2}, sf::Color::Blue);
-    vertices[4] = sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, sf::Color::Blue);
+    const sf::Color shapeColor = sf::Color::Transparent;
+    vertices[0] = sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor);
+    vertices[1] = sf::Vertex({position.x + dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor);
+    vertices[2] = sf::Vertex({position.x + dimensions.x / 2, position.y + dimensions.y / 2}, shapeColor);
+    vertices[3] = sf::Vertex({position.x - dimensions.x / 2, position.y + dimensions.y / 2}, shapeColor);
+    vertices[4] = sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor);
 
     e.addComponent<Component::CTransform>(position);
     e.addComponent<Component::CShape>(vertices);
