@@ -20,9 +20,9 @@ void EntitySpawner::spawnPlayer()
     assert(TOTAL_DEGREES_CIRCLE % TOTAL_RAYS == 0);
 
     constexpr int DEGREE_INCREMENT = TOTAL_DEGREES_CIRCLE / TOTAL_RAYS;
-    constexpr int RAY_SPEED = 1000;
+    constexpr int RAY_SPEED = 100;
 
-    for (int rayAngleDegrees = 0; rayAngleDegrees <= TOTAL_DEGREES_CIRCLE; rayAngleDegrees+=DEGREE_INCREMENT)
+    for (int rayAngleDegrees = 0; rayAngleDegrees <= TOTAL_DEGREES_CIRCLE; rayAngleDegrees += DEGREE_INCREMENT)
     {
         double rayAngleRadians = degrees_to_radians(rayAngleDegrees);
         double rayDirX = std::cos(rayAngleRadians) * RAY_SPEED;
@@ -31,20 +31,22 @@ void EntitySpawner::spawnPlayer()
         rays.emplace_back(
                 Crucible::Vertex({position.x, position.y}, {0, 0}, sf::Color::Yellow),
                 Crucible::Vertex({position.x, position.y}, rayDirectionVector, sf::Color::Yellow)
-                );
+        );
     }
 
     std::cout << "Found: [" << rays.size() << "] light rays" << '\n';
 
     sf::VertexArray shapeVertices(sf::Quads);
-    shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, {255,0,127}));
-    shapeVertices.append(sf::Vertex({position.x + dimensions.x/2, position.y - dimensions.y/2}, {255,0,127}));
-    shapeVertices.append(sf::Vertex({position.x + dimensions.x/2, position.y + dimensions.y/2}, {255,0,127}));
-    shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y + dimensions.y/2}, {255,0,127}));
-    shapeVertices.append(sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, {255,0,127}));
+    sf::Color shapeColor = {255, 0, 127};
+    shapeVertices.append(sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor));
+    shapeVertices.append(sf::Vertex({position.x + dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor));
+    shapeVertices.append(sf::Vertex({position.x + dimensions.x / 2, position.y + dimensions.y / 2}, shapeColor));
+    shapeVertices.append(sf::Vertex({position.x - dimensions.x / 2, position.y + dimensions.y / 2}, shapeColor));
+    shapeVertices.append(sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor));
 
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
-            std::vector<std::vector<Crucible::LightRayIntersect>>(TOTAL_RAYS + 1, std::vector<Crucible::LightRayIntersect>());
+            std::vector<std::vector<Crucible::LightRayIntersect>>(TOTAL_RAYS + 1,
+                    std::vector<Crucible::LightRayIntersect>());
 
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CTransform>(position);
@@ -57,17 +59,18 @@ void EntitySpawner::spawnWall(Vec2 position, Vec2 dimensions)
     auto e = m_entityManager.addEntity(Crucible::EntityType::WALL);
 
     sf::VertexArray vertices(sf::Quads, 5);
-    vertices[0] = sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, sf::Color::Blue);
-    vertices[1] = sf::Vertex({position.x + dimensions.x/2, position.y - dimensions.y/2}, sf::Color::Blue);
-    vertices[2] = sf::Vertex({position.x + dimensions.x/2, position.y + dimensions.y/2}, sf::Color::Blue);
-    vertices[3] = sf::Vertex({position.x - dimensions.x/2, position.y + dimensions.y/2}, sf::Color::Blue);
-    vertices[4] = sf::Vertex({position.x - dimensions.x/2, position.y - dimensions.y/2}, sf::Color::Blue);
+    vertices[0] = sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, sf::Color::Blue);
+    vertices[1] = sf::Vertex({position.x + dimensions.x / 2, position.y - dimensions.y / 2}, sf::Color::Blue);
+    vertices[2] = sf::Vertex({position.x + dimensions.x / 2, position.y + dimensions.y / 2}, sf::Color::Blue);
+    vertices[3] = sf::Vertex({position.x - dimensions.x / 2, position.y + dimensions.y / 2}, sf::Color::Blue);
+    vertices[4] = sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, sf::Color::Blue);
 
     e.addComponent<Component::CTransform>(position);
     e.addComponent<Component::CShape>(vertices);
 }
 
-double EntitySpawner::degrees_to_radians(double y) {
-    double radians= (y * M_PI)/180; // y not x
+double EntitySpawner::degrees_to_radians(double y)
+{
+    double radians = (y * M_PI) / 180; // y not x
     return radians;
 }
