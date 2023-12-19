@@ -8,6 +8,7 @@ CollisionSystem::CollisionSystem(EntityManager& entityManager) : m_entityManager
 void CollisionSystem::execute()
 {
     std::vector<Entity> entities = m_entityManager.getEntities();
+
     for (const Entity entity : entities)
     {
         auto& entityRectangleShape = entity.getComponent<Component::CShape>();
@@ -20,67 +21,101 @@ void CollisionSystem::execute()
                 // @Refactor: Can we do this a better way?
                 continue;
             }
+
             auto& otherEntityRectangleShape = otherEntity.getComponent<Component::CShape>();
-            auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
 
-            sf::FloatRect overlap;
-            if (CollisionSystem::isCollidingAABB(entityRectangleShape, otherEntityRectangleShape, overlap))
-            {
-                resolveCollision(entityRectangleShape, entityTransform, otherEntityRectangleShape, otherEntityTransform, overlap);
-            }
-
-            if (entity.hasComponent<Component::CLightSource>())
-            {
-                auto& lightSource = entity.getComponent<Component::CLightSource>();
-
-                for (int lineIndex = 0; lineIndex <  lightSource.rays.size(); lineIndex++)
-                {
-                    checkForLightIntersectWithShape(otherEntityRectangleShape, lightSource, lineIndex);
-
-                    checkForLightIntersectWithWindowBorderSide(lightSource, lineIndex, Vec2(0, 0), Vec2(Crucible::WINDOW_WIDTH, 0));
-                    checkForLightIntersectWithWindowBorderSide(lightSource, lineIndex, Vec2(0, Crucible::WINDOW_HEIGHT), Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
-                    checkForLightIntersectWithWindowBorderSide(lightSource, lineIndex, Vec2(0, 0), Vec2(0, Crucible::WINDOW_HEIGHT));
-                    checkForLightIntersectWithWindowBorderSide(lightSource, lineIndex, Vec2(Crucible::WINDOW_WIDTH, 0), Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
-                }
-            }
+            resolvePhysicalCollisions(entityRectangleShape, entityTransform, otherEntity, otherEntityRectangleShape);
+            resolveLightCollisions(entity, otherEntityRectangleShape);
         }
     }
 }
 
-void CollisionSystem::checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource, int lineIndex,
-        Vec2 windowBorderVertexA, Vec2 windowBorderVertexB)
+void CollisionSystem::resolveLightCollisions(const Entity& entity, Component::CShape& otherEntityRectangleShape)
 {
-    Vec2 rayStartPos = {lightSource.rays[lineIndex].first.position.x, lightSource.rays[lineIndex].first.position.y};
-    Vec2 rayEndPos = {lightSource.rays[lineIndex].second.position.x, lightSource.rays[lineIndex].second.position.y};
+    if (entity.hasComponent<Component::CLightSource>())
+    {
+        auto& lightSource = entity.getComponent<Component::CLightSource>();
+
+        for (size_t lineIndex = 0; lineIndex <  lightSource.rays.size(); lineIndex++)
+        {
+            Crucible::Ray& ray = lightSource.rays[lineIndex];
+            checkForLightIntersectWithShape(otherEntityRectangleShape, lightSource, ray, lineIndex);
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, Crucible::Vec2(0, 0), Crucible::Vec2(Crucible::WINDOW_WIDTH, 0));
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, Crucible::Vec2(0, Crucible::WINDOW_HEIGHT), Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, Crucible::Vec2(0, 0), Crucible::Vec2(0, Crucible::WINDOW_HEIGHT));
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, Crucible::Vec2(Crucible::WINDOW_WIDTH, 0), Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+        }
+    }
+}
+
+void CollisionSystem::resolvePhysicalCollisions(const Component::CShape& entityRectangleShape,
+        Component::CTransform& entityTransform, const Entity& otherEntity,
+        const Component::CShape& otherEntityRectangleShape)
+{
+    sf::FloatRect overlap;
+    if (isCollidingAABB(entityRectangleShape, otherEntityRectangleShape, overlap))
+    {
+        auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
+        resolveCollision(entityRectangleShape, entityTransform, otherEntityRectangleShape, otherEntityTransform, overlap);
+    }
+}
+
+void CollisionSystem::checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource,
+        Crucible::Ray& ray, size_t lineIndex,
+        Crucible::Vec2 windowBorderVertexA, Crucible::Vec2 windowBorderVertexB)
+{
+    Crucible::Vec2 rayStartPos = {ray.getStartVertex().x, ray.getStartVertex().y};
+    Crucible::Vec2 rayEndPos = {ray.getEndVertex().x, ray.getEndVertex().y};
     Crucible::LightRayIntersect windowBorderIntersection = isLineIntersecting(false, rayStartPos, rayEndPos, windowBorderVertexA, windowBorderVertexB);
     if (windowBorderIntersection.hasIntersection)
     {
-        std::vector<Crucible::LightRayIntersect>& intersects = lightSource.lightRayIntersects[lineIndex];
-        intersects.emplace_back(windowBorderIntersection);
+        lightSource.lightRayIntersects[lineIndex].emplace_back(windowBorderIntersection);
     }
 }
 
 void CollisionSystem::checkForLightIntersectWithShape(Component::CShape& otherEntityShape,
-        Component::CLightSource& lightSource, int lineIndex)
+        Component::CLightSource& lightSource, Crucible::Ray& ray, size_t lineIndex)
 {
     // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.
-    size_t vertexCount = otherEntityShape.vertices.getVertexCount();
-    for (int i = 0; i < vertexCount-1; i++)
+    for (size_t i = 0; i < otherEntityShape.vertices.getVertexCount()-1; i++)
     {
-        Vec2 lightSourceRayStartPos = {lightSource.rays[lineIndex].first.position.x, lightSource.rays[lineIndex].first.position.y};
-        Vec2 lightSourceRayEndPos = {lightSource.rays[lineIndex].second.position.x, lightSource.rays[lineIndex].second.position.y};
+        Crucible::Vec2 ratStartVertex = ray.getStartVertex();
+        Crucible::Vec2 rayStartPos = {ratStartVertex.x, ratStartVertex.y};
+        Crucible::Vec2 rayEndPos = {ray.getEndVertex().x, ray.getEndVertex().y};
 
         sf::Vertex& otherShapeStartVert = otherEntityShape.vertices[i];
         sf::Vertex& otherShapeEndVert = otherEntityShape.vertices[i+1];
-        Vec2 shapeLineStartPos{otherShapeStartVert.position.x, otherShapeStartVert.position.y};
-        Vec2 shapeLineEndPos{otherShapeEndVert.position.x, otherShapeEndVert.position.y};
+        Crucible::Vec2 shapeLineStartPos{otherShapeStartVert.position.x, otherShapeStartVert.position.y};
+        Crucible::Vec2 shapeLineEndPos{otherShapeEndVert.position.x, otherShapeEndVert.position.y};
 
-        Crucible::LightRayIntersect shapeLightRayIntersection = isLineIntersecting(true, lightSourceRayStartPos,
-                lightSourceRayEndPos, shapeLineStartPos, shapeLineEndPos);
+        Crucible::LightRayIntersect shapeLightRayIntersection = isLineIntersecting(true, rayStartPos,
+                rayEndPos, shapeLineStartPos, shapeLineEndPos);
 
         if (shapeLightRayIntersection.hasIntersection)
         {
             lightSource.lightRayIntersects[lineIndex].emplace_back(shapeLightRayIntersection);
+
+            // First corner (Uses scale factor of first corner ray plus an amount to bypass)
+            Crucible::Ray cornerRayA(ratStartVertex, {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
+            Crucible::Ray cornerRayB(ratStartVertex, {ray.getScaleFactor().x-1, ray.getScaleFactor().y});
+            Crucible::Ray cornerRayC(ratStartVertex, {ray.getScaleFactor().x, ray.getScaleFactor().y+1});
+            Crucible::Ray cornerRayD(ratStartVertex, {ray.getScaleFactor().x, ray.getScaleFactor().y-1});
+
+            // Second corner (Uses scale factor of second corner ray plus an amount to bypass)
+            Crucible::Ray cornerRayE(ratStartVertex, {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
+            Crucible::Ray cornerRayF(ratStartVertex, {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
+            Crucible::Ray cornerRayG(ratStartVertex, {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
+            Crucible::Ray cornerRayH(ratStartVertex, {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
+
+            size_t index = Crucible::TOTAL_CORE_LIGHT_RAYS + (i * 8);
+            lightSource.rays[index] = cornerRayA;
+            lightSource.rays[index + 1] = cornerRayB;
+            lightSource.rays[index + 2] = cornerRayC;
+            lightSource.rays[index + 3] = cornerRayD;
+            lightSource.rays[index + 4] = cornerRayE;
+            lightSource.rays[index + 5] = cornerRayF;
+            lightSource.rays[index + 6] = cornerRayG;
+            lightSource.rays[index + 7] = cornerRayH;
         }
     }
 }
@@ -91,11 +126,11 @@ bool CollisionSystem::isCollidingAABB(const Component::CShape& entityRect,
     return entityRect.vertices.getBounds().intersects(otherEntityRect.vertices.getBounds(), overlap);
 }
 
-Crucible::LightRayIntersect CollisionSystem::isLineIntersecting(bool isShapeCollision, Vec2 vertexA, Vec2 vertexB, Vec2 vertexC, Vec2 vertexD)
+Crucible::LightRayIntersect CollisionSystem::isLineIntersecting(bool isShapeCollision, Crucible::Vec2 vertexA, Crucible::Vec2 vertexB, Crucible::Vec2 vertexC, Crucible::Vec2 vertexD)
 {
-    Vec2 r = (vertexB - vertexA);
-    Vec2 s = (vertexD - vertexC);
-    Vec2 cma = vertexC - vertexA;
+    Crucible::Vec2 r = (vertexB - vertexA);
+    Crucible::Vec2 s = (vertexD - vertexC);
+    Crucible::Vec2 cma = vertexC - vertexA;
 
     float rCrossS = crossProduct(r, s);
     float cmaCrossS = crossProduct(cma, s);
@@ -109,14 +144,14 @@ Crucible::LightRayIntersect CollisionSystem::isLineIntersecting(bool isShapeColl
         float collisionVertexX = vertexA.x + (t * r.x);
         float collisionVertexY = vertexA.y + (t * r.y);
 
-        const Vec2& collisionVector = Vec2(collisionVertexX, collisionVertexY);
+        const Crucible::Vec2& collisionVector = Crucible::Vec2(collisionVertexX, collisionVertexY);
         return {true, isShapeCollision, collisionVector, vertexC, vertexD};
     }
 
-    return {false, isShapeCollision, Vec2(0, 0), vertexC, vertexD};
+    return {false, isShapeCollision, Crucible::Vec2(0, 0), vertexC, vertexD};
 }
 
-float CollisionSystem::crossProduct(Vec2 a, Vec2 b)
+float CollisionSystem::crossProduct(Crucible::Vec2 a, Crucible::Vec2 b)
 {
     return a.x * b.y - b.x * a.y;
 }
@@ -132,15 +167,15 @@ void CollisionSystem::resolveCollision(
     float oxDiff = std::abs(otherEntityRectangleShape.vertices[0].position.x - otherEntityRectangleShape.vertices[1].position.x) / 2;
     float oyDiff = std::abs(otherEntityRectangleShape.vertices[0].position.y - otherEntityRectangleShape.vertices[2].position.y) / 2;
 
-    const Vec2& entityPosition = Vec2(entityTransform.position.x - xDiff, entityTransform.position.y + yDiff);
-    const Vec2& otherEntityPosition = Vec2(otherEntityTransform.position.x - oxDiff, otherEntityTransform.position.y + oyDiff);
-    const Vec2& result = entityPosition - otherEntityPosition;
+    const Crucible::Vec2& entityPosition = Crucible::Vec2(entityTransform.position.x - xDiff, entityTransform.position.y + yDiff);
+    const Crucible::Vec2& otherEntityPosition = Crucible::Vec2(otherEntityTransform.position.x - oxDiff, otherEntityTransform.position.y + oyDiff);
+    const Crucible::Vec2& result = entityPosition - otherEntityPosition;
 
     applyCollisionManifoldToTransform(entityTransform, overlap, result);
 }
 
 void CollisionSystem::applyCollisionManifoldToTransform(Component::CTransform& entityTransform,
-        const sf::FloatRect& overlap, const Vec2& result)
+        const sf::FloatRect& overlap, const Crucible::Vec2& result)
 {
     sf::Vector2f collisionNormal{result.x, result.y};
     auto manifold = getManifold(overlap, collisionNormal);

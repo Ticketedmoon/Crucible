@@ -10,6 +10,7 @@
 #include "entity_manager.h"
 #include "common_constants.h"
 #include "vertex.h"
+#include "ray.h"
 
 class EntitySpawner
 {
@@ -17,10 +18,11 @@ class EntitySpawner
         explicit EntitySpawner(EntityManager& entityManager);
 
         void spawnPlayer();
-        void spawnWall(Vec2 position, Vec2 dimensions);
+        void spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions);
 
     private:
-        double degrees_to_radians(double y);
+        static std::vector<Crucible::Ray> createRays(Component::CTransform& playerTransform);
+        static double degrees_to_radians(double y);
 
     private:
         EntityManager& m_entityManager;

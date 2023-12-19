@@ -9,12 +9,13 @@
 #include "vec2.h"
 #include "common_constants.h"
 #include "vertex.h"
+#include "ray.h"
 
 namespace Component
 {
     struct CTransform
     {
-        Vec2 position;
+        Crucible::Vec2 position;
 
         bool has{};
     };
@@ -49,7 +50,8 @@ namespace Component
     struct CLightSource
     {
         // Every 2 elements is a line, so to access the nth line, the index positions are: (v[i * 2], v[(i * 2) * 1])
-        std::vector<std::pair<Crucible::Vertex, Crucible::Vertex>> rays;
+        std::vector<Crucible::Ray> rays;
+
         sf::VertexArray lightVertices;
 
         std::vector<std::vector<Crucible::LightRayIntersect>> lightRayIntersects;

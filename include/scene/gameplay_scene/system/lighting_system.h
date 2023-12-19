@@ -17,8 +17,6 @@ class LightingSystem : public System
     private:
         void addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
                 const Component::CTransform& entityTransform) const;
-        void addVertexForTriangleFanLightSource(Component::CLightSource& entityLightSource,
-                const Crucible::LightRayIntersect& closestIntersect) const;
         Crucible::LightRayIntersect findClosestIntersectForLine(const Component::CTransform& entityTransform,
                 std::vector<Crucible::LightRayIntersect>& intersectList) const;
 

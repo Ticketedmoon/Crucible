@@ -29,22 +29,28 @@ class CollisionSystem : public System
                 const Component::CShape& otherEntityRectangleShape, const Component::CTransform& otherEntityTransform,
                 const sf::FloatRect& overlap);
 
+        static void resolvePhysicalCollisions(const Component::CShape& entityRectangleShape, Component::CTransform& entityTransform,
+                const Entity& otherEntity, const Component::CShape& otherEntityRectangleShape) ;
+
+        static void resolveLightCollisions(const Entity& entity, Component::CShape& otherEntityRectangleShape) ;
+
         static void checkForLightIntersectWithShape(Component::CShape& otherEntityShape,
-                Component::CLightSource& lightSource, int lineIndex);
-        static void checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource, int lineIndex,
-                Vec2 windowBorderVertexA, Vec2 windowBorderVertexB);
+                Component::CLightSource& lightSource, Crucible::Ray& ray, size_t lineIndex);
+
+        static void checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource,
+                Crucible::Ray& ray, size_t lineIndex, Crucible::Vec2 windowBorderVertexA, Crucible::Vec2 windowBorderVertexB);
 
         static sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
 
         static void applyCollisionManifoldToTransform(
                 Component::CTransform& entityTransform,
                 const sf::FloatRect& overlap,
-                const Vec2& result);
+                const Crucible::Vec2& result);
 
-        static float crossProduct(Vec2 a, Vec2 b);
+        static float crossProduct(Crucible::Vec2 a, Crucible::Vec2 b);
 
         static Crucible::LightRayIntersect isLineIntersecting(bool isShapeCollision,
-                Vec2 vertexA, Vec2 vertexB, Vec2 vertexC, Vec2 vertexD);
+                Crucible::Vec2 vertexA, Crucible::Vec2 vertexB, Crucible::Vec2 vertexC, Crucible::Vec2 vertexD);
 
     private:
         EntityManager& m_entityManager;

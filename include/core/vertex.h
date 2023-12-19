@@ -12,7 +12,6 @@ namespace Crucible
     {
         public:
             Vec2 position;
-            Vec2 increment;
             sf::Color colour;
     };
 }

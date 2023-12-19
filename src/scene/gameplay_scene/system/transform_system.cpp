@@ -21,21 +21,9 @@ void TransformSystem::execute()
         if (entity.hasComponent<Component::CLightSource>())
         {
             auto& lightSource = entity.getComponent<Component::CLightSource>();
-
-            // TODO: We should just scale the vectors not arbitrarily update x or y.
-            //       This will enable us to apply rotations on lines and arbitrarily scale until a collision.
-
-            // up
-            // in entity_spawner find vertex for vertex[1], so it points in directly.
-            // This system should only scale the vector until it reaches interesectionds);
-
-            // scale
-            for (std::pair<Crucible::Vertex, Crucible::Vertex>& v : lightSource.rays)
+            for (Crucible::Ray& ray : lightSource.rays)
             {
-                // Start rays to scale based off player position
-                v.first.position = {entityTransform.position.x, entityTransform.position.y};
-                // end points can scale normally
-                v.second.position += v.second.increment;
+                ray.scale();
             }
         }
 

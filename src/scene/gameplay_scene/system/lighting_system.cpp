@@ -32,9 +32,9 @@ void LightingSystem::addVerticesForLightCollisions(Component::CLightSource& enti
     size_t totalLines = entityLightSource.rays.size();
 
     // Add player position as starting vertex
-    //entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
+    //entityLightSource.lightVertices.append({{m_entityTransform.position.x, m_entityTransform.position.y}, sf::Color::Yellow});
 
-    for (int lineIndex = 0; lineIndex < totalLines-1; lineIndex++)
+    for (size_t lineIndex = 0; lineIndex < totalLines-1; lineIndex++)
     {
         std::vector<Crucible::LightRayIntersect>& intersectList = entityLightSource.lightRayIntersects[lineIndex];
         if (intersectList.empty())
@@ -46,34 +46,10 @@ void LightingSystem::addVerticesForLightCollisions(Component::CLightSource& enti
         Crucible::LightRayIntersect closestIntersect = findClosestIntersectForLine(entityTransform, intersectList);
 
         entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
-        addVertexForTriangleFanLightSource(entityLightSource, closestIntersect);
+        entityLightSource.lightVertices.append({{closestIntersect.collisionPoint.x, closestIntersect.collisionPoint.y}, sf::Color::Yellow});
 
         // Clear intersects after finding closest intersect.
         intersectList.clear();
-    }
-}
-
-// If B is colliding with any shape, take the nearest line segment corner to the previous rays end point.
-// Q: Do we base it off the previous rays collision point? Or corner point
-void LightingSystem::addVertexForTriangleFanLightSource(Component::CLightSource& entityLightSource,
-        const Crucible::LightRayIntersect& closestIntersect) const
-{
-    if (closestIntersect.isShapeIntersection)
-    {
-        double distToStartVertex = closestIntersect.collisionPoint.dist(closestIntersect.collidedLineStartVertex);
-        double distToEndVertex = closestIntersect.collisionPoint.dist(closestIntersect.collidedLineEndVertex);
-        if (distToStartVertex < distToEndVertex)
-        {
-            entityLightSource.lightVertices.append({{closestIntersect.collidedLineStartVertex.x, closestIntersect.collidedLineStartVertex.y}, sf::Color::Yellow});
-        }
-        else
-        {
-            entityLightSource.lightVertices.append({{closestIntersect.collidedLineEndVertex.x, closestIntersect.collidedLineEndVertex.y}, sf::Color::Yellow});
-        }
-    }
-    else
-    {
-        entityLightSource.lightVertices.append({{closestIntersect.collisionPoint.x, closestIntersect.collisionPoint.y}, sf::Color::Yellow});
     }
 }
 
