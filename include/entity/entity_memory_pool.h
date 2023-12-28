@@ -59,6 +59,7 @@ class EntityMemoryPool
         {
             std::vector<T>& componentPool = std::get<std::vector<T>>(m_pool);
             componentPool[entityId] = T(std::forward<TArgs>(mArgs)...);
+            //@review: Is this .has necessary?
             componentPool[entityId].has = true;
             return componentPool[entityId];
         }

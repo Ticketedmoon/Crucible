@@ -38,6 +38,7 @@ void CollisionSystem::resolveLightCollisions(const Entity& entity, Component::CS
 
         for (size_t lineIndex = 0; lineIndex <  lightSource.rays.size(); lineIndex++)
         {
+            // @Refactor: If ray collision with shape, we don't need to check window border collisions.
             Crucible::Ray& ray = lightSource.rays[lineIndex];
             checkForLightIntersectWithShape(otherEntityRectangleShape, lightSource, ray, lineIndex);
             checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, Crucible::Vec2(0, 0), Crucible::Vec2(Crucible::WINDOW_WIDTH, 0));
@@ -79,8 +80,7 @@ void CollisionSystem::checkForLightIntersectWithShape(Component::CShape& otherEn
     // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.
     for (size_t i = 0; i < otherEntityShape.vertices.getVertexCount()-1; i++)
     {
-        Crucible::Vec2 ratStartVertex = ray.getStartVertex();
-        Crucible::Vec2 rayStartPos = {ratStartVertex.x, ratStartVertex.y};
+        Crucible::Vec2 rayStartPos = {ray.getStartVertex().x, ray.getStartVertex().y};
         Crucible::Vec2 rayEndPos = {ray.getEndVertex().x, ray.getEndVertex().y};
 
         sf::Vertex& otherShapeStartVert = otherEntityShape.vertices[i];
@@ -96,26 +96,26 @@ void CollisionSystem::checkForLightIntersectWithShape(Component::CShape& otherEn
             lightSource.lightRayIntersects[lineIndex].emplace_back(shapeLightRayIntersection);
 
             // First corner (Uses scale factor of first corner ray plus an amount to bypass)
-            Crucible::Ray cornerRayA(ratStartVertex, {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
-            Crucible::Ray cornerRayB(ratStartVertex, {ray.getScaleFactor().x-1, ray.getScaleFactor().y});
-            Crucible::Ray cornerRayC(ratStartVertex, {ray.getScaleFactor().x, ray.getScaleFactor().y+1});
-            Crucible::Ray cornerRayD(ratStartVertex, {ray.getScaleFactor().x, ray.getScaleFactor().y-1});
-
-            // Second corner (Uses scale factor of second corner ray plus an amount to bypass)
-            Crucible::Ray cornerRayE(ratStartVertex, {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
-            Crucible::Ray cornerRayF(ratStartVertex, {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
-            Crucible::Ray cornerRayG(ratStartVertex, {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
-            Crucible::Ray cornerRayH(ratStartVertex, {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
-
-            size_t index = Crucible::TOTAL_CORE_LIGHT_RAYS + (i * 8);
-            lightSource.rays[index] = cornerRayA;
-            lightSource.rays[index + 1] = cornerRayB;
-            lightSource.rays[index + 2] = cornerRayC;
-            lightSource.rays[index + 3] = cornerRayD;
-            lightSource.rays[index + 4] = cornerRayE;
-            lightSource.rays[index + 5] = cornerRayF;
-            lightSource.rays[index + 6] = cornerRayG;
-            lightSource.rays[index + 7] = cornerRayH;
+//            const Crucible::Ray cornerRayA(ray.getStartVertex(), {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
+//            const Crucible::Ray cornerRayB(ray.getStartVertex(), {ray.getScaleFactor().x-1, ray.getScaleFactor().y});
+//            const Crucible::Ray cornerRayC(ray.getStartVertex(), {ray.getScaleFactor().x, ray.getScaleFactor().y+1});
+//            const Crucible::Ray cornerRayD(ray.getStartVertex(), {ray.getScaleFactor().x, ray.getScaleFactor().y-1});
+//
+//            // Second corner (Uses scale factor of second corner ray plus an amount to bypass)
+//            const Crucible::Ray cornerRayE(ray.getStartVertex(), {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
+//            const Crucible::Ray cornerRayF(ray.getStartVertex(), {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
+//            const Crucible::Ray cornerRayG(ray.getStartVertex(), {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
+//            const Crucible::Ray cornerRayH(ray.getStartVertex(), {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
+//
+//            size_t index = Crucible::TOTAL_CORE_LIGHT_RAYS + (i * 8);
+//            lightSource.rays[index] = cornerRayA;
+//            lightSource.rays[index + 1] = cornerRayB;
+//            lightSource.rays[index + 2] = cornerRayC;
+//            lightSource.rays[index + 3] = cornerRayD;
+//            lightSource.rays[index + 4] = cornerRayE;
+//            lightSource.rays[index + 5] = cornerRayF;
+//            lightSource.rays[index + 6] = cornerRayG;
+//            lightSource.rays[index + 7] = cornerRayH;
         }
     }
 }

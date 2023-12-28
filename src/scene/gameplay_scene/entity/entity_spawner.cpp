@@ -51,17 +51,15 @@ void EntitySpawner::spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions
 
 std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& playerTransform)
 {
-    std::vector<Crucible::Ray> rays = std::vector<Crucible::Ray>(Crucible::TOTAL_RAYS);
+    std::vector<Crucible::Ray> rays = std::vector<Crucible::Ray>(Crucible::TOTAL_RAYS + 1);
 
-    for (int rayIndex = 0; rayIndex < Crucible::TOTAL_CORE_LIGHT_RAYS; rayIndex++)
+    for (size_t rayIndex = 0; rayIndex <= Crucible::TOTAL_CORE_LIGHT_RAYS; rayIndex++)
     {
         const double rayAngleRadians = degrees_to_radians(Crucible::DEGREE_INCREMENT * rayIndex);
         const double rayDirX = cos(rayAngleRadians) * Crucible::RAY_SPEED;
         const double rayDirY = sin(rayAngleRadians) * Crucible::RAY_SPEED;
-        Crucible::Vec2 scaleFactor = Crucible::Vec2(rayDirX, rayDirY);
-        Crucible::Ray ray(playerTransform.position, scaleFactor);
         // @refactor: use move constructor here?
-        rays[rayIndex] = ray;
+        rays[rayIndex] = Crucible::Ray(playerTransform.position,  Crucible::Vec2(rayDirX, rayDirY));
     }
 
     std::cout << "Configured: [" << rays.size() << "] core light rays" << '\n';

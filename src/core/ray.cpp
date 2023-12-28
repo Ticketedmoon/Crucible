@@ -1,33 +1,47 @@
 #include "ray.h"
 
-Crucible::Ray::Ray() = default;
-
-Crucible::Ray::Ray(Vec2& entityPosition, Vec2 scaleFactor) : m_entityPosition(entityPosition), m_scaleFactor(scaleFactor)
+namespace Crucible
 {
+    Ray::Ray() : m_entityPosition({}), m_scaleFactor(Vec2())
+    {
 
-}
+    }
+    Ray::~Ray() = default;
 
-Crucible::Ray::Ray(const Crucible::Ray& ray) : m_entityPosition(ray.m_entityPosition), m_scaleFactor(ray.m_scaleFactor)
-{
-    std::cout << "[Ray] Copy Constructor called." << '\n';
-}
+    Ray::Ray(Vec2 entityPosition, Vec2 scaleFactor) : m_entityPosition(entityPosition),
+                                                      m_scaleFactor(scaleFactor)
+    {
 
-void Crucible::Ray::scale()
-{
-    m_endVertex.position += m_scaleFactor;
-}
+    }
 
-Crucible::Vec2 Crucible::Ray::getStartVertex() const
-{
-    return m_entityPosition;
-}
+    // assignment operator function
+    Ray& Ray::operator=(const Ray& other)
+    {
+        std::cout << "[Ray] Assignment Operator Override called." << '\n';
+        m_entityPosition = other.m_entityPosition;
+        m_scaleFactor = other.m_scaleFactor;
+        m_endVertex = other.m_endVertex;
+        return *this;
+    }
 
-Crucible::Vec2 Crucible::Ray::getEndVertex() const
-{
-    return m_endVertex.position;
-}
+    void Ray::scale()
+    {
+        // Scale
+        m_endVertex.position += m_scaleFactor;
+    }
 
-Crucible::Vec2 Crucible::Ray::getScaleFactor() const
-{
-    return m_scaleFactor;
+    Vec2& Ray::getStartVertex()
+    {
+        return m_entityPosition;
+    }
+
+    Vec2 Ray::getEndVertex() const
+    {
+        return m_endVertex.position;
+    }
+
+    Vec2 Ray::getScaleFactor() const
+    {
+        return m_scaleFactor;
+    }
 }

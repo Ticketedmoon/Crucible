@@ -5,22 +5,25 @@
 
 #include <SFML/Graphics/Vertex.hpp>
 #include "vertex.h"
-#include "component.h"
 #include <iostream>
+#include <memory>
 
+// TODO @investigate: Should ray contain collision information? e.g., collision point, corner points of collision side
 namespace Crucible
 {
-    // TODO @investigate: Should ray contain collision information? e.g., collision point, corner points of collision side
     class Ray
     {
         public:
             Ray();
-            explicit Ray(Vec2& entityPosition, Vec2 scaleFactor);
-            Ray(const Ray& ray);
+            ~Ray();
+            explicit Ray(Vec2 entityPosition, Vec2 scaleFactor);
+
+            // assignment operator overload.
+            Ray& operator=(const Ray& other);
 
             void scale();
 
-            [[nodiscard]] Vec2 getStartVertex() const;
+            [[nodiscard]] Vec2& getStartVertex();
             [[nodiscard]] Vec2 getEndVertex() const;
             [[nodiscard]] Vec2 getScaleFactor() const;
 

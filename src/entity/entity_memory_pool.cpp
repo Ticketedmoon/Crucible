@@ -22,7 +22,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
     rectShapeComponents.reserve(maxNumEntities);
     lightSourceComponents.reserve(maxNumEntities);
 
-    for (int i = 0; i < maxNumEntities; i++)
+    for (size_t i = 0; i < maxNumEntities; i++)
     {
         m_types.insert(m_types.begin() + i, Crucible::EntityType::NONE);
         m_alive.insert(m_alive.begin() + i, false);
