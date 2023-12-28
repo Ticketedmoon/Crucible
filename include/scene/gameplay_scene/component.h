@@ -15,7 +15,7 @@ namespace Component
 {
     struct CTransform
     {
-        Crucible::Vec2 position;
+        std::shared_ptr<Crucible::Vec2> position;
 
         bool has{};
     };

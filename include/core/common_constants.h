@@ -27,7 +27,7 @@ namespace Crucible
     constexpr uint8_t SHAPES_VISIBLE = 4;
     constexpr size_t TOTAL_ADDITIONAL_CORNER_RAYS = TOTAL_RAYS_PER_CORNER * TOTAL_CORNERS_FOR_RAY * SIDES_PER_SHAPE_VISIBLE * SHAPES_VISIBLE;
 
-    constexpr size_t TOTAL_CORE_LIGHT_RAYS = 8;
+    constexpr size_t TOTAL_CORE_LIGHT_RAYS = 360;
     constexpr size_t TOTAL_RAYS = TOTAL_CORE_LIGHT_RAYS;//+ TOTAL_ADDITIONAL_CORNER_RAYS;
 
     constexpr uint16_t TOTAL_DEGREES_CIRCLE = 360;

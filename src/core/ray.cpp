@@ -1,15 +1,17 @@
 #include "ray.h"
 
+#include <utility>
+
 namespace Crucible
 {
-    Ray::Ray() : m_entityPosition({}), m_scaleFactor(Vec2())
+    Ray::Ray() : m_entityPosition(), m_scaleFactor(Vec2())
     {
 
     }
     Ray::~Ray() = default;
 
-    Ray::Ray(Vec2 entityPosition, Vec2 scaleFactor) : m_entityPosition(entityPosition),
-                                                      m_scaleFactor(scaleFactor)
+    Ray::Ray(std::shared_ptr<Vec2> entityPosition, Vec2 scaleFactor) : m_entityPosition(std::move(entityPosition)),
+                                                                       m_scaleFactor(scaleFactor)
     {
 
     }
@@ -17,10 +19,13 @@ namespace Crucible
     // assignment operator function
     Ray& Ray::operator=(const Ray& other)
     {
-        std::cout << "[Ray] Assignment Operator Override called." << '\n';
-        m_entityPosition = other.m_entityPosition;
-        m_scaleFactor = other.m_scaleFactor;
-        m_endVertex = other.m_endVertex;
+        if (this != &other)
+        {
+            m_entityPosition = other.m_entityPosition;
+            m_scaleFactor = other.m_scaleFactor;
+            m_endVertex = other.m_endVertex;
+        }
+
         return *this;
     }
 
@@ -30,7 +35,7 @@ namespace Crucible
         m_endVertex.position += m_scaleFactor;
     }
 
-    Vec2& Ray::getStartVertex()
+    std::shared_ptr<Vec2>& Ray::getStartVertex()
     {
         return m_entityPosition;
     }

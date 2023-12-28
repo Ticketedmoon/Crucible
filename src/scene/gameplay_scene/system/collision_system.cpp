@@ -65,7 +65,7 @@ void CollisionSystem::checkForLightIntersectWithWindowBorderSide(Component::CLig
         Crucible::Ray& ray, size_t lineIndex,
         Crucible::Vec2 windowBorderVertexA, Crucible::Vec2 windowBorderVertexB)
 {
-    Crucible::Vec2 rayStartPos = {ray.getStartVertex().x, ray.getStartVertex().y};
+    Crucible::Vec2 rayStartPos = {ray.getStartVertex()->x, ray.getStartVertex()->y};
     Crucible::Vec2 rayEndPos = {ray.getEndVertex().x, ray.getEndVertex().y};
     Crucible::LightRayIntersect windowBorderIntersection = isLineIntersecting(false, rayStartPos, rayEndPos, windowBorderVertexA, windowBorderVertexB);
     if (windowBorderIntersection.hasIntersection)
@@ -80,7 +80,7 @@ void CollisionSystem::checkForLightIntersectWithShape(Component::CShape& otherEn
     // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.
     for (size_t i = 0; i < otherEntityShape.vertices.getVertexCount()-1; i++)
     {
-        Crucible::Vec2 rayStartPos = {ray.getStartVertex().x, ray.getStartVertex().y};
+        Crucible::Vec2 rayStartPos = {ray.getStartVertex()->x, ray.getStartVertex()->y};
         Crucible::Vec2 rayEndPos = {ray.getEndVertex().x, ray.getEndVertex().y};
 
         sf::Vertex& otherShapeStartVert = otherEntityShape.vertices[i];
@@ -167,8 +167,8 @@ void CollisionSystem::resolveCollision(
     float oxDiff = std::abs(otherEntityRectangleShape.vertices[0].position.x - otherEntityRectangleShape.vertices[1].position.x) / 2;
     float oyDiff = std::abs(otherEntityRectangleShape.vertices[0].position.y - otherEntityRectangleShape.vertices[2].position.y) / 2;
 
-    const Crucible::Vec2& entityPosition = Crucible::Vec2(entityTransform.position.x - xDiff, entityTransform.position.y + yDiff);
-    const Crucible::Vec2& otherEntityPosition = Crucible::Vec2(otherEntityTransform.position.x - oxDiff, otherEntityTransform.position.y + oyDiff);
+    const Crucible::Vec2& entityPosition = Crucible::Vec2(entityTransform.position->x - xDiff, entityTransform.position->y + yDiff);
+    const Crucible::Vec2& otherEntityPosition = Crucible::Vec2(otherEntityTransform.position->x - oxDiff, otherEntityTransform.position->y + oyDiff);
     const Crucible::Vec2& result = entityPosition - otherEntityPosition;
 
     applyCollisionManifoldToTransform(entityTransform, overlap, result);
@@ -183,23 +183,23 @@ void CollisionSystem::applyCollisionManifoldToTransform(Component::CTransform& e
     if (manifold.y == 1)
     {
         // Bottom Collision
-        entityTransform.position.y -= overlap.height;
+        entityTransform.position->y -= overlap.height;
     }
     if (manifold.y == -1)
     {
         // Top Collision
-        entityTransform.position.y += overlap.height;
+        entityTransform.position->y += overlap.height;
     }
 
     if (manifold.x == 1)
     {
         // Left Collision
-        entityTransform.position.x -= overlap.width;
+        entityTransform.position->x -= overlap.width;
     }
     if (manifold.x == -1)
     {
         // Right Collision
-        entityTransform.position.x += overlap.width;
+        entityTransform.position->x += overlap.width;
     }
 }
 

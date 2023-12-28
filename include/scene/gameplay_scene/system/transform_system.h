@@ -25,8 +25,8 @@ class TransformSystem : public System
 
     private:
         static void resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform);
-        void updateVertexPositionsForEntity(const Component::CTransform& entityTransform,
-                Component::CShape& entityRectangleShape) const;
+        static void updateVertexPositionsForEntity(const Component::CTransform& entityTransform,
+                Component::CShape& entityRectangleShape) ;
 
     private:
         EntityManager& m_entityManager;

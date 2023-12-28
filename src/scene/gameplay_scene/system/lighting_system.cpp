@@ -45,7 +45,7 @@ void LightingSystem::addVerticesForLightCollisions(Component::CLightSource& enti
         // Find closest intersect point.
         Crucible::LightRayIntersect closestIntersect = findClosestIntersectForLine(entityTransform, intersectList);
 
-        entityLightSource.lightVertices.append({{entityTransform.position.x, entityTransform.position.y}, sf::Color::Yellow});
+        entityLightSource.lightVertices.append({{entityTransform.position->x, entityTransform.position->y}, sf::Color::Yellow});
         entityLightSource.lightVertices.append({{closestIntersect.collisionPoint.x, closestIntersect.collisionPoint.y}, sf::Color::Yellow});
 
         // Clear intersects after finding closest intersect.
@@ -57,10 +57,10 @@ Crucible::LightRayIntersect LightingSystem::findClosestIntersectForLine(const Co
         std::vector<Crucible::LightRayIntersect>& intersectList) const
 {
     Crucible::LightRayIntersect closestIntersect = intersectList[0];
-    double distToPlayer = entityTransform.position.dist(intersectList[0].collisionPoint);
+    double distToPlayer = entityTransform.position->dist(intersectList[0].collisionPoint);
     for (Crucible::LightRayIntersect intersect: intersectList)
     {
-        double nextDistToPlayer = entityTransform.position.dist(intersect.collisionPoint);
+        double nextDistToPlayer = entityTransform.position->dist(intersect.collisionPoint);
         if (nextDistToPlayer < distToPlayer)
         {
             distToPlayer = nextDistToPlayer;

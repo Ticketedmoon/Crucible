@@ -9,20 +9,21 @@ void EntitySpawner::spawnPlayer()
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::PLAYER);
 
-    Crucible::Vec2 position{Crucible::WINDOW_WIDTH / 2.0f, Crucible::WINDOW_HEIGHT - 128};
+    std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(Crucible::WINDOW_WIDTH / 2.0f,
+            Crucible::WINDOW_HEIGHT - 128);
     Crucible::Vec2 dimensions{Crucible::PLAYER_SIZE, Crucible::PLAYER_SIZE};
     
-    Component::CTransform playerTransform = e.addComponent<Component::CTransform>(position);
+    auto& playerTransform = e.addComponent<Component::CTransform>(position);
     
     std::vector<Crucible::Ray> rays = createRays(playerTransform);
 
     sf::VertexArray shapeVertices(sf::Quads);
     const sf::Color playerColor = {255, 0, 127};
-    shapeVertices.append(sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, playerColor));
-    shapeVertices.append(sf::Vertex({position.x + dimensions.x / 2, position.y - dimensions.y / 2}, playerColor));
-    shapeVertices.append(sf::Vertex({position.x + dimensions.x / 2, position.y + dimensions.y / 2}, playerColor));
-    shapeVertices.append(sf::Vertex({position.x - dimensions.x / 2, position.y + dimensions.y / 2}, playerColor));
-    shapeVertices.append(sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, playerColor));
+    shapeVertices.append(sf::Vertex({position->x - dimensions.x / 2, position->y - dimensions.y / 2}, playerColor));
+    shapeVertices.append(sf::Vertex({position->x + dimensions.x / 2, position->y - dimensions.y / 2}, playerColor));
+    shapeVertices.append(sf::Vertex({position->x + dimensions.x / 2, position->y + dimensions.y / 2}, playerColor));
+    shapeVertices.append(sf::Vertex({position->x - dimensions.x / 2, position->y + dimensions.y / 2}, playerColor));
+    shapeVertices.append(sf::Vertex({position->x - dimensions.x / 2, position->y - dimensions.y / 2}, playerColor));
 
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
             std::vector<std::vector<Crucible::LightRayIntersect>>(Crucible::TOTAL_CORE_LIGHT_RAYS + Crucible::TOTAL_ADDITIONAL_CORNER_RAYS + 1,
@@ -45,7 +46,7 @@ void EntitySpawner::spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions
     vertices[3] = sf::Vertex({position.x - dimensions.x / 2, position.y + dimensions.y / 2}, shapeColor);
     vertices[4] = sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor);
 
-    e.addComponent<Component::CTransform>(position);
+    e.addComponent<Component::CTransform>(std::make_shared<Crucible::Vec2>(position));
     e.addComponent<Component::CShape>(vertices);
 }
 
