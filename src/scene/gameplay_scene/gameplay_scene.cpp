@@ -11,7 +11,6 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     registerSystems();
 
     // TODO move this to be config driven
-    m_entitySpawner.spawnPlayer();
     m_entitySpawner.spawnWall({150, 150}, {100, 100});
     m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH-150, 150}, {100, 100});
     m_entitySpawner.spawnWall({150, Crucible::WINDOW_HEIGHT-150}, {100, 100});
@@ -22,6 +21,11 @@ void GameplayScene::update()
 {
     m_entityManager.update();
     m_systemManager.update();
+
+    if (m_entityManager.getEntitiesByComponentType<Component::CControllable>().empty())
+    {
+        m_entitySpawner.spawnPlayer();
+    }
 }
 
 void GameplayScene::render()

@@ -29,12 +29,10 @@ void LightingSystem::execute()
 void LightingSystem::addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
         const Component::CTransform& entityTransform) const
 {
-    size_t totalLines = entityLightSource.rays.size();
-
     // Add player position as starting vertex
-    //entityLightSource.lightVertices.append({{m_entityTransform.position.x, m_entityTransform.position.y}, sf::Color::Yellow});
+    //entityLightSource.lightVertices.append({{entityTransform.position->x, entityTransform.position->y}, sf::Color::Yellow});
 
-    for (size_t lineIndex = 0; lineIndex < totalLines-1; lineIndex++)
+    for (size_t lineIndex = 0; lineIndex <  entityLightSource.rays.size(); lineIndex++)
     {
         std::vector<Crucible::LightRayIntersect>& intersectList = entityLightSource.lightRayIntersects[lineIndex];
         if (intersectList.empty())

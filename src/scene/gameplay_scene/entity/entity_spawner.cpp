@@ -2,7 +2,6 @@
 
 EntitySpawner::EntitySpawner(EntityManager& entityManager) : m_entityManager(entityManager)
 {
-    assert(Crucible::TOTAL_DEGREES_CIRCLE % Crucible::TOTAL_CORE_LIGHT_RAYS == 0);
 }
 
 void EntitySpawner::spawnPlayer()
@@ -26,8 +25,7 @@ void EntitySpawner::spawnPlayer()
     shapeVertices.append(sf::Vertex({position->x - dimensions.x / 2, position->y - dimensions.y / 2}, playerColor));
 
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
-            std::vector<std::vector<Crucible::LightRayIntersect>>(Crucible::TOTAL_CORE_LIGHT_RAYS + Crucible::TOTAL_ADDITIONAL_CORNER_RAYS + 1,
-                    std::vector<Crucible::LightRayIntersect>());
+            std::vector<std::vector<Crucible::LightRayIntersect>>(rays.size(), std::vector<Crucible::LightRayIntersect>());
 
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CShape>(shapeVertices);
@@ -52,23 +50,29 @@ void EntitySpawner::spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions
 
 std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& playerTransform)
 {
-    std::vector<Crucible::Ray> rays = std::vector<Crucible::Ray>(Crucible::TOTAL_RAYS + 1);
+    std::vector<Crucible::Ray> rays = std::vector<Crucible::Ray>();
 
-    for (size_t rayIndex = 0; rayIndex <= Crucible::TOTAL_CORE_LIGHT_RAYS; rayIndex++)
+    // Add wall vertices
+    std::vector<Entity> wallEntities = m_entityManager.getEntitiesByComponentType<Component::CShape>();
+
+    for (auto wallEntity : wallEntities)
     {
-        const double rayAngleRadians = degrees_to_radians(Crucible::DEGREE_INCREMENT * rayIndex);
-        const double rayDirX = cos(rayAngleRadians) * Crucible::RAY_SPEED;
-        const double rayDirY = sin(rayAngleRadians) * Crucible::RAY_SPEED;
-        // @refactor: use move constructor here?
-        rays[rayIndex] = Crucible::Ray(playerTransform.position,  Crucible::Vec2(rayDirX, rayDirY));
+        Component::CShape s = wallEntity.getComponent<Component::CShape>();
+        size_t shapeVertCount = s.vertices.getVertexCount();
+        for (size_t vertIndex = 0; vertIndex < shapeVertCount; vertIndex++)
+        {
+            // @refactor: use move constructor here?
+            sf::Vertex v = s.vertices[vertIndex];
+            rays.emplace_back(playerTransform.position, Crucible::Vec2(v.position.x, v.position.y));
+        }
     }
+
+    // Add window corner vertices
+    rays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
+    rays.emplace_back(playerTransform.position, Crucible::Vec2(Crucible::WINDOW_WIDTH, 0));
+    rays.emplace_back(playerTransform.position, Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+    rays.emplace_back(playerTransform.position, Crucible::Vec2(0, Crucible::WINDOW_HEIGHT));
 
     std::cout << "Configured: [" << rays.size() << "] core light rays" << '\n';
     return rays;
-}
-
-double EntitySpawner::degrees_to_radians(double y)
-{
-    double radians = (y * M_PI) / 180; // y not x
-    return radians;
 }

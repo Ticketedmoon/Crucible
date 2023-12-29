@@ -16,7 +16,7 @@ namespace Crucible
         public:
             Ray();
             ~Ray();
-            explicit Ray(std::shared_ptr<Vec2> entityPosition, Vec2 scaleFactor);
+            explicit Ray(std::shared_ptr<Vec2> entityPosition, Vec2 endPosition);
 
             // assignment operator overload.
             Ray& operator=(const Ray& other);
@@ -25,7 +25,6 @@ namespace Crucible
 
             [[nodiscard]] std::shared_ptr<Vec2>& getStartVertex();
             [[nodiscard]] Vec2 getEndVertex() const;
-            [[nodiscard]] Vec2 getScaleFactor() const;
 
         private:
             std::shared_ptr<Vec2> m_entityPosition;

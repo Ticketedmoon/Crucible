@@ -23,7 +23,6 @@ void CollisionSystem::execute()
             }
 
             auto& otherEntityRectangleShape = otherEntity.getComponent<Component::CShape>();
-
             resolvePhysicalCollisions(entityRectangleShape, entityTransform, otherEntity, otherEntityRectangleShape);
             resolveLightCollisions(entity, otherEntityRectangleShape);
         }
@@ -41,10 +40,15 @@ void CollisionSystem::resolveLightCollisions(const Entity& entity, Component::CS
             // @Refactor: If ray collision with shape, we don't need to check window border collisions.
             Crucible::Ray& ray = lightSource.rays[lineIndex];
             checkForLightIntersectWithShape(otherEntityRectangleShape, lightSource, ray, lineIndex);
-            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, Crucible::Vec2(0, 0), Crucible::Vec2(Crucible::WINDOW_WIDTH, 0));
-            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, Crucible::Vec2(0, Crucible::WINDOW_HEIGHT), Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
-            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, Crucible::Vec2(0, 0), Crucible::Vec2(0, Crucible::WINDOW_HEIGHT));
-            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, Crucible::Vec2(Crucible::WINDOW_WIDTH, 0), Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+
+            // top
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, 0, Crucible::Vec2(0, 0), Crucible::Vec2(Crucible::WINDOW_WIDTH, 0));
+            // right
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, 1, Crucible::Vec2(Crucible::WINDOW_WIDTH, 0), Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+            // bottom
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, 2, Crucible::Vec2(0, Crucible::WINDOW_HEIGHT), Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+            // left
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, 3, Crucible::Vec2(0, 0), Crucible::Vec2(0, Crucible::WINDOW_HEIGHT));
         }
     }
 }
@@ -62,12 +66,13 @@ void CollisionSystem::resolvePhysicalCollisions(const Component::CShape& entityR
 }
 
 void CollisionSystem::checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource,
-        Crucible::Ray& ray, size_t lineIndex,
+        Crucible::Ray& ray, size_t lineIndex, size_t shapeSideIndex,
         Crucible::Vec2 windowBorderVertexA, Crucible::Vec2 windowBorderVertexB)
 {
     Crucible::Vec2 rayStartPos = {ray.getStartVertex()->x, ray.getStartVertex()->y};
     Crucible::Vec2 rayEndPos = {ray.getEndVertex().x, ray.getEndVertex().y};
-    Crucible::LightRayIntersect windowBorderIntersection = isLineIntersecting(false, rayStartPos, rayEndPos, windowBorderVertexA, windowBorderVertexB);
+    Crucible::LightRayIntersect windowBorderIntersection = isLineIntersecting(false, rayStartPos,
+            rayEndPos, windowBorderVertexA, windowBorderVertexB);
     if (windowBorderIntersection.hasIntersection)
     {
         lightSource.lightRayIntersects[lineIndex].emplace_back(windowBorderIntersection);
@@ -78,45 +83,27 @@ void CollisionSystem::checkForLightIntersectWithShape(Component::CShape& otherEn
         Component::CLightSource& lightSource, Crucible::Ray& ray, size_t lineIndex)
 {
     // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.
-    for (size_t i = 0; i < otherEntityShape.vertices.getVertexCount()-1; i++)
+    // [0, 1] = top, [1, 2] = right, [2, 3] = bottom, [3, 4] = left
+    for (size_t shapeSideIndex = 0; shapeSideIndex < otherEntityShape.vertices.getVertexCount()-1; shapeSideIndex++)
     {
         Crucible::Vec2 rayStartPos = {ray.getStartVertex()->x, ray.getStartVertex()->y};
         Crucible::Vec2 rayEndPos = {ray.getEndVertex().x, ray.getEndVertex().y};
 
-        sf::Vertex& otherShapeStartVert = otherEntityShape.vertices[i];
-        sf::Vertex& otherShapeEndVert = otherEntityShape.vertices[i+1];
+        sf::Vertex& otherShapeStartVert = otherEntityShape.vertices[shapeSideIndex];
+        sf::Vertex& otherShapeEndVert = otherEntityShape.vertices[shapeSideIndex + 1];
+
         Crucible::Vec2 shapeLineStartPos{otherShapeStartVert.position.x, otherShapeStartVert.position.y};
         Crucible::Vec2 shapeLineEndPos{otherShapeEndVert.position.x, otherShapeEndVert.position.y};
 
         Crucible::LightRayIntersect shapeLightRayIntersection = isLineIntersecting(true, rayStartPos,
                 rayEndPos, shapeLineStartPos, shapeLineEndPos);
 
-        if (shapeLightRayIntersection.hasIntersection)
+        if (!shapeLightRayIntersection.hasIntersection)
         {
-            lightSource.lightRayIntersects[lineIndex].emplace_back(shapeLightRayIntersection);
-
-            // First corner (Uses scale factor of first corner ray plus an amount to bypass)
-//            const Crucible::Ray cornerRayA(ray.getStartVertex(), {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
-//            const Crucible::Ray cornerRayB(ray.getStartVertex(), {ray.getScaleFactor().x-1, ray.getScaleFactor().y});
-//            const Crucible::Ray cornerRayC(ray.getStartVertex(), {ray.getScaleFactor().x, ray.getScaleFactor().y+1});
-//            const Crucible::Ray cornerRayD(ray.getStartVertex(), {ray.getScaleFactor().x, ray.getScaleFactor().y-1});
-//
-//            // Second corner (Uses scale factor of second corner ray plus an amount to bypass)
-//            const Crucible::Ray cornerRayE(ray.getStartVertex(), {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
-//            const Crucible::Ray cornerRayF(ray.getStartVertex(), {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
-//            const Crucible::Ray cornerRayG(ray.getStartVertex(), {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
-//            const Crucible::Ray cornerRayH(ray.getStartVertex(), {ray.getScaleFactor().x+1, ray.getScaleFactor().y});
-//
-//            size_t index = Crucible::TOTAL_CORE_LIGHT_RAYS + (i * 8);
-//            lightSource.rays[index] = cornerRayA;
-//            lightSource.rays[index + 1] = cornerRayB;
-//            lightSource.rays[index + 2] = cornerRayC;
-//            lightSource.rays[index + 3] = cornerRayD;
-//            lightSource.rays[index + 4] = cornerRayE;
-//            lightSource.rays[index + 5] = cornerRayF;
-//            lightSource.rays[index + 6] = cornerRayG;
-//            lightSource.rays[index + 7] = cornerRayH;
+            continue;
         }
+
+        lightSource.lightRayIntersects[lineIndex].emplace_back(shapeLightRayIntersection);
     }
 }
 
@@ -126,7 +113,9 @@ bool CollisionSystem::isCollidingAABB(const Component::CShape& entityRect,
     return entityRect.vertices.getBounds().intersects(otherEntityRect.vertices.getBounds(), overlap);
 }
 
-Crucible::LightRayIntersect CollisionSystem::isLineIntersecting(bool isShapeCollision, Crucible::Vec2 vertexA, Crucible::Vec2 vertexB, Crucible::Vec2 vertexC, Crucible::Vec2 vertexD)
+Crucible::LightRayIntersect
+CollisionSystem::isLineIntersecting(bool isShapeCollision,
+        Crucible::Vec2 vertexA, Crucible::Vec2 vertexB, Crucible::Vec2 vertexC, Crucible::Vec2 vertexD)
 {
     Crucible::Vec2 r = (vertexB - vertexA);
     Crucible::Vec2 s = (vertexD - vertexC);
@@ -145,7 +134,10 @@ Crucible::LightRayIntersect CollisionSystem::isLineIntersecting(bool isShapeColl
         float collisionVertexY = vertexA.y + (t * r.y);
 
         const Crucible::Vec2& collisionVector = Crucible::Vec2(collisionVertexX, collisionVertexY);
-        return {true, isShapeCollision, collisionVector, vertexC, vertexD};
+
+        const Crucible::Vec2& collidedCornerVertexA = isShapeCollision ? vertexC : collisionVector;
+        const Crucible::Vec2& collidedCornerVertexB = isShapeCollision ? vertexD : collisionVector;
+        return {true, isShapeCollision, collisionVector, collidedCornerVertexA, collidedCornerVertexB};
     }
 
     return {false, isShapeCollision, Crucible::Vec2(0, 0), vertexC, vertexD};

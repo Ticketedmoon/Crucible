@@ -38,7 +38,8 @@ class CollisionSystem : public System
                 Component::CLightSource& lightSource, Crucible::Ray& ray, size_t lineIndex);
 
         static void checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource,
-                Crucible::Ray& ray, size_t lineIndex, Crucible::Vec2 windowBorderVertexA, Crucible::Vec2 windowBorderVertexB);
+                Crucible::Ray& ray, size_t lineIndex, size_t shapeSideIndex,
+                Crucible::Vec2 windowBorderVertexA, Crucible::Vec2 windowBorderVertexB);
 
         static sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
 
@@ -49,8 +50,9 @@ class CollisionSystem : public System
 
         static float crossProduct(Crucible::Vec2 a, Crucible::Vec2 b);
 
-        static Crucible::LightRayIntersect isLineIntersecting(bool isShapeCollision,
-                Crucible::Vec2 vertexA, Crucible::Vec2 vertexB, Crucible::Vec2 vertexC, Crucible::Vec2 vertexD);
+        static Crucible::LightRayIntersect
+        isLineIntersecting(bool isShapeCollision, Crucible::Vec2 vertexA, Crucible::Vec2 vertexB,
+                Crucible::Vec2 vertexC, Crucible::Vec2 vertexD);
 
     private:
         EntityManager& m_entityManager;

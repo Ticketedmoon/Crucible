@@ -21,19 +21,6 @@ namespace Crucible
 
     constexpr float PLAYER_SIZE = 50;
 
-    constexpr uint8_t TOTAL_CORNERS_FOR_RAY = 2;
-    constexpr uint8_t TOTAL_RAYS_PER_CORNER = 4;
-    constexpr uint8_t SIDES_PER_SHAPE_VISIBLE = 2;
-    constexpr uint8_t SHAPES_VISIBLE = 4;
-    constexpr size_t TOTAL_ADDITIONAL_CORNER_RAYS = TOTAL_RAYS_PER_CORNER * TOTAL_CORNERS_FOR_RAY * SIDES_PER_SHAPE_VISIBLE * SHAPES_VISIBLE;
-
-    constexpr size_t TOTAL_CORE_LIGHT_RAYS = 360;
-    constexpr size_t TOTAL_RAYS = TOTAL_CORE_LIGHT_RAYS;//+ TOTAL_ADDITIONAL_CORNER_RAYS;
-
-    constexpr uint16_t TOTAL_DEGREES_CIRCLE = 360;
-    constexpr uint16_t DEGREE_INCREMENT = TOTAL_DEGREES_CIRCLE / Crucible::TOTAL_CORE_LIGHT_RAYS;
-    constexpr uint16_t RAY_SPEED = 10000;
-
     enum class EntityType
     {
         PLAYER,
@@ -44,7 +31,6 @@ namespace Crucible
     struct LightRayIntersect
     {
         bool hasIntersection{};
-
         bool isShapeIntersection{};
 
         Vec2 collisionPoint;

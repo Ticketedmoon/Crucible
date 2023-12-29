@@ -21,8 +21,7 @@ class EntitySpawner
         void spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions);
 
     private:
-        static std::vector<Crucible::Ray> createRays(Component::CTransform& playerTransform);
-        static double degrees_to_radians(double y);
+        std::vector<Crucible::Ray> createRays(Component::CTransform& playerTransform);
 
     private:
         EntityManager& m_entityManager;
