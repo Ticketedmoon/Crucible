@@ -38,11 +38,13 @@ void EntitySpawner::spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions
 
     sf::VertexArray vertices(sf::Quads, 5);
     const sf::Color shapeColor = sf::Color::Blue;
-    vertices[0] = sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor);
-    vertices[1] = sf::Vertex({position.x + dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor);
-    vertices[2] = sf::Vertex({position.x + dimensions.x / 2, position.y + dimensions.y / 2}, shapeColor);
-    vertices[3] = sf::Vertex({position.x - dimensions.x / 2, position.y + dimensions.y / 2}, shapeColor);
-    vertices[4] = sf::Vertex({position.x - dimensions.x / 2, position.y - dimensions.y / 2}, shapeColor);
+    float halfEntityWidth = dimensions.x / 2;
+    float halfEntityHeight = dimensions.y / 2;
+    vertices[0] = sf::Vertex({position.x - halfEntityWidth, position.y - halfEntityHeight}, shapeColor);
+    vertices[1] = sf::Vertex({position.x + halfEntityWidth, position.y - halfEntityHeight}, shapeColor);
+    vertices[2] = sf::Vertex({position.x + halfEntityWidth, position.y + halfEntityHeight}, shapeColor);
+    vertices[3] = sf::Vertex({position.x - halfEntityWidth, position.y + halfEntityHeight}, shapeColor);
+    vertices[4] = sf::Vertex({position.x - halfEntityWidth, position.y - halfEntityHeight}, shapeColor);
 
     e.addComponent<Component::CTransform>(std::make_shared<Crucible::Vec2>(position));
     e.addComponent<Component::CShape>(vertices);
@@ -51,28 +53,35 @@ void EntitySpawner::spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions
 std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& playerTransform)
 {
     std::vector<Crucible::Ray> rays = std::vector<Crucible::Ray>();
+    std::vector<Crucible::Ray> additionalRays = std::vector<Crucible::Ray>();
 
-    // Add wall vertices
+    // Add window corner vertex rays
+    rays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
+    rays.emplace_back(playerTransform.position, Crucible::Vec2(Crucible::WINDOW_WIDTH, 0));
+    rays.emplace_back(playerTransform.position, Crucible::Vec2(0, Crucible::WINDOW_HEIGHT));
+    rays.emplace_back(playerTransform.position, Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+
+    // Add wall vertices rays
     std::vector<Entity> wallEntities = m_entityManager.getEntitiesByComponentType<Component::CShape>();
-
     for (auto wallEntity : wallEntities)
     {
         Component::CShape s = wallEntity.getComponent<Component::CShape>();
-        size_t shapeVertCount = s.vertices.getVertexCount();
-        for (size_t vertIndex = 0; vertIndex < shapeVertCount; vertIndex++)
+        for (size_t vertIndex = 0; vertIndex < s.vertices.getVertexCount()-1; vertIndex++)
         {
-            // @refactor: use move constructor here?
             sf::Vertex v = s.vertices[vertIndex];
+
+            // Add core ray
             rays.emplace_back(playerTransform.position, Crucible::Vec2(v.position.x, v.position.y));
+
+            // Add additional rays to left and right of core ray (This happens in RayAppenderSystem)
+            additionalRays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
+            additionalRays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
         }
     }
 
-    // Add window corner vertices
-    rays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
-    rays.emplace_back(playerTransform.position, Crucible::Vec2(Crucible::WINDOW_WIDTH, 0));
-    rays.emplace_back(playerTransform.position, Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
-    rays.emplace_back(playerTransform.position, Crucible::Vec2(0, Crucible::WINDOW_HEIGHT));
+    rays.insert(rays.end(), additionalRays.begin(), additionalRays.end());
 
-    std::cout << "Configured: [" << rays.size() << "] core light rays" << '\n';
+    std::cout << "Configured: [" << rays.size() << "] light rays" << '\n';
+
     return rays;
 }

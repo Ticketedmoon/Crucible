@@ -10,8 +10,8 @@ namespace Crucible
     }
     Ray::~Ray() = default;
 
-    Ray::Ray(std::shared_ptr<Vec2> entityPosition, Vec2 endPosition) : m_entityPosition(std::move(entityPosition)),
-                                                                       m_endVertex(endPosition)
+    Ray::Ray(std::shared_ptr<Vec2> entityPosition, Vec2 endVertex) : m_entityPosition(std::move(entityPosition)),
+                                                                     m_endVertex(endVertex)
     {
 
     }
@@ -26,13 +26,6 @@ namespace Crucible
         }
 
         return *this;
-    }
-
-    void Ray::scale()
-    {
-        //
-        // Scale
-        m_endVertex.position += m_scaleFactor;
     }
 
     std::shared_ptr<Vec2>& Ray::getStartVertex()

@@ -35,20 +35,20 @@ void CollisionSystem::resolveLightCollisions(const Entity& entity, Component::CS
     {
         auto& lightSource = entity.getComponent<Component::CLightSource>();
 
-        for (size_t lineIndex = 0; lineIndex <  lightSource.rays.size(); lineIndex++)
+        for (size_t rayIndex = 0; rayIndex <  lightSource.rays.size(); rayIndex++)
         {
             // @Refactor: If ray collision with shape, we don't need to check window border collisions.
-            Crucible::Ray& ray = lightSource.rays[lineIndex];
-            checkForLightIntersectWithShape(otherEntityRectangleShape, lightSource, ray, lineIndex);
+            Crucible::Ray& ray = lightSource.rays[rayIndex];
+            checkForLightIntersectWithShape(otherEntityRectangleShape, lightSource, ray, rayIndex);
 
             // top
-            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, 0, Crucible::Vec2(0, 0), Crucible::Vec2(Crucible::WINDOW_WIDTH, 0));
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, rayIndex, 0, Crucible::Vec2(0, 0), Crucible::Vec2(Crucible::WINDOW_WIDTH, 0));
             // right
-            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, 1, Crucible::Vec2(Crucible::WINDOW_WIDTH, 0), Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, rayIndex, 1, Crucible::Vec2(Crucible::WINDOW_WIDTH, 0), Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
             // bottom
-            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, 2, Crucible::Vec2(0, Crucible::WINDOW_HEIGHT), Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, rayIndex, 2, Crucible::Vec2(0, Crucible::WINDOW_HEIGHT), Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
             // left
-            checkForLightIntersectWithWindowBorderSide(lightSource, ray, lineIndex, 3, Crucible::Vec2(0, 0), Crucible::Vec2(0, Crucible::WINDOW_HEIGHT));
+            checkForLightIntersectWithWindowBorderSide(lightSource, ray, rayIndex, 3, Crucible::Vec2(0, 0), Crucible::Vec2(0, Crucible::WINDOW_HEIGHT));
         }
     }
 }

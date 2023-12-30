@@ -18,15 +18,6 @@ void TransformSystem::execute()
             resolveControllerMovementForEntity(entity, entityTransform);
         }
 
-        if (entity.hasComponent<Component::CLightSource>())
-        {
-            auto& lightSource = entity.getComponent<Component::CLightSource>();
-            for (Crucible::Ray& ray : lightSource.rays)
-            {
-                ray.scale();
-            }
-        }
-
         updateVertexPositionsForEntity(entityTransform, entityRectangleShape);
     }
 }
