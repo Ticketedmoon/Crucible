@@ -39,15 +39,18 @@ void RayAppenderSystem::execute()
 
                 size_t rayIndex = 20 + vertIndex + (totalAdditionalRaysPerEntity * otherShapeIndex);
 
-                size_t scale = 100;
                 size_t rayDelta = 1;
+                const Crucible::Vec2& rayEndPositionLeftOfVertex = Crucible::Vec2(v.position.x-rayDelta, v.position.y);
+                const Crucible::Vec2& rayEndPositionRightOfVertex = Crucible::Vec2(v.position.x+rayDelta, v.position.y);
 
-                Crucible::Vec2 cp{playerTransform.position->x, playerTransform.position->y};
-                const Crucible::Vec2& vertP = Crucible::Vec2(v.position.x-rayDelta, v.position.y);
-                const Crucible::Vec2& vertG = Crucible::Vec2(v.position.x+rayDelta, v.position.y);
-                Crucible::Vec2 endVa = ((vertP - cp) * scale) + cp;
-                Crucible::Vec2 endVb = ((vertG - cp) * scale) + cp;
+                // Scale rays
+                size_t scale = 100;
+                Crucible::Vec2 playerPosition{playerTransform.position->x, playerTransform.position->y};
+                Crucible::Vec2 endVa = ((rayEndPositionLeftOfVertex - playerPosition) * scale) + playerPosition;
+                Crucible::Vec2 endVb = ((rayEndPositionRightOfVertex - playerPosition) * scale) + playerPosition;
 
+                // @Review: Look to improve on this.
+                // Update rays each frame in-place
                 playerLightSource.rays[rayIndex] = Crucible::Ray(playerTransform.position, endVa);
                 playerLightSource.rays[rayIndex+1] = Crucible::Ray(playerTransform.position, endVb);
             }
