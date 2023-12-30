@@ -15,10 +15,12 @@ class LightingSystem : public System
         void execute() override;
 
     private:
-        void addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
-                const Component::CTransform& entityTransform) const;
-        Crucible::LightRayIntersect findClosestIntersectForLine(const Component::CTransform& entityTransform,
-                std::vector<Crucible::LightRayIntersect>& intersectList) const;
+        static std::vector<Crucible::LightRayIntersect> findAllRayIntersectionPoints(Component::CLightSource& entityLightSource,
+                const Component::CTransform& entityTransform) ;
+        static void addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
+                const Component::CTransform& entityTransform, const std::vector<Crucible::LightRayIntersect>& intersections) ;
+        static Crucible::LightRayIntersect findClosestIntersectForLine(const Component::CTransform& entityTransform,
+                std::vector<Crucible::LightRayIntersect>& intersectList) ;
 
     private:
         EntityManager& m_entityManager;

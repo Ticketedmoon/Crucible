@@ -31,12 +31,7 @@ namespace Crucible
     struct LightRayIntersect
     {
         bool hasIntersection{};
-        bool isShapeIntersection{};
-
         Vec2 collisionPoint;
-
-        Vec2 collidedLineStartVertex;
-        Vec2 collidedLineEndVertex;
     };
 }
 
