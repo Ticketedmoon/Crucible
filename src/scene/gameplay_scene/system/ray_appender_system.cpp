@@ -40,12 +40,11 @@ void RayAppenderSystem::execute()
                 size_t rayIndex = 20 + vertIndex + (totalAdditionalRaysPerEntity * otherShapeIndex);
 
                 size_t scale = 100;
-                //Crucible::Vec2 endVa = Crucible::Vec2(v.position.x - scale, 0);
-                //Crucible::Vec2 endVb = Crucible::Vec2(v.position.x + scale, 0);
-                //Crucible::Vec2 endVa = Crucible::Vec2(v.position.x, v.position.y - scale);
+                size_t rayDelta = 1;
+
                 Crucible::Vec2 cp{playerTransform.position->x, playerTransform.position->y};
-                const Crucible::Vec2& vertP = Crucible::Vec2(v.position.x-1, v.position.y);
-                const Crucible::Vec2& vertG = Crucible::Vec2(v.position.x+1, v.position.y);
+                const Crucible::Vec2& vertP = Crucible::Vec2(v.position.x-rayDelta, v.position.y);
+                const Crucible::Vec2& vertG = Crucible::Vec2(v.position.x+rayDelta, v.position.y);
                 Crucible::Vec2 endVa = ((vertP - cp) * scale) + cp;
                 Crucible::Vec2 endVb = ((vertG - cp) * scale) + cp;
 
