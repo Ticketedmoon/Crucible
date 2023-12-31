@@ -27,12 +27,15 @@ class CollisionSystem : public System
         static void resolveCollision(
                 const Component::CShape& entityRectangleShape, Component::CTransform& entityTransform,
                 const Component::CShape& otherEntityRectangleShape, const Component::CTransform& otherEntityTransform,
+                Component::CCollidable& otherEntityCollider,
                 const sf::FloatRect& overlap);
 
-        static void resolvePhysicalCollisions(const Component::CShape& entityRectangleShape, Component::CTransform& entityTransform,
-                const Entity& otherEntity, const Component::CShape& otherEntityRectangleShape) ;
+        static void resolvePhysicalCollisions(const Component::CShape& entityRectangleShape,
+                Component::CTransform& entityTransform, Component::CCollidable& entityCollider,
+                const Component::CTransform& otherEntityTransform,
+                const Component::CShape& otherEntityRectangleShape);
 
-        static void resolveLightCollisions(const Entity& entity, Component::CShape& otherEntityRectangleShape) ;
+        static void resolveLightCollisions(const Entity& entity, Component::CShape& otherEntityRectangleShape);
 
         static void checkForLightIntersectWithShape(Component::CShape& otherEntityShape,
                 Component::CLightSource& lightSource, Crucible::Ray& ray, size_t lineIndex);
@@ -42,10 +45,8 @@ class CollisionSystem : public System
 
         static sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
 
-        static void applyCollisionManifoldToTransform(
-                Component::CTransform& entityTransform,
-                const sf::FloatRect& overlap,
-                const Crucible::Vec2& result);
+        static void applyCollisionManifoldToTransform(Component::CCollidable& entityCollider,
+                const sf::FloatRect& overlap, const Crucible::Vec2& result);
 
         static float crossProduct(Crucible::Vec2 a, Crucible::Vec2 b);
 

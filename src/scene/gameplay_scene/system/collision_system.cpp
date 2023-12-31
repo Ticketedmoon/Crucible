@@ -13,6 +13,7 @@ void CollisionSystem::execute()
     {
         auto& entityRectangleShape = entity.getComponent<Component::CShape>();
         auto& entityTransform = entity.getComponent<Component::CTransform>();
+        auto& entityCollider = entity.getComponent<Component::CCollidable>();
 
         for (const Entity otherEntity : entities)
         {
@@ -23,7 +24,8 @@ void CollisionSystem::execute()
             }
 
             auto& otherEntityRectangleShape = otherEntity.getComponent<Component::CShape>();
-            resolvePhysicalCollisions(entityRectangleShape, entityTransform, otherEntity, otherEntityRectangleShape);
+            auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
+            resolvePhysicalCollisions(entityRectangleShape, entityTransform, entityCollider, otherEntityTransform, otherEntityRectangleShape);
             resolveLightCollisions(entity, otherEntityRectangleShape);
         }
     }
@@ -61,14 +63,15 @@ void CollisionSystem::resolveLightCollisions(const Entity& entity, Component::CS
 }
 
 void CollisionSystem::resolvePhysicalCollisions(const Component::CShape& entityRectangleShape,
-        Component::CTransform& entityTransform, const Entity& otherEntity,
+        Component::CTransform& entityTransform, Component::CCollidable& entityCollider,
+        const Component::CTransform& otherEntityTransform,
         const Component::CShape& otherEntityRectangleShape)
 {
     sf::FloatRect overlap;
     if (isCollidingAABB(entityRectangleShape, otherEntityRectangleShape, overlap))
     {
-        auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
-        resolveCollision(entityRectangleShape, entityTransform, otherEntityRectangleShape, otherEntityTransform, overlap);
+        resolveCollision(entityRectangleShape, entityTransform, otherEntityRectangleShape, otherEntityTransform,
+                entityCollider, overlap);
     }
 }
 
@@ -151,6 +154,7 @@ float CollisionSystem::crossProduct(Crucible::Vec2 a, Crucible::Vec2 b)
 void CollisionSystem::resolveCollision(
         const Component::CShape& entityRectangleShape, Component::CTransform& entityTransform,
         const Component::CShape& otherEntityRectangleShape, const Component::CTransform& otherEntityTransform,
+        Component::CCollidable& otherEntityCollider,
         const sf::FloatRect& overlap)
 {
     float xDiff = std::abs(entityRectangleShape.vertices[0].position.x - entityRectangleShape.vertices[1].position.x) / 2;
@@ -163,36 +167,17 @@ void CollisionSystem::resolveCollision(
     const Crucible::Vec2& otherEntityPosition = Crucible::Vec2(otherEntityTransform.position->x - oxDiff, otherEntityTransform.position->y + oyDiff);
     const Crucible::Vec2& result = entityPosition - otherEntityPosition;
 
-    applyCollisionManifoldToTransform(entityTransform, overlap, result);
+    applyCollisionManifoldToTransform(otherEntityCollider, overlap, result);
 }
 
-void CollisionSystem::applyCollisionManifoldToTransform(Component::CTransform& entityTransform,
+void CollisionSystem::applyCollisionManifoldToTransform(Component::CCollidable& entityCollider,
         const sf::FloatRect& overlap, const Crucible::Vec2& result)
 {
     sf::Vector2f collisionNormal{result.x, result.y};
-    auto manifold = getManifold(overlap, collisionNormal);
+    sf::Vector3f manifold = getManifold(overlap, collisionNormal);
 
-    if (manifold.y == 1)
-    {
-        // Bottom Collision
-        entityTransform.position->y -= overlap.height;
-    }
-    if (manifold.y == -1)
-    {
-        // Top Collision
-        entityTransform.position->y += overlap.height;
-    }
-
-    if (manifold.x == 1)
-    {
-        // Left Collision
-        entityTransform.position->x -= overlap.width;
-    }
-    if (manifold.x == -1)
-    {
-        // Right Collision
-        entityTransform.position->x += overlap.width;
-    }
+    entityCollider.manifoldDist = manifold;
+    entityCollider.collisionOverlap = {overlap.width, overlap.height};
 }
 
 sf::Vector3f CollisionSystem::getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal)

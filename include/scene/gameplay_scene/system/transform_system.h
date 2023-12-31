@@ -25,8 +25,10 @@ class TransformSystem : public System
 
     private:
         static void resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform);
-        static void updateVertexPositionsForEntity(const Component::CTransform& entityTransform,
-                Component::CShape& entityRectangleShape) ;
+        static void applyMovementToEntityTransformFromInput(const Component::CTransform& entityTransform,
+                Component::CShape& entityRectangleShape);
+        static void applyCollisionOverlapToEntityTransform(Component::CTransform& entityTransform,
+                Component::CCollidable& entityCollider);
 
     private:
         EntityManager& m_entityManager;

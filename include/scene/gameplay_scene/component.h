@@ -3,10 +3,10 @@
 #ifndef CRUCIBLE_COMPONENT_H
 #define CRUCIBLE_COMPONENT_H
 
-#include <SFML/System/Vector2.hpp>
 #include <utility>
 #include <SFML/Graphics/VertexArray.hpp>
 #include "vec2.h"
+#include <SFML/System/Vector3.hpp>
 #include "common_constants.h"
 #include "vertex.h"
 #include "ray.h"
@@ -30,14 +30,17 @@ namespace Component
         bool has;
     };
 
-    struct CCollision
+    struct CCollidable
     {
-        bool isCollidingUp;
-        bool isCollidingDown;
-        bool isCollidingLeft;
-        bool isCollidingRight;
+        bool isCollidingUp{};
+        bool isCollidingDown{};
+        bool isCollidingLeft{};
+        bool isCollidingRight{};
 
-        bool has;
+        sf::Vector3f manifoldDist;
+        Crucible::Vec2 collisionOverlap;
+
+        bool has{};
     };
 
     struct CShape

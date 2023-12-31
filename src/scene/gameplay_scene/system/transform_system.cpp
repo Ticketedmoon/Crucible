@@ -10,7 +10,8 @@ void TransformSystem::execute()
     for (const Entity entity : entities)
     {
         auto& entityTransform = entity.getComponent<Component::CTransform>();
-        auto& entityRectangleShape = entity.getComponent<Component::CShape>();
+        auto& entityCollider = entity.getComponent<Component::CCollidable>();
+        applyCollisionOverlapToEntityTransform(entityTransform, entityCollider);
 
         // @Refactor: Should we do this elsewhere?
         if (entity.hasComponent<Component::CControllable>())
@@ -18,8 +19,38 @@ void TransformSystem::execute()
             resolveControllerMovementForEntity(entity, entityTransform);
         }
 
-        updateVertexPositionsForEntity(entityTransform, entityRectangleShape);
+        auto& entityRectangleShape = entity.getComponent<Component::CShape>();
+        applyMovementToEntityTransformFromInput(entityTransform, entityRectangleShape);
     }
+}
+
+void TransformSystem::applyCollisionOverlapToEntityTransform(Component::CTransform& entityTransform,
+        Component::CCollidable& entityCollider)
+{
+    if (entityCollider.manifoldDist.y == 1)
+    {
+        // Bottom Collision
+        entityTransform.position->y -= entityCollider.collisionOverlap.y;
+    }
+    if (entityCollider.manifoldDist.y == -1)
+    {
+        // Top Collision
+        entityTransform.position->y += entityCollider.collisionOverlap.y;
+    }
+
+    if (entityCollider.manifoldDist.x == 1)
+    {
+        // Left Collision
+        entityTransform.position->x -= entityCollider.collisionOverlap.x;
+    }
+    if (entityCollider.manifoldDist.x == -1)
+    {
+        // Right Collision
+        entityTransform.position->x += entityCollider.collisionOverlap.x;
+    }
+
+    entityCollider.manifoldDist = {0, 0, 0};
+    entityCollider.collisionOverlap = {0, 0};
 }
 
 void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform)
@@ -45,7 +76,7 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
     }
 }
 
-void TransformSystem::updateVertexPositionsForEntity(const Component::CTransform& entityTransform,
+void TransformSystem::applyMovementToEntityTransformFromInput(const Component::CTransform& entityTransform,
         Component::CShape& entityRectangleShape)
 {
     float xDiff = std::abs(entityRectangleShape.vertices[0].position.x - entityRectangleShape.vertices[1].position.x) / 2;
