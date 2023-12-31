@@ -7,10 +7,11 @@ TransformSystem::TransformSystem(EntityManager& entityManager) : m_entityManager
 void TransformSystem::execute()
 {
     std::vector<Entity> entities = m_entityManager.getEntities();
-    for (const Entity entity : entities)
+    for (const Entity& entity : entities)
     {
         auto& entityTransform = entity.getComponent<Component::CTransform>();
         auto& entityCollider = entity.getComponent<Component::CCollidable>();
+
         applyCollisionOverlapToEntityTransform(entityTransform, entityCollider);
 
         // @Refactor: Should we do this elsewhere?
