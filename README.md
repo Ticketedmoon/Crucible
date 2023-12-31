@@ -3,7 +3,7 @@
 ---
 
 ## What is this project?
-A 2D top-down stealth rogue-like game.
+A couch Co-Op 2D top-down stealth rogue-like game.
 
 ---
 

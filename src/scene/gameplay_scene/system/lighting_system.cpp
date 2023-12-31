@@ -19,31 +19,34 @@ void LightingSystem::execute()
         auto& entityLightSource = entity.getComponent<Component::CLightSource>();
         auto& entityTransform = entity.getComponent<Component::CTransform>();
 
-        // Clear current light vertices
         entityLightSource.lightVertices.clear();
 
-        // Find intersections
         std::vector<Crucible::LightRayIntersect> intersections = findAllRayIntersectionPoints(entityLightSource,
                 entityTransform);
 
-        // Sort by increasing Angle
-        auto comparator =
-                [&entityTransform](const Crucible::LightRayIntersect& intersectA, const Crucible::LightRayIntersect& intersectB) {
-                    const Crucible::Vec2 velocityA{intersectA.collisionPoint.x - entityTransform.position->x,
-                                                  intersectA.collisionPoint.y - entityTransform.position->y};
-                    const Crucible::Vec2 velocityB{intersectB.collisionPoint.x - entityTransform.position->x,
-                                                   intersectB.collisionPoint.y - entityTransform.position->y};
-                    const float angleA = std::atan2(velocityA.y, velocityA.x);
-                    const float angleB = std::atan2(velocityB.y, velocityB.x);
-
-                    return angleA < angleB;
-                };
-
-        std::sort(intersections.begin(), intersections.end(), comparator);
+        sortIntersectionsByAngleAscending(entityTransform, intersections);
 
         // Add to light rendering vertex array
         addVerticesForLightCollisions(entityLightSource, entityTransform, intersections);
     }
+}
+
+void LightingSystem::sortIntersectionsByAngleAscending(const Component::CTransform& entityTransform,
+        std::vector<Crucible::LightRayIntersect>& intersections)
+{
+    auto comparator =
+            [&entityTransform](const Crucible::LightRayIntersect& intersectA, const Crucible::LightRayIntersect& intersectB) {
+                const Crucible::Vec2 velocityA{intersectA.collisionPoint.x - entityTransform.position->x,
+                                              intersectA.collisionPoint.y - entityTransform.position->y};
+                const Crucible::Vec2 velocityB{intersectB.collisionPoint.x - entityTransform.position->x,
+                                               intersectB.collisionPoint.y - entityTransform.position->y};
+                const float angleA = std::atan2(velocityA.y, velocityA.x);
+                const float angleB = std::atan2(velocityB.y, velocityB.x);
+
+                return angleA < angleB;
+            };
+
+    std::sort(intersections.begin(), intersections.end(), comparator);
 }
 
 std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionPoints(Component::CLightSource& entityLightSource,
@@ -58,11 +61,9 @@ std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionP
             continue;
         }
 
-        // Find closest intersect point.
         Crucible::LightRayIntersect closestIntersect = findClosestIntersectForLine(entityTransform, intersectList);
         collisionPoints.emplace_back(closestIntersect);
 
-        // Clear intersects after finding closest intersect.
         intersectList.clear();
     }
     return collisionPoints;

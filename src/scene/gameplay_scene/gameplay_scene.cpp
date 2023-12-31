@@ -93,8 +93,6 @@ void GameplayScene::registerActions()
     registerActionType(sf::Keyboard::Key::D, Action::Type::MOVE_RIGHT);
     registerActionType(sf::Keyboard::Key::W, Action::Type::MOVE_UP);
     registerActionType(sf::Keyboard::Key::S, Action::Type::MOVE_DOWN);
-
-    // Other
 }
 
 void GameplayScene::registerSystems()
