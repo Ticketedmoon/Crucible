@@ -44,7 +44,7 @@ Here are the changes summarised during this period:
 ![Sat 30 Dec 2023 16:50:20 GMT](https://github.com/Ticketedmoon/Crucible/assets/21260839/1ef528d2-6c34-4128-b85f-1549b1c84021)
 ![Sat 30 Dec 2023 16:57:20 GMT](https://github.com/Ticketedmoon/Crucible/assets/21260839/4e6bc14b-58e1-4ffb-88fd-89ae573f7f57)
 
-- The pinky block represents out player and light source. 
+- The pinky block represents our player and light source. 
 - The yellow area represents the region the player can see.
 
 ---
