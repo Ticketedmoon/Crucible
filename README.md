@@ -16,7 +16,7 @@ A couch Co-Op 2D top-down stealth rogue-like game.
 
 ## Dev Log
 
-### Entry #1 [Nov 14th -> Nov 26th]:
+### Entry #1 [Nov 14th -> Nov 26th, 2023]:
 - Basic 2D geometry added to the world.
 - Basic player controls.
 - Ability to push and move objects in the world.
@@ -26,7 +26,7 @@ I did not take screenshots during this period.
 
 ---
 
-### Entry #2 [Nov 27th -> Dec 30th]:
+### Entry #2 [Nov 27th -> Dec 30th, 2023]:
 Not a huge amount of time was spent working on the project during this period due to work and with the Christmas holidays.
 However, I did start a separate branch on the project for building my own line segment intersection algorithm.
 
@@ -49,8 +49,10 @@ Here are the changes summarised during this period:
 
 ---
 
-### Entry #3:
-[TBD]
+### Entry #3 [Jan 21st, 2024]:
+
+Haven't had much time to work on this project over the last month, but except for one notable fix:
+- Fixed a bug where the light rays would flicker when pushing entities in the game world.
 
 ---
 
