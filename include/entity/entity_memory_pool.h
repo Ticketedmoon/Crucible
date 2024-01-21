@@ -11,13 +11,15 @@
 #include <cassert>
 #include <utility>
 
-const inline uint8_t TOTAL_EXPECTED_COMPONENT_TYPES = 4;
+const inline uint8_t TOTAL_EXPECTED_COMPONENT_TYPES = 5;
+const inline uint8_t TOTAL_RESERVED_COMPONENT_TYPE_GROUPS = 5;
 
 typedef std::tuple<
-std::vector<Component::CTransform>,
-std::vector<Component::CControllable>,
-std::vector<Component::CCollision>,
-std::vector<Component::CRectangleShape>
+        std::vector<Component::CTransform>,
+        std::vector<Component::CControllable>,
+        std::vector<Component::CCollidable>,
+        std::vector<Component::CShape>,
+        std::vector<Component::CLightSource>
 > EntityComponentVectorTuple;
 
 static size_t MAX_NUM_ENTITIES = 100;
@@ -57,6 +59,7 @@ class EntityMemoryPool
         {
             std::vector<T>& componentPool = std::get<std::vector<T>>(m_pool);
             componentPool[entityId] = T(std::forward<TArgs>(mArgs)...);
+            //@review: Is this .has necessary?
             componentPool[entityId].has = true;
             return componentPool[entityId];
         }

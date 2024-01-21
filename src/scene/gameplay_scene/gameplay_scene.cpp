@@ -11,30 +11,33 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     registerSystems();
 
     // TODO move this to be config driven
-    m_entitySpawner.spawnPlayer();
     m_entitySpawner.spawnWall({150, 150}, {100, 100});
     m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH-150, 150}, {100, 100});
     m_entitySpawner.spawnWall({150, Crucible::WINDOW_HEIGHT-150}, {100, 100});
     m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH-150, Crucible::WINDOW_HEIGHT-150}, {100, 100});
+    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH/2, Crucible::WINDOW_HEIGHT/2}, {200, 200});
 }
 
 void GameplayScene::update()
 {
     m_entityManager.update();
     m_systemManager.update();
+
+    if (m_entityManager.getEntitiesByComponentType<Component::CControllable>().empty())
+    {
+        m_entitySpawner.spawnPlayer();
+    }
 }
 
 void GameplayScene::render()
 {
-    gameEngine.window.clear();
     m_renderTexture.clear(LEVEL_BACKGROUND_COLOR);
-
     m_systemManager.render();
-
     m_renderTexture.display();
     m_renderSprite.setTexture(m_renderTexture.getTexture());
-    gameEngine.window.draw(m_renderSprite, sf::RenderStates(sf::BlendAdd));
 
+    gameEngine.window.clear();
+    gameEngine.window.draw(m_renderSprite, sf::RenderStates(sf::BlendAdd));
     gameEngine.window.display();
 }
 
@@ -90,8 +93,6 @@ void GameplayScene::registerActions()
     registerActionType(sf::Keyboard::Key::D, Action::Type::MOVE_RIGHT);
     registerActionType(sf::Keyboard::Key::W, Action::Type::MOVE_UP);
     registerActionType(sf::Keyboard::Key::S, Action::Type::MOVE_DOWN);
-
-    // Other
 }
 
 void GameplayScene::registerSystems()
@@ -99,8 +100,14 @@ void GameplayScene::registerSystems()
     m_systemManager.registerSystem(
             std::make_shared<TransformSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
-            std::make_shared<CollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+            std::make_shared<PhysicalCollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+    m_systemManager.registerSystem(
+            std::make_shared<RayAppenderSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+    m_systemManager.registerSystem(
+            std::make_shared<LightCollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
 
+    m_systemManager.registerSystem(
+            std::make_shared<LightingSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
             std::make_shared<RenderSystem>(m_renderTexture, m_entityManager), SystemManager::SystemType::RENDER);
 }

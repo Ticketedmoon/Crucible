@@ -17,10 +17,18 @@ void RenderSystem::drawEntities()
     std::vector<Entity> entities = m_entityManager.getEntities();
     for (const Entity e : entities)
     {
-        if (e.hasComponent<Component::CRectangleShape>())
+        if (e.hasComponent<Component::CLightSource>())
         {
-            auto& cRectangleShape = e.getComponent<Component::CRectangleShape>();
-            m_renderTarget.draw(cRectangleShape.shape);
+            auto& cLightSource = e.getComponent<Component::CLightSource>();
+            sf::VertexArray& lightVertices = cLightSource.lightVertices;
+            m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::TriangleFan);
+            //m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::Lines);
+        }
+
+        if (e.hasComponent<Component::CShape>())
+        {
+            auto& cShape = e.getComponent<Component::CShape>();
+            m_renderTarget.draw(cShape.vertices);
         }
     }
 }

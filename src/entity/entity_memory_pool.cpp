@@ -12,15 +12,17 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
     // Pool
     auto& transformComponents = std::get<std::vector<Component::CTransform>>(m_pool);
     auto& controllableComponents = std::get<std::vector<Component::CControllable>>(m_pool);
-    auto& collisionComponents = std::get<std::vector<Component::CCollision>>(m_pool);
-    auto& rectShapeComponents = std::get<std::vector<Component::CRectangleShape>>(m_pool);
+    auto& collisionComponents = std::get<std::vector<Component::CCollidable>>(m_pool);
+    auto& rectShapeComponents = std::get<std::vector<Component::CShape>>(m_pool);
+    auto& lightSourceComponents = std::get<std::vector<Component::CLightSource>>(m_pool);
 
     transformComponents.reserve(maxNumEntities);
     controllableComponents.reserve(maxNumEntities);
     collisionComponents.reserve(maxNumEntities);
     rectShapeComponents.reserve(maxNumEntities);
-    
-    for (int i = 0; i < maxNumEntities; i++)
+    lightSourceComponents.reserve(maxNumEntities);
+
+    for (size_t i = 0; i < maxNumEntities; i++)
     {
         m_types.insert(m_types.begin() + i, Crucible::EntityType::NONE);
         m_alive.insert(m_alive.begin() + i, false);
@@ -28,8 +30,11 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
         transformComponents.insert(transformComponents.begin() + i, {{}, false});
         controllableComponents.insert(controllableComponents.begin() + i, {{}, false});
         collisionComponents.insert(collisionComponents.begin() + i, {{}, false});
-        rectShapeComponents.insert(rectShapeComponents.begin() + i, {sf::RectangleShape(), false});
+        rectShapeComponents.insert(rectShapeComponents.begin() + i, {{}, false});
+        lightSourceComponents.insert(lightSourceComponents.begin() + i, {{}, {}, {}, false});
     }
+
+    assert(std::tuple_size_v<EntityComponentVectorTuple> == TOTAL_RESERVED_COMPONENT_TYPE_GROUPS);
 }
 
 Entity EntityMemoryPool::addEntity(Crucible::EntityType type) const

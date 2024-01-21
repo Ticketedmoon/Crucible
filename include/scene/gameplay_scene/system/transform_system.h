@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <cmath>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -23,7 +24,7 @@ class TransformSystem : public System
         void execute() override;
 
     private:
-        void resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform) const;
+        static void resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform);
 
     private:
         EntityManager& m_entityManager;

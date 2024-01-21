@@ -3,16 +3,19 @@
 #ifndef CRUCIBLE_COMPONENT_H
 #define CRUCIBLE_COMPONENT_H
 
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
 #include <utility>
+#include <SFML/Graphics/VertexArray.hpp>
 #include "vec2.h"
+#include <SFML/System/Vector3.hpp>
+#include "common_constants.h"
+#include "vertex.h"
+#include "ray.h"
 
 namespace Component
 {
     struct CTransform
     {
-        Vec2 position;
+        std::shared_ptr<Crucible::Vec2> position;
 
         bool has{};
     };
@@ -27,19 +30,31 @@ namespace Component
         bool has;
     };
 
-    struct CCollision
+    struct CCollidable
     {
-        bool isCollidingUp;
-        bool isCollidingDown;
-        bool isCollidingLeft;
-        bool isCollidingRight;
+        bool isCollidingUp{};
+        bool isCollidingDown{};
+        bool isCollidingLeft{};
+        bool isCollidingRight{};
 
-        bool has;
+        bool has{};
     };
 
-    struct CRectangleShape
+    struct CShape
     {
-        sf::RectangleShape shape;
+        sf::VertexArray vertices = sf::VertexArray(sf::LineStrip);
+
+        bool has{};
+    };
+
+    struct CLightSource
+    {
+        // Every 2 elements is a line, so to access the nth line, the index positions are: (v[i * 2], v[(i * 2) * 1])
+        std::vector<Crucible::Ray> rays;
+
+        sf::VertexArray lightVertices;
+
+        std::vector<std::vector<Crucible::LightRayIntersect>> lightRayIntersects;
 
         bool has{};
     };
