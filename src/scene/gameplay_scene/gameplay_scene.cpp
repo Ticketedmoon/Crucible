@@ -99,19 +99,15 @@ void GameplayScene::registerSystems()
 {
     m_systemManager.registerSystem(
             std::make_shared<TransformSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
-
-    // FIXME: When pushing blocks, there is a flickering effect still, as the ray append system comes before the
-    //        collision system. Flipping the order of these systems still causes issues, we need to think about
-    //        combining the systems in some way, such that the pushing transformation is done prior to the RayAppenderSystem.
-    //        However, it also much be before the light collisions are calculated in the CollisionSystem.
+    m_systemManager.registerSystem(
+            std::make_shared<PhysicalCollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
             std::make_shared<RayAppenderSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
-            std::make_shared<CollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+            std::make_shared<LightCollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
 
     m_systemManager.registerSystem(
             std::make_shared<LightingSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
-
     m_systemManager.registerSystem(
             std::make_shared<RenderSystem>(m_renderTexture, m_entityManager), SystemManager::SystemType::RENDER);
 }

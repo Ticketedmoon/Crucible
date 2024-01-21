@@ -1,2 +1,2 @@
-./run_compile.sh
-./crucible.exe
+./build_cmake.sh
+./build/crucible

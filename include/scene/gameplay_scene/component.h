@@ -37,9 +37,6 @@ namespace Component
         bool isCollidingLeft{};
         bool isCollidingRight{};
 
-        sf::Vector3f manifoldDist;
-        Crucible::Vec2 collisionOverlap;
-
         bool has{};
     };
 

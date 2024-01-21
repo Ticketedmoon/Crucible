@@ -72,6 +72,11 @@ std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionP
 void LightingSystem::addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
         const Component::CTransform& entityTransform, const std::vector<Crucible::LightRayIntersect>& intersections)
 {
+    if (intersections.empty())
+    {
+        return;
+    }
+
     // Add transform position of player entity.
     entityLightSource.lightVertices.append({{entityTransform.position->x, entityTransform.position->y}, sf::Color::Yellow});
 
