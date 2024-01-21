@@ -1,7 +1,5 @@
 #include "ray.h"
 
-#include <utility>
-
 namespace Crucible
 {
     Ray::Ray() : m_entityPosition(), m_endVertex(Vec2())

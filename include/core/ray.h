@@ -7,6 +7,7 @@
 #include "vertex.h"
 #include <iostream>
 #include <memory>
+#include <utility>
 
 // TODO @investigate: Should ray contain collision information? e.g., collision point, corner points of collision side
 namespace Crucible
