@@ -17,7 +17,7 @@ const inline uint8_t TOTAL_RESERVED_COMPONENT_TYPE_GROUPS = 5;
 typedef std::tuple<
         std::vector<Component::CTransform>,
         std::vector<Component::CControllable>,
-        std::vector<Component::CCollidable>,
+        std::vector<Component::CCollider>,
         std::vector<Component::CShape>,
         std::vector<Component::CLightSource>
 > EntityComponentVectorTuple;

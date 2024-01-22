@@ -18,7 +18,7 @@ class EntitySpawner
         explicit EntitySpawner(EntityManager& entityManager);
 
         void spawnPlayer();
-        void spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions);
+        void spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions, bool isCollidable, sf::Color wallColor);
 
     private:
         std::vector<Crucible::Ray> createRays(Component::CTransform& playerTransform);

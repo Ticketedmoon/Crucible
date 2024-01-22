@@ -28,16 +28,17 @@ void EntitySpawner::spawnPlayer()
             std::vector<std::vector<Crucible::LightRayIntersect>>(rays.size(), std::vector<Crucible::LightRayIntersect>());
 
     e.addComponent<Component::CControllable>();
+    e.addComponent<Component::CCollider>();
     e.addComponent<Component::CShape>(shapeVertices);
     e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects);
 }
 
-void EntitySpawner::spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions)
+void EntitySpawner::spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions, bool isCollidable, sf::Color wallColor)
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::WALL);
 
     sf::VertexArray vertices(sf::Quads, 5);
-    const sf::Color shapeColor = sf::Color::Blue;
+    const sf::Color shapeColor = wallColor;
     float halfEntityWidth = dimensions.x / 2;
     float halfEntityHeight = dimensions.y / 2;
     vertices[0] = sf::Vertex({position.x - halfEntityWidth, position.y - halfEntityHeight}, shapeColor);
@@ -48,6 +49,10 @@ void EntitySpawner::spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions
 
     e.addComponent<Component::CTransform>(std::make_shared<Crucible::Vec2>(position));
     e.addComponent<Component::CShape>(vertices);
+    if (isCollidable)
+    {
+        e.addComponent<Component::CCollider>();
+    }
 }
 
 std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& playerTransform)

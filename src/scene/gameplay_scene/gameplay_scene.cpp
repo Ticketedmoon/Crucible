@@ -10,12 +10,15 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     registerActions();
     registerSystems();
 
+    sf::Color collidableBlockColor = sf::Color::Blue;
+    sf::Color immovableBlockColor = {255, 165, 0};
+
     // TODO move this to be config driven
-    m_entitySpawner.spawnWall({150, 150}, {100, 100});
-    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH-150, 150}, {100, 100});
-    m_entitySpawner.spawnWall({150, Crucible::WINDOW_HEIGHT-150}, {100, 100});
-    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH-150, Crucible::WINDOW_HEIGHT-150}, {100, 100});
-    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH/2, Crucible::WINDOW_HEIGHT/2}, {200, 200});
+    m_entitySpawner.spawnWall({150, 150}, {100, 100}, true, collidableBlockColor);
+    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH-150, 150}, {100, 100}, true, collidableBlockColor);
+    m_entitySpawner.spawnWall({150, Crucible::WINDOW_HEIGHT-150}, {100, 100}, true, collidableBlockColor);
+    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH-150, Crucible::WINDOW_HEIGHT-150}, {100, 100}, true, collidableBlockColor);
+    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH/2, Crucible::WINDOW_HEIGHT/2}, {200, 200}, false, immovableBlockColor);
 }
 
 void GameplayScene::update()

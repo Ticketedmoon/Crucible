@@ -12,7 +12,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
     // Pool
     auto& transformComponents = std::get<std::vector<Component::CTransform>>(m_pool);
     auto& controllableComponents = std::get<std::vector<Component::CControllable>>(m_pool);
-    auto& collisionComponents = std::get<std::vector<Component::CCollidable>>(m_pool);
+    auto& collisionComponents = std::get<std::vector<Component::CCollider>>(m_pool);
     auto& rectShapeComponents = std::get<std::vector<Component::CShape>>(m_pool);
     auto& lightSourceComponents = std::get<std::vector<Component::CLightSource>>(m_pool);
 
@@ -29,7 +29,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
 
         transformComponents.insert(transformComponents.begin() + i, {{}, false});
         controllableComponents.insert(controllableComponents.begin() + i, {{}, false});
-        collisionComponents.insert(collisionComponents.begin() + i, {{}, false});
+        collisionComponents.insert(collisionComponents.begin() + i, {{}});
         rectShapeComponents.insert(rectShapeComponents.begin() + i, {{}, false});
         lightSourceComponents.insert(lightSourceComponents.begin() + i, {{}, {}, {}, false});
     }

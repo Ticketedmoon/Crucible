@@ -11,6 +11,11 @@ void PhysicalCollisionSystem::execute()
 
     for (const Entity entity : entities)
     {
+        if (!entity.hasComponent<Component::CCollider>())
+        {
+            continue;
+        }
+
         auto& entityRectangleShape = entity.getComponent<Component::CShape>();
         auto& entityTransform = entity.getComponent<Component::CTransform>();
 

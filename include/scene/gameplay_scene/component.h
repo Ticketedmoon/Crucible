@@ -30,13 +30,8 @@ namespace Component
         bool has;
     };
 
-    struct CCollidable
+    struct CCollider
     {
-        bool isCollidingUp{};
-        bool isCollidingDown{};
-        bool isCollidingLeft{};
-        bool isCollidingRight{};
-
         bool has{};
     };
 
