@@ -24,10 +24,12 @@ void PhysicalCollisionSystem::execute()
 
             auto& otherEntityRectangleShape = otherEntity.getComponent<Component::CShape>();
             auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
+
             resolvePhysicalCollisions(entityRectangleShape, entityTransform, otherEntityTransform,
                     otherEntityRectangleShape);
-            updateShapeVertexPositions(entityTransform, entityRectangleShape);
         }
+
+        updateShapeVertexPositions(entityTransform, entityRectangleShape);
     }
 }
 
@@ -103,10 +105,10 @@ void PhysicalCollisionSystem::resolveCollision(Component::CShape& entityRectangl
     const Crucible::Vec2& otherEntityPosition = Crucible::Vec2(otherEntityTransform.position->x - oxDiff, otherEntityTransform.position->y + oyDiff);
     const Crucible::Vec2& result = entityPosition - otherEntityPosition;
 
-    applyCollisionManifoldToTransform(entityTransform, otherEntityTransform, overlap, result);
+    applyCollisionManifoldToTransform(entityTransform, overlap, result);
 }
 
-void PhysicalCollisionSystem::applyCollisionManifoldToTransform(Component::CTransform& cTransform, Component::CTransform& otherCTransform,
+void PhysicalCollisionSystem::applyCollisionManifoldToTransform(Component::CTransform& cTransform,
         const sf::FloatRect& overlap, const Crucible::Vec2& result)
 {
     sf::Vector2f collisionNormal{result.x, result.y};
@@ -114,7 +116,6 @@ void PhysicalCollisionSystem::applyCollisionManifoldToTransform(Component::CTran
     sf::Vector2f collisionOverlap = {overlap.width, overlap.height};
 
     applyCollisionOverlapToEntityTransform(cTransform, manifoldDist, collisionOverlap);
-    applyCollisionOverlapToEntityTransform(otherCTransform, -manifoldDist, collisionOverlap);
 }
 
 sf::Vector3f PhysicalCollisionSystem::getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal)

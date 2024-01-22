@@ -41,7 +41,7 @@ class PhysicalCollisionSystem : public System
 
         static sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
 
-        static void applyCollisionManifoldToTransform(Component::CTransform& cTransform, Component::CTransform& otherCTransform,
+        static void applyCollisionManifoldToTransform(Component::CTransform& cTransform,
                 const sf::FloatRect& overlap, const Crucible::Vec2& result);
 
     private:
