@@ -26,7 +26,8 @@ class RayAppenderSystem  : public System
         static const int TOTAL_CORE_RAYS = 20;
         static const size_t RAY_DELTA = 1;
         static const size_t RAY_SCALE = 100;
-        const size_t totalRaysPerVertex = 4;
+        static constexpr float RADIANS_OFFSET = 0.3174533f;
+        const size_t totalRaysPerVertex = 2;
 
 };
 

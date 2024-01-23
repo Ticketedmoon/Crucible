@@ -81,8 +81,6 @@ std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& play
             // Add additional rays to left and right of core ray (This happens in RayAppenderSystem)
             additionalRays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
             additionalRays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
-            additionalRays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
-            additionalRays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
         }
     }
 
