@@ -32,12 +32,15 @@ class GameEngine
 
     public:
         sf::RenderWindow window;
+        sf::RenderTexture m_renderTexture;
+        sf::Sprite m_renderSprite;
+
         sf::Clock gameClock;
-        AudioManager* m_audioManager = AudioManager::getInstance();
 
     private:
         Scene::Type currentScene = Scene::Type::LEVEL_ONE_GAMEPLAY_SCENE;
         std::unordered_map<Scene::Type, std::shared_ptr<Scene>> gameScenes;
+        AudioManager* m_audioManager = AudioManager::getInstance();
 };
 
 #endif //CRUCIBLE_GAME_ENGINE_H

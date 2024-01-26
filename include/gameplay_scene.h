@@ -41,9 +41,6 @@ class GameplayScene : public Scene
         EntityManager m_entityManager;
         EntitySpawner m_entitySpawner;
         SystemManager m_systemManager;
-
-        sf::RenderTexture m_renderTexture;
-        sf::Sprite m_renderSprite;
 };
 
 
