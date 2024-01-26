@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26.4)
+cmake_minimum_required(VERSION 3.26.4...3.28.1)
 project(crucible)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -9,10 +9,10 @@ set(IS_RELEASE_MODE FALSE)
 # Note: This compiler optimisation may break debugging.
 if (IS_RELEASE_MODE)
     message("-- Loading release build, compiler optimisations set")
-    set(CXXFLAGS  "-Wall -std=c++${CMAKE_CXX_STANDARD} -I./include -I./libs/headers -g -O2")
+    set(CXXFLAGS  "-Wall -std=c++${CMAKE_CXX_STANDARD} -I./include -I./lib/header -g -O2")
 else()
     message("-- Loading debug build, compiler optimisations disabled")
-    set(CXXFLAGS  "-Wall -std=c++${CMAKE_CXX_STANDARD} -I./include -I./libs/headers -g -O0")
+    set(CXXFLAGS  "-Wall -std=c++${CMAKE_CXX_STANDARD} -I./include -I./lib/header -g -O0")
 endif ()
 set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
 
@@ -48,18 +48,19 @@ file(GLOB GAMEPLAY_SCENE_SYSTEM_SOURCES "src/scene/gameplay_scene/system/*.cpp")
 
 file(COPY resources DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
+# Detect and add SFML
+find_package(SFML 2.5.1 COMPONENTS system window graphics network audio REQUIRED)
+
 add_executable(${PROJECT_NAME} ${ROOT_GAME_SOURCES} ${CORE_GAME_SOURCES} ${SCENE_SOURCES} ${ENTITY_SOURCES} ${SYSTEM_SOURCES}
-        ${MENU_SCENE_ROOT_COMPONENT_SOURCES} ${LEVEL_SELECT_SCENE_ROOT_COMPONENT_SOURCES} ${GAME_OVER_SCENE_ROOT_COMPONENT_SOURCES}
-        ${GAMEPLAY_SCENE_ROOT_COMPONENT_SOURCES} ${GAMEPLAY_SCENE_COMPONENT_SOURCES} ${GAMEPLAY_SCENE_ENTITY_SOURCES} ${GAMEPLAY_SCENE_SYSTEM_SOURCES})
+${MENU_SCENE_ROOT_COMPONENT_SOURCES} ${LEVEL_SELECT_SCENE_ROOT_COMPONENT_SOURCES} ${GAME_OVER_SCENE_ROOT_COMPONENT_SOURCES}
+${GAMEPLAY_SCENE_ROOT_COMPONENT_SOURCES} ${GAMEPLAY_SCENE_COMPONENT_SOURCES} ${GAMEPLAY_SCENE_ENTITY_SOURCES} ${GAMEPLAY_SCENE_SYSTEM_SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_BINARY_DIR}")
 target_include_directories(${PROJECT_NAME} PRIVATE include include/component include/core include/entity include/system
         include/scene include/scene/gameplay_scene include/scene/gameplay_scene/component
         include/scene/gameplay_scene/system  include/scene/menu_scene include/scene/menu_scene/system)
+target_include_directories(${PROJECT_NAME} PRIVATE lib/header)
 
-# Detect and add SFML
-find_package(SFML 2.5.1 COMPONENTS system window graphics network audio REQUIRED)
-
-target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
+target_link_libraries(${PROJECT_NAME} PUBLIC sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)

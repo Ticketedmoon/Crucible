@@ -13,6 +13,7 @@
 #include "common_constants.h"
 #include "scene.h"
 #include "gameplay_scene.h"
+#include "level_manager.h"
 
 class GameEngine
 {
@@ -40,6 +41,8 @@ class GameEngine
     private:
         Scene::Type currentScene = Scene::Type::LEVEL_ONE_GAMEPLAY_SCENE;
         std::unordered_map<Scene::Type, std::shared_ptr<Scene>> gameScenes;
+
+        LevelManager m_levelManager;
         AudioManager* m_audioManager = AudioManager::getInstance();
 };
 

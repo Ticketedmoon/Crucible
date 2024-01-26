@@ -3,6 +3,7 @@
 GameEngine::GameEngine()
 {
     createGameWindow();
+
     gameScenes[currentScene] = std::make_shared<GameplayScene>(*this);
 }
 
