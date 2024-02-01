@@ -1,20 +1,29 @@
 #include "gameplay_scene.h"
 
 GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
-    m_entitySpawner(m_entityManager)
+    m_entitySpawner(m_entityManager), m_levelManager(m_entityManager)
 {
     registerActions();
     registerSystems();
 
-    sf::Color collidableBlockColor = sf::Color::Blue;
-    sf::Color immovableBlockColor = {255, 165, 0};
+    Level& level = m_levelManager.loadLevel();
+    for (int row = 0; row < level.height; row++)
+    {
+        for (int col = 0; col < level.width; col++)
+        {
+            int textureIndex = col + (row * level.width);
+            Tile t = level.layers[0].data.at(textureIndex);
+            t.position.x *= Crucible::TILE_SIZE;
+            t.position.y *= Crucible::TILE_SIZE;
 
-    // TODO move this to be config driven
-    m_entitySpawner.spawnWall({150, 150}, {100, 100}, true, collidableBlockColor);
-    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH-150, 150}, {100, 100}, true, collidableBlockColor);
-    m_entitySpawner.spawnWall({150, Crucible::WINDOW_HEIGHT-150}, {100, 100}, true, collidableBlockColor);
-    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH-150, Crucible::WINDOW_HEIGHT-150}, {100, 100}, true, collidableBlockColor);
-    m_entitySpawner.spawnWall({Crucible::WINDOW_WIDTH/2, Crucible::WINDOW_HEIGHT/2}, {200, 200}, false, immovableBlockColor);
+            bool isCollidable = t.type == TileType::BEDROCK_BLOCK || t.type == TileType::BROWN_FLOOR_BLOCK
+                    || t.type == TileType::ARROW_BLOCK || t.type == TileType::PINK_BROOM_BLOCK;
+            bool isImmovable = t.type == TileType::BEDROCK_BLOCK || t.type == TileType::BROWN_FLOOR_BLOCK
+                    || t.type == TileType::PINK_BROOM_BLOCK
+                    || t.type == TileType::SKY_SPAWN_BLOCK;
+            m_entitySpawner.createTile(t, isCollidable, isImmovable);
+        }
+    }
 }
 
 void GameplayScene::update()
@@ -24,7 +33,7 @@ void GameplayScene::update()
 
     if (m_entityManager.getEntitiesByComponentType<Component::CControllable>().empty())
     {
-        m_entitySpawner.spawnPlayer();
+        m_entitySpawner.createPlayer();
     }
 }
 

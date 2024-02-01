@@ -18,11 +18,11 @@ typedef std::tuple<
         std::vector<Component::CTransform>,
         std::vector<Component::CControllable>,
         std::vector<Component::CCollider>,
-        std::vector<Component::CShape>,
+        std::vector<Component::CTile>,
         std::vector<Component::CLightSource>
 > EntityComponentVectorTuple;
 
-static size_t MAX_NUM_ENTITIES = 100;
+static size_t MAX_NUM_ENTITIES = 300;
 
 // forward declare
 class Entity;

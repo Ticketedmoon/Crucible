@@ -6,22 +6,25 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <iostream>
 
+#include "level_manager.h"
 #include "system.h"
 #include "entity_manager.h"
 #include "common_constants.h"
 #include "vertex.h"
 #include "ray.h"
+#include "tile.h"
 
 class EntitySpawner
 {
     public:
         explicit EntitySpawner(EntityManager& entityManager);
 
-        void spawnPlayer();
-        void spawnWall(Crucible::Vec2 position, Crucible::Vec2 dimensions, bool isCollidable, sf::Color wallColor);
+        void createPlayer();
+        void createTile(Tile& t, bool isCollidable, bool immovable);
 
     private:
         std::vector<Crucible::Ray> createRays(Component::CTransform& playerTransform);
+        static void updateTileTexture(Tile& tile);
 
     private:
         EntityManager& m_entityManager;

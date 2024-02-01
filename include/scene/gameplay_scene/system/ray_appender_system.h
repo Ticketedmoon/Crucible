@@ -3,9 +3,9 @@
 #ifndef CRUCIBLE_RAY_APPENDER_SYSTEM_H
 #define CRUCIBLE_RAY_APPENDER_SYSTEM_H
 
-
 #include "system.h"
 #include "entity_manager.h"
+#include "level_manager.h"
 
 /**
  * [System Description]

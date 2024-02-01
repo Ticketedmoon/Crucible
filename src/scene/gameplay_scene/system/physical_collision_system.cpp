@@ -9,17 +9,13 @@ void PhysicalCollisionSystem::execute()
 {
     std::vector<Entity> entities = m_entityManager.getEntities();
 
-    for (const Entity entity : entities)
+    for (const Entity& entity : entities)
     {
-        if (!entity.hasComponent<Component::CCollider>())
-        {
-            continue;
-        }
-
-        auto& entityRectangleShape = entity.getComponent<Component::CShape>();
+        auto& entityRectangleShape = entity.getComponent<Component::CTile>();
         auto& entityTransform = entity.getComponent<Component::CTransform>();
+        auto& entityCollider = entity.getComponent<Component::CCollider>();
 
-        for (const Entity otherEntity : entities)
+        for (const Entity& otherEntity : entities)
         {
             if (entity.getId() == otherEntity.getId())
             {
@@ -27,21 +23,28 @@ void PhysicalCollisionSystem::execute()
                 continue;
             }
 
-            auto& otherEntityRectangleShape = otherEntity.getComponent<Component::CShape>();
-            auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
-
-            resolvePhysicalCollisions(entityRectangleShape, entityTransform, otherEntityTransform,
-                    otherEntityRectangleShape);
+            if (entity.hasComponent<Component::CCollider>() && otherEntity.hasComponent<Component::CCollider>())
+            {
+                auto& otherEntityRectangleShape = otherEntity.getComponent<Component::CTile>();
+                auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
+                resolvePhysicalCollisions(entityRectangleShape, entityTransform, entityCollider,
+                        otherEntityTransform, otherEntityRectangleShape);
+            }
         }
 
         updateShapeVertexPositions(entityTransform, entityRectangleShape);
     }
 }
 
-void PhysicalCollisionSystem::resolvePhysicalCollisions(Component::CShape& entityRectangleShape,
-        Component::CTransform& entityTransform, Component::CTransform& otherEntityTransform,
-        Component::CShape& otherEntityRectangleShape)
+void PhysicalCollisionSystem::resolvePhysicalCollisions(Component::CTile& entityRectangleShape,
+        Component::CTransform& entityTransform, Component::CCollider entityCollider,
+        Component::CTransform& otherEntityTransform, Component::CTile& otherEntityRectangleShape)
 {
+    if (entityCollider.immovable)
+    {
+        return;
+    }
+
     sf::FloatRect overlap;
     if (isCollidingAABB(entityRectangleShape, otherEntityRectangleShape, overlap))
     {
@@ -50,10 +53,10 @@ void PhysicalCollisionSystem::resolvePhysicalCollisions(Component::CShape& entit
     }
 }
 
-bool PhysicalCollisionSystem::isCollidingAABB(const Component::CShape& entityRect,
-        const Component::CShape& otherEntityRect, sf::FloatRect& overlap)
+bool PhysicalCollisionSystem::isCollidingAABB(const Component::CTile& entityTile,
+        const Component::CTile& otherTile, sf::FloatRect& overlap)
 {
-    return entityRect.vertices.getBounds().intersects(otherEntityRect.vertices.getBounds(), overlap);
+    return entityTile.tile.vertices->getBounds().intersects(otherTile.tile.vertices->getBounds(), overlap);
 }
 
 void PhysicalCollisionSystem::applyCollisionOverlapToEntityTransform(Component::CTransform& entityTransform,
@@ -83,28 +86,26 @@ void PhysicalCollisionSystem::applyCollisionOverlapToEntityTransform(Component::
 }
 
 void PhysicalCollisionSystem::updateShapeVertexPositions(const Component::CTransform& entityTransform,
-        Component::CShape& entityRectangleShape)
+        Component::CTile& entityTile)
 {
-    float xDiff = std::abs(entityRectangleShape.vertices[0].position.x - entityRectangleShape.vertices[1].position.x) / 2;
-    float yDiff = std::abs(entityRectangleShape.vertices[0].position.y - entityRectangleShape.vertices[2].position.y) / 2;
-
     // Update rect based on transform points
-    entityRectangleShape.vertices[0].position = { entityTransform.position->x - xDiff, entityTransform.position->y - yDiff };
-    entityRectangleShape.vertices[1].position = { entityTransform.position->x + xDiff, entityTransform.position->y - yDiff };
-    entityRectangleShape.vertices[2].position = { entityTransform.position->x + xDiff, entityTransform.position->y + yDiff };
-    entityRectangleShape.vertices[3].position = { entityTransform.position->x - xDiff, entityTransform.position->y + yDiff };
-    entityRectangleShape.vertices[4].position = { entityTransform.position->x - xDiff, entityTransform.position->y - yDiff };
+    sf::VertexArray& tileVertices = *entityTile.tile.vertices;
+    tileVertices[0].position = {entityTransform.position->x, entityTransform.position->y};
+    tileVertices[1].position = {entityTransform.position->x + Crucible::TILE_SIZE, entityTransform.position->y};
+    tileVertices[2].position = {entityTransform.position->x + Crucible::TILE_SIZE, entityTransform.position->y + Crucible::TILE_SIZE };
+    tileVertices[3].position = {entityTransform.position->x, entityTransform.position->y + Crucible::TILE_SIZE };
+    tileVertices[4].position = {entityTransform.position->x, entityTransform.position->y};
 }
 
-void PhysicalCollisionSystem::resolveCollision(Component::CShape& entityRectangleShape, Component::CTransform& entityTransform,
-        Component::CShape& otherEntityRectangleShape, Component::CTransform& otherEntityTransform,
-        const sf::FloatRect& overlap)
+void PhysicalCollisionSystem::resolveCollision(Component::CTile& entityTile, Component::CTransform& entityTransform,
+        Component::CTile& otherEntityTile, Component::CTransform& otherEntityTransform, const sf::FloatRect& overlap)
 {
-    float xDiff = std::abs(entityRectangleShape.vertices[0].position.x - entityRectangleShape.vertices[1].position.x) / 2;
-    float yDiff = std::abs(entityRectangleShape.vertices[0].position.y - entityRectangleShape.vertices[2].position.y) / 2;
+    sf::VertexArray& tileVertices = *entityTile.tile.vertices;
+    float xDiff = std::abs(tileVertices[0].position.x - tileVertices[1].position.x) / 2;
+    float yDiff = std::abs(tileVertices[0].position.y - tileVertices[2].position.y) / 2;
 
-    float oxDiff = std::abs(otherEntityRectangleShape.vertices[0].position.x - otherEntityRectangleShape.vertices[1].position.x) / 2;
-    float oyDiff = std::abs(otherEntityRectangleShape.vertices[0].position.y - otherEntityRectangleShape.vertices[2].position.y) / 2;
+    float oxDiff = std::abs(tileVertices[0].position.x - tileVertices[1].position.x) / 2;
+    float oyDiff = std::abs(tileVertices[0].position.y - tileVertices[2].position.y) / 2;
 
     const Crucible::Vec2& entityPosition = Crucible::Vec2(entityTransform.position->x - xDiff, entityTransform.position->y + yDiff);
     const Crucible::Vec2& otherEntityPosition = Crucible::Vec2(otherEntityTransform.position->x - oxDiff, otherEntityTransform.position->y + oyDiff);

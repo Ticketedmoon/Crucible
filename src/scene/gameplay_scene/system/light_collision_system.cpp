@@ -11,33 +11,23 @@ void LightCollisionSystem::execute()
 
     for (const Entity entity : entities)
     {
-        for (const Entity otherEntity : entities)
+        if (!entity.hasComponent<Component::CLightSource>())
         {
-            if (entity.getId() == otherEntity.getId())
-            {
-                // @Refactor: Can we do this a better way?
-                continue;
-            }
-
-            auto& otherEntityRectangleShape = otherEntity.getComponent<Component::CShape>();
-            resolveLightCollisions(entity, otherEntityRectangleShape);
+            continue;
         }
+
+        resolveLightCollisions(entity);
     }
 }
 
-void LightCollisionSystem::resolveLightCollisions(const Entity& entity, Component::CShape& otherEntityRectangleShape)
+void LightCollisionSystem::resolveLightCollisions(const Entity& entity)
 {
-    if (!entity.hasComponent<Component::CLightSource>())
-    {
-        return;
-    }
-
     auto& lightSource = entity.getComponent<Component::CLightSource>();
     for (size_t rayIndex = 0; rayIndex < lightSource.rays.size(); rayIndex++)
     {
         // @Refactor: If ray collision with shape, we don't need to check window border collisions.
         Crucible::Ray& ray = lightSource.rays[rayIndex];
-        checkForLightIntersectWithShape(otherEntityRectangleShape, lightSource, ray, rayIndex);
+        checkForLightIntersectWithShape(lightSource, ray, rayIndex);
 
         // top
         checkForLightIntersectWithWindowBorderSide(lightSource, ray, rayIndex,
@@ -71,32 +61,35 @@ void LightCollisionSystem::checkForLightIntersectWithWindowBorderSide(Component:
     }
 }
 
-void LightCollisionSystem::checkForLightIntersectWithShape(Component::CShape& otherEntityShape,
+void LightCollisionSystem::checkForLightIntersectWithShape(
         Component::CLightSource& lightSource, Crucible::Ray& ray, size_t lineIndex)
 {
     // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.
     // [0, 1] = top, [1, 2] = right, [2, 3] = bottom, [3, 4] = left
-    for (size_t shapeSideIndex = 0; shapeSideIndex < otherEntityShape.vertices.getVertexCount()-1; shapeSideIndex++)
-    {
-        Crucible::Vec2 rayStartPos = {ray.getStartVertex()->x, ray.getStartVertex()->y};
-        Crucible::Vec2 rayEndPos = {ray.getEndVertex().x, ray.getEndVertex().y};
-
-        sf::Vertex& otherShapeStartVert = otherEntityShape.vertices[shapeSideIndex];
-        sf::Vertex& otherShapeEndVert = otherEntityShape.vertices[shapeSideIndex + 1];
-
-        Crucible::Vec2 shapeLineStartPos{otherShapeStartVert.position.x, otherShapeStartVert.position.y};
-        Crucible::Vec2 shapeLineEndPos{otherShapeEndVert.position.x, otherShapeEndVert.position.y};
-
-        Crucible::LightRayIntersect shapeLightRayIntersection = isLineIntersecting(rayStartPos, rayEndPos,
-                shapeLineStartPos, shapeLineEndPos);
-
-        if (!shapeLightRayIntersection.hasIntersection)
+    for (const std::shared_ptr<sf::VertexArray>& objectVertices : LevelManager::activeLevel.layers[0].tileObjectsVertexLayer)
+        for (size_t shapeSideIndex = 0; shapeSideIndex < objectVertices->getVertexCount()-1; shapeSideIndex++)
         {
-            continue;
-        }
+            {
+                Crucible::Vec2 rayStartPos{ray.getStartVertex()->x, ray.getStartVertex()->y};
+                Crucible::Vec2 rayEndPos{ray.getEndVertex().x, ray.getEndVertex().y};
 
-        lightSource.lightRayIntersects[lineIndex].emplace_back(shapeLightRayIntersection);
-    }
+                const sf::Vertex& otherShapeStartVert = (*objectVertices)[shapeSideIndex];
+                const sf::Vertex& otherShapeEndVert = (*objectVertices)[shapeSideIndex + 1];
+
+                Crucible::Vec2 shapeLineStartPos{otherShapeStartVert.position.x, otherShapeStartVert.position.y};
+                Crucible::Vec2 shapeLineEndPos{otherShapeEndVert.position.x, otherShapeEndVert.position.y};
+
+                Crucible::LightRayIntersect shapeLightRayIntersection = isLineIntersecting(rayStartPos, rayEndPos,
+                        shapeLineStartPos, shapeLineEndPos);
+
+                if (!shapeLightRayIntersection.hasIntersection)
+                {
+                    continue;
+                }
+
+                lightSource.lightRayIntersects[lineIndex].emplace_back(shapeLightRayIntersection);
+            }
+        }
 }
 
 Crucible::LightRayIntersect LightCollisionSystem::isLineIntersecting(Crucible::Vec2 vertexA,

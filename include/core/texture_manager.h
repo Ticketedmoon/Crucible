@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef VANQUISH_TEXTURE_MANAGER_H
-#define VANQUISH_TEXTURE_MANAGER_H
+#ifndef CRUCIBLE_TEXTURE_MANAGER_H
+#define CRUCIBLE_TEXTURE_MANAGER_H
 
 #include <SFML/Graphics.hpp>
 
@@ -15,12 +15,12 @@ class TextureManager
 {
     public:
         TextureManager();
-        void addTexture(const std::string& id, const std::string& texturePath);
-        std::shared_ptr<sf::Texture> getTexture(const std::string& id);
+        void addTexture(const std::string& filePath);
+        std::shared_ptr<sf::Texture>& getTexture(const std::string& filePath);
         bool hasTexture(const std::string& id);
 
     private:
         std::unordered_map<std::string, std::shared_ptr<sf::Texture>> textureMap_;
 };
 
-#endif //VANQUISH_TEXTURE_MANAGER_H
+#endif //CRUCIBLE_TEXTURE_MANAGER_H

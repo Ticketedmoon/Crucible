@@ -33,6 +33,7 @@ class GameEngine
 
     public:
         sf::RenderWindow window;
+
         sf::RenderTexture m_renderTexture;
         sf::Sprite m_renderSprite;
 
@@ -41,8 +42,6 @@ class GameEngine
     private:
         Scene::Type currentScene = Scene::Type::LEVEL_ONE_GAMEPLAY_SCENE;
         std::unordered_map<Scene::Type, std::shared_ptr<Scene>> gameScenes;
-
-        LevelManager m_levelManager;
         AudioManager* m_audioManager = AudioManager::getInstance();
 };
 

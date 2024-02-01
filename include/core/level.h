@@ -6,11 +6,16 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <SFML/Graphics/Rect.hpp>
+#include <memory>
+#include "tile.h"
+#include "vec2.h"
 
-struct TileList
+struct TileLayer
 {
     std::string name;
-    std::vector<uint8_t> data;
+    std::vector<Tile> data;
+    std::vector<std::shared_ptr<sf::VertexArray>> tileObjectsVertexLayer;
 };
 
 class Level
@@ -18,7 +23,7 @@ class Level
     public:
         uint8_t width;
         uint8_t height;
-        TileList layers;
+        std::vector<TileLayer> layers;
 };
 
 

@@ -19,20 +19,14 @@ void RayAppenderSystem::execute()
         auto& playerTransform = entity.getComponent<Component::CTransform>();
 
         int otherShapeIndex = 0;
-        for (auto & otherEntity : entities)
+        for (std::shared_ptr<sf::VertexArray>& objectVertices : LevelManager::activeLevel.layers[0].tileObjectsVertexLayer)
         {
-            if (entity.getId() == otherEntity.getId())
-            {
-                continue;
-            }
-
-            const auto& entityRectangleShape = otherEntity.getComponent<Component::CShape>();
-            const size_t totalShapeVertices = (entityRectangleShape.vertices.getVertexCount() - 1);
+            const size_t totalShapeVertices = objectVertices->getVertexCount();
             const size_t totalAdditionalRaysPerEntity = totalShapeVertices * totalRaysPerVertex;
 
             for (size_t vertIndex = 0; vertIndex < totalAdditionalRaysPerEntity; vertIndex += totalRaysPerVertex)
             {
-                const sf::Vertex& v = entityRectangleShape.vertices[vertIndex/totalRaysPerVertex];
+                const sf::Vertex& v = (*objectVertices)[vertIndex/totalRaysPerVertex];
                 
                 // Update ray vector to point left and right of endV with large RAY_SCALE.
                 const size_t additionalRayIndex = TOTAL_CORE_RAYS + vertIndex + (totalAdditionalRaysPerEntity * otherShapeIndex);

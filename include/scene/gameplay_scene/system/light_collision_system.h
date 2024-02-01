@@ -9,6 +9,7 @@
 #include <iostream>
 #include <SFML/System/Vector3.hpp>
 
+#include "level_manager.h"
 #include "system.h"
 #include "entity_manager.h"
 #include "common_constants.h"
@@ -21,9 +22,9 @@ class LightCollisionSystem : public System
         void execute() override;
 
     private:
-        static void resolveLightCollisions(const Entity& entity, Component::CShape& otherEntityRectangleShape);
+        static void resolveLightCollisions(const Entity& entity);
 
-        static void checkForLightIntersectWithShape(Component::CShape& otherEntityShape,
+        static void checkForLightIntersectWithShape(
                 Component::CLightSource& lightSource, Crucible::Ray& ray, size_t lineIndex);
 
         static void checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource, Crucible::Ray& ray,

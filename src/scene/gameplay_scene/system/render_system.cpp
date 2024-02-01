@@ -15,20 +15,25 @@ void RenderSystem::execute()
 void RenderSystem::drawEntities()
 {
     std::vector<Entity> entities = m_entityManager.getEntities();
+
+    const sf::RenderStates lightSrcRenderStates{sf::BlendMultiply};
+    const sf::RenderStates tileRenderStates{LevelManager::tileSheetTexture.get()};
+
     for (const Entity e : entities)
     {
         if (e.hasComponent<Component::CLightSource>())
         {
             auto& cLightSource = e.getComponent<Component::CLightSource>();
             sf::VertexArray& lightVertices = cLightSource.lightVertices;
-            m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::TriangleFan);
-            //m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::Lines);
+
+            m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::TriangleFan, lightSrcRenderStates);
         }
 
-        if (e.hasComponent<Component::CShape>())
+        if (e.hasComponent<Component::CTile>())
         {
-            auto& cShape = e.getComponent<Component::CShape>();
-            m_renderTarget.draw(cShape.vertices);
+            auto& cTile = e.getComponent<Component::CTile>();
+
+            m_renderTarget.draw(*cTile.tile.vertices, tileRenderStates);
         }
     }
 }

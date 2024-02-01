@@ -10,6 +10,7 @@
 #include "common_constants.h"
 #include "vertex.h"
 #include "ray.h"
+#include "tile.h"
 
 namespace Component
 {
@@ -32,12 +33,14 @@ namespace Component
 
     struct CCollider
     {
+        bool immovable{};
+
         bool has{};
     };
 
-    struct CShape
+    struct CTile
     {
-        sf::VertexArray vertices = sf::VertexArray(sf::LineStrip);
+        Tile tile;
 
         bool has{};
     };

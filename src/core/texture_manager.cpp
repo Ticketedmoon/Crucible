@@ -2,32 +2,30 @@
 
 TextureManager::TextureManager() = default;
 
-void TextureManager::addTexture(const std::string &id, const std::string &texturePath) {
-    auto it = textureMap_.find(id);
+void TextureManager::addTexture(const std::string& filePath) {
+    auto it = textureMap_.find(filePath);
     if (it != textureMap_.end()) {
-        std::string msg = "Unable to add texture: '" + id + "' already exists\n";
-        throw new std::runtime_error(msg);
+        std::string msg = "Unable to add texture: '" + filePath + "' already exists\n";
+        throw std::runtime_error(msg);
     }
 
     std::shared_ptr<sf::Texture> texture = std::make_shared<sf::Texture>();
-
-    if (!texture->loadFromFile(texturePath)) {
-        std::string msg = "Unable to open texture '" + texturePath + "'\n";
-        throw new std::runtime_error(msg);
+    if (!texture->loadFromFile(filePath)) {
+        std::string msg = "Unable to open texture '" + filePath + "'\n";
+        throw std::runtime_error(msg);
     }
-
     texture->setSmooth(true);
 
-    textureMap_.emplace(id, texture);
-
-    std::cout << "Texture with path: [" << texturePath << "] has been added\n";
+    textureMap_.emplace(filePath, texture);
+    std::cout << "Texture with path: [" << filePath << "] has been added, size: [" << texture->getSize().x << ", "
+        << texture->getSize().y << "]\n";
 }
 
-std::shared_ptr<sf::Texture> TextureManager::getTexture(const std::string &id) {
-    auto it = textureMap_.find(id);
+std::shared_ptr<sf::Texture>& TextureManager::getTexture(const std::string& filePath) {
+    auto it = textureMap_.find(filePath);
     if (it == textureMap_.end()) {
-        std::cout << "Unable to load texture: " << id << " doesn't exist\n";
-        return nullptr;
+        std::string msg = "Unable to add texture: '" + filePath + "' doesn't exist\n";
+        throw std::runtime_error(msg);
     }
 
     return it->second;

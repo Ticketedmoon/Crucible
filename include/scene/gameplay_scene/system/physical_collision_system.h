@@ -21,20 +21,20 @@ class PhysicalCollisionSystem : public System
         void execute() override;
 
     private:
-        static bool isCollidingAABB(const Component::CShape& entityRect,
-                const Component::CShape& otherEntityRect, sf::FloatRect& overlap);
+        static bool isCollidingAABB(const Component::CTile& entityTile,
+                const Component::CTile& otherTile, sf::FloatRect& overlap);
 
-        static void resolveCollision(Component::CShape& entityRectangleShape,
+        static void resolveCollision(Component::CTile& entityTile,
                 Component::CTransform& entityTransform,
-                Component::CShape& otherEntityRectangleShape, Component::CTransform& otherEntityTransform,
+                Component::CTile& otherEntityTile, Component::CTransform& otherEntityTransform,
                 const sf::FloatRect& overlap);
 
-        static void resolvePhysicalCollisions(Component::CShape& entityRectangleShape,
-                Component::CTransform& entityTransform, Component::CTransform& otherEntityTransform,
-                Component::CShape& otherEntityRectangleShape);
+        static void resolvePhysicalCollisions(Component::CTile& entityRectangleShape,
+                Component::CTransform& entityTransform, Component::CCollider entityCollider,
+                Component::CTransform& otherEntityTransform, Component::CTile& otherEntityRectangleShape);
 
         static void updateShapeVertexPositions(const Component::CTransform& entityTransform,
-                Component::CShape& entityRectangleShape);
+                Component::CTile& entityTile);
 
         static void applyCollisionOverlapToEntityTransform(Component::CTransform& entityTransform,
                 sf::Vector3f manifoldDist, sf::Vector2f collisionOverlap);

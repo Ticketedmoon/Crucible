@@ -13,13 +13,13 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
     auto& transformComponents = std::get<std::vector<Component::CTransform>>(m_pool);
     auto& controllableComponents = std::get<std::vector<Component::CControllable>>(m_pool);
     auto& collisionComponents = std::get<std::vector<Component::CCollider>>(m_pool);
-    auto& rectShapeComponents = std::get<std::vector<Component::CShape>>(m_pool);
+    auto& tileComponents = std::get<std::vector<Component::CTile>>(m_pool);
     auto& lightSourceComponents = std::get<std::vector<Component::CLightSource>>(m_pool);
 
     transformComponents.reserve(maxNumEntities);
     controllableComponents.reserve(maxNumEntities);
     collisionComponents.reserve(maxNumEntities);
-    rectShapeComponents.reserve(maxNumEntities);
+    tileComponents.reserve(maxNumEntities);
     lightSourceComponents.reserve(maxNumEntities);
 
     for (size_t i = 0; i < maxNumEntities; i++)
@@ -30,7 +30,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
         transformComponents.insert(transformComponents.begin() + i, {{}, false});
         controllableComponents.insert(controllableComponents.begin() + i, {{}, false});
         collisionComponents.insert(collisionComponents.begin() + i, {{}});
-        rectShapeComponents.insert(rectShapeComponents.begin() + i, {{}, false});
+        tileComponents.insert(tileComponents.begin() + i, {{}, false});
         lightSourceComponents.insert(lightSourceComponents.begin() + i, {{}, {}, {}, false});
     }
 

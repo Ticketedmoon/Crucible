@@ -20,12 +20,10 @@ namespace Crucible
 
     static const inline float DEFAULT_SFX_VOLUME = 50.0f;
 
-    constexpr float PLAYER_SIZE = 50;
-
     enum class EntityType
     {
         PLAYER,
-        WALL,
+        TILE,
         NONE
     };
 

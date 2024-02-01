@@ -11,7 +11,7 @@ void LightingSystem::execute()
     for (const Entity entity : entities)
     {
         if (!entity.hasComponent<Component::CLightSource>() || !entity.hasComponent<Component::CTransform>() ||
-                !entity.hasComponent<Component::CShape>())
+                !entity.hasComponent<Component::CTile>())
         {
             continue;
         }
@@ -78,16 +78,19 @@ void LightingSystem::addVerticesForLightCollisions(Component::CLightSource& enti
     }
 
     // Add transform position of player entity.
-    entityLightSource.lightVertices.append({{entityTransform.position->x, entityTransform.position->y}, sf::Color::Yellow});
+    const sf::Color& lightColor{255, 255, 0};
+    entityLightSource.lightVertices.append({{entityTransform.position->x, entityTransform.position->y}, lightColor});
 
     // Add all collision points with
     for (const Crucible::LightRayIntersect& intersection : intersections)
     {
-        entityLightSource.lightVertices.append({{intersection.collisionPoint.x, intersection.collisionPoint.y}, sf::Color::Yellow});
+        entityLightSource.lightVertices.append({{intersection.collisionPoint.x, intersection.collisionPoint.y},
+                                                lightColor});
     }
 
     // Add initial collision point again so the TriangleFan can connect forming a full-looking geometric shape displaying visibility.
-    entityLightSource.lightVertices.append({{intersections[0].collisionPoint.x, intersections[0].collisionPoint.y}, sf::Color::Yellow});
+    entityLightSource.lightVertices.append({{intersections[0].collisionPoint.x, intersections[0].collisionPoint.y},
+                                            lightColor});
 }
 
 Crucible::LightRayIntersect LightingSystem::findClosestIntersectForLine(const Component::CTransform& entityTransform,

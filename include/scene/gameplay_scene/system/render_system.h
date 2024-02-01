@@ -14,6 +14,7 @@
 #include "system.h"
 #include "entity/entity_manager.h"
 #include "scene/gameplay_scene/system/render_system.h"
+#include "level_manager.h"
 
 class RenderSystem : public System
 {
@@ -24,6 +25,7 @@ class RenderSystem : public System
 
     private:
         void drawEntities();
+
         void drawGuiData();
         void configureTextRendering();
         void drawText(sf::Text& text, const sf::Color& fillColour, uint8_t characterSize, sf::Vector2f position);
