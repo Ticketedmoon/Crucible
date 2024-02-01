@@ -15,23 +15,6 @@
 #include "common_constants.h"
 #include "entity_manager.h"
 
-// Flags currently used by Tiled map editor for horizontally,
-// vertically and anti-diagonally flipped tiles
-const unsigned long tiledRotationFlagsDiagonal = std::stoul("0x20000000", nullptr, 16);
-const unsigned long tiledRotationFlagsHorizontal = std::stoul("0x80000000", nullptr, 16);
-const unsigned long tiledRotationFlagsVertical = std::stoul("0x40000000", nullptr, 16);
-
-// Resolved flags for an easier use of the flags above
-struct TiledRotationOffset
-{
-    // Left rotation is tiledRotationFlagsDiagonal + tiledRotationFlagsVertical
-    const unsigned long left = tiledRotationFlagsDiagonal + tiledRotationFlagsVertical;
-    // Right rotation is tiledRotationFlagsHorizontal + tiledRotationFlagsDiagonal
-    const unsigned long right = tiledRotationFlagsHorizontal + tiledRotationFlagsDiagonal;
-    // Top rotation is tiledRotationFlagsHorizontal + tiledRotationFlagsVertical
-    const unsigned long top = tiledRotationFlagsHorizontal + tiledRotationFlagsVertical;
-};
-
 class LevelManager
 {
     public:
@@ -46,11 +29,15 @@ class LevelManager
     private:
         Level loadMapData();
         void buildTileSheet(const char* tileSheetFilePath);
-        std::vector<Tile> createTilesForWorld(const Level& level, const nlohmann::json& data);
+        std::vector<Tile> createTilesForWorld(const Level& level, const nlohmann::json& data, const size_t layerIdx);
         Tile& getTile(Level& level, uint32_t x, uint32_t y);
         uint32_t getPositionForTile(const Level& level, uint32_t x, uint32_t y);
 
     private:
+        const char* LEVEL_FILE_LAYERS_KEY = "layers";
+        const char* LEVEL_FILE_OBJECTS_KEY = "objects";
+        const char* LEVEL_FILE_DATA_KEY = "data";
+
         static inline TextureManager m_textureManager;
 
         EntityManager& m_entityManager;

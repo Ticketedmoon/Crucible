@@ -22,7 +22,7 @@ typedef std::tuple<
         std::vector<Component::CLightSource>
 > EntityComponentVectorTuple;
 
-static size_t MAX_NUM_ENTITIES = 300;
+static size_t MAX_NUM_ENTITIES = 1000;
 
 // forward declare
 class Entity;

@@ -66,7 +66,7 @@ void LightCollisionSystem::checkForLightIntersectWithShape(
 {
     // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.
     // [0, 1] = top, [1, 2] = right, [2, 3] = bottom, [3, 4] = left
-    for (const std::shared_ptr<sf::VertexArray>& objectVertices : LevelManager::activeLevel.layers[0].tileObjectsVertexLayer)
+    for (const std::shared_ptr<sf::VertexArray>& objectVertices : LevelManager::activeLevel.objectLayers[0].tileObjectVertices)
         for (size_t shapeSideIndex = 0; shapeSideIndex < objectVertices->getVertexCount()-1; shapeSideIndex++)
         {
             {

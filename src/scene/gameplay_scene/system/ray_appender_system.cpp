@@ -19,7 +19,7 @@ void RayAppenderSystem::execute()
         auto& playerTransform = entity.getComponent<Component::CTransform>();
 
         int otherShapeIndex = 0;
-        for (std::shared_ptr<sf::VertexArray>& objectVertices : LevelManager::activeLevel.layers[0].tileObjectsVertexLayer)
+        for (std::shared_ptr<sf::VertexArray>& objectVertices : LevelManager::activeLevel.objectLayers[0].tileObjectVertices)
         {
             const size_t totalShapeVertices = objectVertices->getVertexCount();
             const size_t totalAdditionalRaysPerEntity = totalShapeVertices * totalRaysPerVertex;

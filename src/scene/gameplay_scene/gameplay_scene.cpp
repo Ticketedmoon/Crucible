@@ -7,21 +7,24 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     registerSystems();
 
     Level& level = m_levelManager.loadLevel();
-    for (int row = 0; row < level.height; row++)
+    for (TileLayer layer : level.tileLayers)
     {
-        for (int col = 0; col < level.width; col++)
+        for (int row = 0; row < level.height; row++)
         {
-            int textureIndex = col + (row * level.width);
-            Tile t = level.layers[0].data.at(textureIndex);
-            t.position.x *= Crucible::TILE_SIZE;
-            t.position.y *= Crucible::TILE_SIZE;
+            for (int col = 0; col < level.width; col++)
+            {
+                int textureIndex = col + (row * level.width);
+                Tile t = layer.data.at(textureIndex);
+                t.position.x *= Crucible::TILE_SIZE;
+                t.position.y *= Crucible::TILE_SIZE;
 
-            bool isCollidable = t.type == TileType::BEDROCK_BLOCK || t.type == TileType::BROWN_FLOOR_BLOCK
-                    || t.type == TileType::ARROW_BLOCK || t.type == TileType::PINK_BROOM_BLOCK;
-            bool isImmovable = t.type == TileType::BEDROCK_BLOCK || t.type == TileType::BROWN_FLOOR_BLOCK
-                    || t.type == TileType::PINK_BROOM_BLOCK
-                    || t.type == TileType::SKY_SPAWN_BLOCK;
-            m_entitySpawner.createTile(t, isCollidable, isImmovable);
+                bool isCollidable = t.type == TileType::BEDROCK_BLOCK || t.type == TileType::BROWN_FLOOR_BLOCK
+                        || t.type == TileType::ARROW_BLOCK || t.type == TileType::PINK_BROOM_BLOCK;
+                bool isImmovable = t.type == TileType::BEDROCK_BLOCK || t.type == TileType::BROWN_FLOOR_BLOCK
+                        || t.type == TileType::PINK_BROOM_BLOCK
+                        || t.type == TileType::SKY_SPAWN_BLOCK;
+                m_entitySpawner.createTile(t, isCollidable, isImmovable);
+            }
         }
     }
 }

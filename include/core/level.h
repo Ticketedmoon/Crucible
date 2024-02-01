@@ -11,11 +11,20 @@
 #include "tile.h"
 #include "vec2.h"
 
-struct TileLayer
+struct Layer
 {
     std::string name;
+    std::string type;
+};
+
+struct TileLayer : Layer
+{
     std::vector<Tile> data;
-    std::vector<std::shared_ptr<sf::VertexArray>> tileObjectsVertexLayer;
+};
+
+struct ObjectLayer : Layer
+{
+    std::vector<std::shared_ptr<sf::VertexArray>> tileObjectVertices;
 };
 
 class Level
@@ -23,7 +32,8 @@ class Level
     public:
         uint8_t width;
         uint8_t height;
-        std::vector<TileLayer> layers;
+        std::vector<TileLayer> tileLayers;
+        std::vector<ObjectLayer> objectLayers;
 };
 
 

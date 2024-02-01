@@ -21,7 +21,7 @@ Level& LevelManager::loadLevel()
 Tile& LevelManager::getTile(Level& level, uint32_t x, uint32_t y)
 {
     uint32_t positionForTile = getPositionForTile(level, x, y);
-    return level.layers[0].data.at(positionForTile);
+    return level.tileLayers[0].data.at(positionForTile);
 }
 
 uint32_t LevelManager::getPositionForTile(const Level& level, uint32_t x, uint32_t y)
@@ -33,7 +33,7 @@ uint32_t LevelManager::getPositionForTile(const Level& level, uint32_t x, uint32
 
 Level LevelManager::loadMapData()
 {
-    const char* mapFilePath = "resources/maps/level_one_map_basic_tileset.json";
+    const char* mapFilePath = "resources/maps/level_one_map_dungeon_tileset.json";
 
     std::ifstream f(mapFilePath);
     nlohmann::json data = nlohmann::json::parse(f);
@@ -43,45 +43,71 @@ Level LevelManager::loadMapData()
     level.width = data["width"];
     level.height = data["height"];
 
-    TileLayer layerA;
-    layerA.name = data["layers"][0]["name"];
-    layerA.data = createTilesForWorld(level, data);
-
-    for (size_t i = 0; i < data["layers"][1]["objects"].size(); i++)
+    for (size_t layerIdx = 0; layerIdx < data[LEVEL_FILE_LAYERS_KEY].size(); layerIdx++)
     {
-        sf::FloatRect r;
-        r.left = data["layers"][1]["objects"][i]["x"];
-        r.top = data["layers"][1]["objects"][i]["y"];
-        r.width = data["layers"][1]["objects"][i]["width"];
-        r.height = data["layers"][1]["objects"][i]["height"];
+        std::string layerType = data[LEVEL_FILE_LAYERS_KEY][layerIdx]["type"];
+        // TODO use enum class for this
+        if (layerType == "tilelayer")
+        {
+            TileLayer layer;
+            layer.name = data[LEVEL_FILE_LAYERS_KEY][layerIdx]["name"];
+            layer.type = layerType;
+            layer.data = createTilesForWorld(level, data, layerIdx);
+            level.tileLayers.emplace_back(layer);
+        }
 
-        std::shared_ptr<sf::VertexArray> verts = std::make_shared<sf::VertexArray>();
-        verts->append({{r.left, r.top}});
-        verts->append({{r.left + r.width, r.top}});
-        verts->append({{r.left + r.width, r.top + r.height}});
-        verts->append({{r.left, r.top + r.height}});
-        verts->append({{r.left, r.top}});
+        if (layerType == "objectgroup")
+        {
+            ObjectLayer layer;
+            layer.name = data[LEVEL_FILE_LAYERS_KEY][layerIdx]["name"];
+            layer.type = layerType;
+            for (size_t i = 0; i < data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY].size(); i++)
+            {
+                sf::FloatRect r;
+                r.left = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["x"];
+                r.top = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["y"];
+                r.width = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["width"];
+                r.height = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["height"];
 
-        layerA.tileObjectsVertexLayer.emplace_back(verts);
+                std::shared_ptr<sf::VertexArray> verts = std::make_shared<sf::VertexArray>();
+                verts->append({{r.left, r.top}});
+                verts->append({{r.left + r.width, r.top}});
+                verts->append({{r.left + r.width, r.top + r.height}});
+                verts->append({{r.left, r.top + r.height}});
+                verts->append({{r.left, r.top}});
+                layer.tileObjectVertices.emplace_back(verts);
+            }
+
+            level.objectLayers.emplace_back(layer);
+        }
     }
-
-    level.layers.emplace_back(layerA);
 
     return level;
 }
 
-std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nlohmann::json& data)
+std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nlohmann::json& data, const size_t layerIdx)
 {
     std::vector<Tile> tiles;
-    std::vector<uint8_t> tileValues = data["layers"][0]["data"].get<std::vector<uint8_t>>();
+    std::vector<long> tileValues = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_DATA_KEY].get<std::vector<long>>();
     for (unsigned int y = 0; y < level.height; y++)
     {
         for (unsigned int x = 0; x < level.width; x++)
         {
             uint32_t position = getPositionForTile(level, x, y);
-            auto tileType = static_cast<TileType>(tileValues[position]);
+            unsigned long tileValue = tileValues[position];
+            TileRotation rotation{TileRotation::NONE};
+
+            // Tile has been rotated
+            if (tileValue > INT_MAX)
+            {
+                // Tile is rotated, set rotation flag and correct tileValue
+                rotation = TileRotation::FLIPPED_LEFT;
+                tileValue -= Crucible::FLIPPED_LEFT;
+            }
+
+            auto tileType = static_cast<TileType>(tileValue);
             sf::Vector2u pos{x, y};
-            Tile tile(pos, tileType, {});
+            Tile tile(pos, tileType, rotation, {});
             tiles.emplace_back(tile);
         }
     }

@@ -40,14 +40,45 @@ enum class TileType
     YELLOW_WRENCH_BLOCK = 25
 };
 
+enum class TileRotation
+{
+    NONE,
+    LEFT,
+    RIGHT,
+    TOP,
+    FLIPPED_LEFT,
+    FLIPPED_RIGHT
+};
+
+namespace Crucible
+{
+    // Flags currently used by Tiled map editor for horizontally,
+    // vertically and anti-diagonally flipped tiles
+    const unsigned long tiledRotationFlagsDiagonal = std::stoul("0x20000000", nullptr, 16);
+    const unsigned long tiledRotationFlagsHorizontal = std::stoul("0x80000000", nullptr, 16);
+    const unsigned long tiledRotationFlagsVertical = std::stoul("0x40000000", nullptr, 16);
+    // Resolved flags for an easier use of the flags above
+    // Left rotation is tiledRotationFlagsDiagonal + tiledRotationFlagsVertical
+    static inline const unsigned long LEFT = tiledRotationFlagsDiagonal + tiledRotationFlagsVertical;
+    // Right rotation is tiledRotationFlagsHorizontal + tiledRotationFlagsDiagonal
+    static inline const unsigned long RIGHT = tiledRotationFlagsHorizontal + tiledRotationFlagsDiagonal;
+    // Top rotation is tiledRotationFlagsHorizontal + tiledRotationFagsVertical
+    static inline const unsigned long TOP = tiledRotationFlagsHorizontal + tiledRotationFlagsVertical;
+    // x2 left rotation
+    static inline const unsigned long FLIPPED_LEFT = LEFT * 2;
+    // x2 right rotation
+    static inline const unsigned long FLIPPED_RIGHT = RIGHT * 2;
+}
 class Tile
 {
     public:
         Tile();
-        Tile(sf::Vector2u position, TileType type, std::shared_ptr<sf::VertexArray> vertices);
+        Tile(sf::Vector2u position, TileType type, TileRotation tileRotation, std::shared_ptr<sf::VertexArray> vertices);
 
+    public:
         sf::Vector2u position;
         TileType type;
+        TileRotation rotation;
         std::shared_ptr<sf::VertexArray> vertices;
 };
 
