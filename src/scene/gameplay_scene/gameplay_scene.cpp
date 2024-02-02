@@ -15,14 +15,16 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
             {
                 int textureIndex = col + (row * level.width);
                 Tile t = layer.data.at(textureIndex);
+                if (t.type == TileType::TRANSPARENT)
+                {
+                    continue;
+                }
+
                 t.position.x *= Crucible::TILE_SIZE;
                 t.position.y *= Crucible::TILE_SIZE;
 
-                bool isCollidable = t.type == TileType::BEDROCK_BLOCK || t.type == TileType::BROWN_FLOOR_BLOCK
-                        || t.type == TileType::ARROW_BLOCK || t.type == TileType::PINK_BROOM_BLOCK;
-                bool isImmovable = t.type == TileType::BEDROCK_BLOCK || t.type == TileType::BROWN_FLOOR_BLOCK
-                        || t.type == TileType::PINK_BROOM_BLOCK
-                        || t.type == TileType::SKY_SPAWN_BLOCK;
+                bool isCollidable = t.type != TileType::BACKGROUND_PURPLE_WALL;
+                bool isImmovable = t.type != TileType::BACKGROUND_PURPLE_WALL;
                 m_entitySpawner.createTile(t, isCollidable, isImmovable);
             }
         }

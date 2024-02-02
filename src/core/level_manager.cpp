@@ -10,7 +10,6 @@ Level& LevelManager::loadLevel()
     activeLevel = loadMapData();
 
     // Build Tile sheet
-    const char* tileSheetFilePath = "resources/maps/basic_tileset.png";
     buildTileSheet(tileSheetFilePath);
 
     tileSheetTexture = m_textureManager.getTexture(tileSheetFilePath);
@@ -33,15 +32,33 @@ uint32_t LevelManager::getPositionForTile(const Level& level, uint32_t x, uint32
 
 Level LevelManager::loadMapData()
 {
-    const char* mapFilePath = "resources/maps/level_one_map_dungeon_tileset.json";
-
     std::ifstream f(mapFilePath);
     nlohmann::json data = nlohmann::json::parse(f);
 
     Level level;
-
     level.width = data["width"];
     level.height = data["height"];
+
+    for (size_t tilesetIdx = 0; tilesetIdx < data[LEVEL_FILE_TILESETS_KEY].size(); tilesetIdx++)
+    {
+        size_t totalTiles = data[LEVEL_FILE_TILESETS_KEY][tilesetIdx][LEVEL_FILE_TILES_KEY].size();
+        for (size_t tileIdx = 0; tileIdx < totalTiles; tileIdx++)
+        {
+            std::vector<std::unordered_map<std::string, std::string>> properties =
+                    data[LEVEL_FILE_TILESETS_KEY][tilesetIdx][LEVEL_FILE_TILES_KEY][tileIdx]["properties"];
+            uint32_t tileId =
+                    data[LEVEL_FILE_TILESETS_KEY][tilesetIdx][LEVEL_FILE_TILES_KEY][tileIdx]["id"];
+
+            for (std::unordered_map<std::string, std::string> p : properties)
+            {
+                if (p.contains("type"))
+                {
+                    TileType tileType = TILE_TYPE_LOOKUP_TABLE.at(p.at("value"));
+                    level.tileTypeToId.insert({{tileType, tileId}});
+                }
+            }
+        }
+    }
 
     for (size_t layerIdx = 0; layerIdx < data[LEVEL_FILE_LAYERS_KEY].size(); layerIdx++)
     {
@@ -81,6 +98,7 @@ Level LevelManager::loadMapData()
             level.objectLayers.emplace_back(layer);
         }
     }
+
 
     return level;
 }

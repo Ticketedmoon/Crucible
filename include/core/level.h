@@ -34,6 +34,7 @@ class Level
         uint8_t height;
         std::vector<TileLayer> tileLayers;
         std::vector<ObjectLayer> objectLayers;
+        std::unordered_map<TileType, uint32_t> tileTypeToId;
 };
 
 

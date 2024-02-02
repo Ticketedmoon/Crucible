@@ -5,11 +5,61 @@
  </editorsettings>
  <tileset firstgid="1" name="dungeon_bricks_shadow_tilset" tilewidth="64" tileheight="64" tilecount="48" columns="4">
   <image source="dungeon_bricks_shadow_tilset.png" width="256" height="768"/>
+  <tile id="0">
+   <properties>
+    <property name="type" value="TOP_CORNER_WALL_BROKEN_PURPLE"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="type" value="TOP_WALL_BROKEN_PURPLE"/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="type" value="BORDER_WALL_BROKEN_PURPLE"/>
+   </properties>
+  </tile>
+  <tile id="9">
+   <properties>
+    <property name="type" value="BACKGROUND_PURPLE_WALL"/>
+   </properties>
+  </tile>
+  <tile id="10">
+   <properties>
+    <property name="type" value="CENTRAL_WALL_MEDIUM_BROKEN_PURPLE"/>
+   </properties>
+  </tile>
+  <tile id="16">
+   <properties>
+    <property name="type" value="BOTTOM_CORNER_WALL_BROKEN_PURPLE"/>
+   </properties>
+  </tile>
+  <tile id="17">
+   <properties>
+    <property name="type" value="BOTTOM_WALL_BROKEN_PURPLE"/>
+   </properties>
+  </tile>
+  <tile id="24">
+   <properties>
+    <property name="type" value="CENTRAL_WALL_SMALL_BROKEN_PURPLE"/>
+   </properties>
+  </tile>
+  <tile id="35">
+   <properties>
+    <property name="type" value="COLUMN_WALL_BROKEN_PURPLE"/>
+   </properties>
+  </tile>
+  <tile id="36">
+   <properties>
+    <property name="type" value="CENTRAL_WALL_LARGE_BROKEN_PURPLE"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="49" name="basic_tileset" tilewidth="64" tileheight="64" tilecount="28" columns="4">
   <image source="basic_tileset.png" width="256" height="448"/>
  </tileset>
- <layer id="1" name="background" width="20" height="12">
+ <layer id="1" name="background" width="20" height="12" locked="1">
   <data encoding="csv">
 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
@@ -27,29 +77,29 @@
  </layer>
  <layer id="4" name="foreground" width="20" height="12">
   <data encoding="csv">
-1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,
-9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3221225481,
-9,0,0,0,44,0,0,0,44,0,0,0,44,0,0,0,44,0,0,3221225481,
-9,0,0,0,44,0,0,0,44,0,0,0,44,36,9,0,44,0,0,3221225481,
-9,0,0,0,44,3221225505,0,0,44,0,0,40,44,0,0,0,44,0,0,3221225481,
-9,0,71,0,44,39,0,0,44,0,0,3221225511,44,0,0,0,44,0,72,3221225481,
-9,0,0,0,44,3221225512,0,0,44,0,0,33,44,0,0,0,44,0,72,3221225481,
-9,0,0,0,44,0,0,0,44,0,0,0,44,0,0,0,44,0,0,3221225481,
-9,0,0,0,44,0,0,0,44,0,0,0,44,0,3221225481,3221225508,44,0,0,3221225481,
-9,0,0,0,44,0,0,0,44,0,0,0,44,0,0,0,44,0,0,3221225481,
-9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3221225481,
-17,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,19
+1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2147483649,
+9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2147483657,
+9,0,0,0,36,0,0,0,44,0,0,0,44,0,0,0,44,0,0,2147483657,
+9,0,0,0,36,0,0,0,44,0,0,0,44,36,9,0,44,0,0,2147483657,
+9,0,0,0,36,2147483659,0,0,44,0,0,11,44,0,0,0,44,0,0,2147483657,
+9,0,71,0,36,37,0,0,44,0,0,2147483685,44,0,0,0,44,0,72,2147483657,
+9,0,0,0,36,3221225497,0,0,44,0,0,1073741849,44,0,0,0,44,0,72,2147483657,
+9,0,0,0,36,0,0,0,44,0,0,0,44,0,0,0,44,0,0,2147483657,
+9,0,0,0,36,0,0,0,44,0,0,0,44,0,3221225481,3221225508,44,0,0,2147483657,
+9,0,0,0,36,0,0,0,44,0,0,0,44,0,0,0,44,0,0,2147483657,
+9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2147483657,
+17,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,2147483665
 </data>
  </layer>
- <objectgroup id="2" name="Object Layer 1">
+ <objectgroup id="2" name="Object Layer 1" locked="1">
   <object id="1" name="spawn zone" x="128" y="320" width="64" height="64"/>
   <object id="2" name="wall 1" x="256" y="128" width="64" height="512"/>
   <object id="3" name="wall 2" x="512" y="128" width="64" height="512"/>
   <object id="4" name="wall 3" x="768" y="128" width="64" height="512"/>
   <object id="5" name="wall 4" x="1024" y="128" width="64" height="512"/>
   <object id="6" name="end zone" x="1152" y="320" width="64" height="128"/>
-  <object id="7" name="wall 1 sub wall" x="320" y="256" width="64" height="192"/>
-  <object id="8" name="wall 2 sub wall" x="704" y="256" width="64" height="192"/>
+  <object id="7" name="wall 1 sub wall" x="320" y="256" width="64" height="160"/>
+  <object id="8" name="wall 2 sub wall" x="704" y="256" width="64" height="160"/>
   <object id="9" name="wall 3 sub wall A" x="832" y="192" width="128" height="64"/>
   <object id="10" name="wall 3 sub wall B" x="896" y="512" width="128" height="64"/>
   <object id="12" name="top border" x="0" y="0" width="1280" height="32"/>

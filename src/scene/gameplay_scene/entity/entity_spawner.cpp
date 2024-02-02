@@ -18,8 +18,12 @@ void EntitySpawner::createPlayer()
     vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y + Crucible::TILE_SIZE}));
     vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y}));
 
-    Tile playerTile({static_cast<unsigned int>(player->x), static_cast<unsigned int>(player->y)}, TileType::FACE_SMILE_BLOCK,
-            TileRotation::NONE, vertices);
+    Tile playerTile(
+            {static_cast<unsigned int>(player->x), static_cast<unsigned int>(player->y)},
+            TileType::TOP_WALL_BROKEN_PURPLE,
+            TileRotation::NONE,
+            vertices);
+
     updateTileTexture(playerTile);
 
     e.addComponent<Component::CControllable>();
@@ -50,10 +54,10 @@ void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
     vertices->append(sf::Vertex({position.x, position.y + Crucible::TILE_SIZE}));
     vertices->append(sf::Vertex({position.x, position.y}));
 
-    if (t.type == TileType::ARROW_BLOCK)
-    {
-        LevelManager::activeLevel.objectLayers[0].tileObjectVertices.emplace_back(vertices);
-    }
+//    if (t.type == TileType::ARROW_BLOCK)
+//    {
+//        LevelManager::activeLevel.objectLayers[0].tileObjectVertices.emplace_back(vertices);
+//    }
 
     t.vertices = vertices;
 
