@@ -112,18 +112,25 @@ std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nl
         for (unsigned int x = 0; x < level.width; x++)
         {
             uint32_t position = getPositionForTile(level, x, y);
-            unsigned long tileValue = tileValues[position];
-            TileRotation rotation{TileRotation::NONE};
+            unsigned long globalTileId = tileValues[position];
 
-            // Tile has been rotated
-            if (tileValue > INT_MAX)
-            {
-                // Tile is rotated, set rotation flag and correct tileValue
-                rotation = TileRotation::FLIPPED_LEFT;
-                tileValue -= Crucible::FLIPPED_LEFT;
-            }
+            // Read out the flags
+            bool flippedHorizontally = (globalTileId & Crucible::FLIPPED_HORIZONTALLY_FLAG);
+            bool flippedVertically = (globalTileId & Crucible::FLIPPED_VERTICALLY_FLAG);
+            bool flippedDiagonally = (globalTileId & Crucible::FLIPPED_DIAGONALLY_FLAG);
+            bool rotatedHex120 = (globalTileId & Crucible::ROTATED_HEXAGONAL_120_FLAG);
 
-            auto tileType = static_cast<TileType>(tileValue);
+            // Clear all four flags
+            globalTileId &= ~(Crucible::FLIPPED_HORIZONTALLY_FLAG |
+                    Crucible::FLIPPED_VERTICALLY_FLAG |
+                    Crucible::FLIPPED_DIAGONALLY_FLAG |
+                    Crucible::ROTATED_HEXAGONAL_120_FLAG);
+
+            TileRotation rotation = flippedHorizontally ? TileRotation::FLIPPED_HORIZONTALLY
+                    : flippedVertically ? TileRotation::FLIPPED_VERTICALLY
+                    : TileRotation::NONE;
+
+            auto tileType = static_cast<TileType>(globalTileId);
             sf::Vector2u pos{x, y};
             Tile tile(pos, tileType, rotation, {});
             tiles.emplace_back(tile);

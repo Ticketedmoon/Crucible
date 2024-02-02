@@ -100,34 +100,30 @@ void EntitySpawner::updateTileTexture(Tile& tile)
     float tvPositionStart = tv * Crucible::TILE_SIZE;
     float tvPositionEnd = (tv + 1) * Crucible::TILE_SIZE;
 
-    if (tile.rotation == TileRotation::NONE)
-    {
-        sf::VertexArray& tileVertices = *tile.vertices;
-        tileVertices[0].texCoords = sf::Vector2f(tuPositionStart, tvPositionStart);
-        tileVertices[1].texCoords = sf::Vector2f(tuPositionEnd, tvPositionStart);
-        tileVertices[2].texCoords = sf::Vector2f(tuPositionEnd, tvPositionEnd);
-        tileVertices[3].texCoords = sf::Vector2f(tuPositionStart, tvPositionEnd);
-        tileVertices[4].texCoords = sf::Vector2f(tuPositionStart, tvPositionStart);
-        return;
-    }
-
-    // define a translation transform
-    sf::Transform translation;
-    translation.translate(1, 1);
-    // define a rotation transform
-    sf::Transform rotation;
-    rotation.rotate(180);
-    // combine them
-    sf::Transform transform = translation * rotation;
-    // use the result to transform stuff...
-    //sf::Vector2f point = transform.transformPoint(10, 20);
-    //sf::FloatRect rect = transform.transformRect(sf::FloatRect(0, 0, 10, 100));
-
-    // Apply rotation
     sf::VertexArray& tileVertices = *tile.vertices;
-    tileVertices[0].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionStart, tvPositionStart));
-    tileVertices[1].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionEnd, tvPositionStart));
-    tileVertices[2].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionEnd, tvPositionEnd));
-    tileVertices[3].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionStart, tvPositionEnd));
-    tileVertices[4].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionStart, tvPositionStart));
+    tileVertices[0].texCoords = sf::Vector2f(tuPositionStart, tvPositionStart);
+    tileVertices[1].texCoords = sf::Vector2f(tuPositionEnd, tvPositionStart);
+    tileVertices[2].texCoords = sf::Vector2f(tuPositionEnd, tvPositionEnd);
+    tileVertices[3].texCoords = sf::Vector2f(tuPositionStart, tvPositionEnd);
+    tileVertices[4].texCoords = sf::Vector2f(tuPositionStart, tvPositionStart);
+
+//    // define a translation transform
+//    sf::Transform translation;
+//    translation.translate(1, 1);
+//    // define a rotation transform
+//    sf::Transform rotation;
+//    rotation.rotate(180);
+//    // combine them
+//    sf::Transform transform = translation * rotation;
+//    // use the result to transform stuff...
+//    //sf::Vector2f point = transform.transformPoint(10, 20);
+//    //sf::FloatRect rect = transform.transformRect(sf::FloatRect(0, 0, 10, 100));
+//
+//    // Apply rotation
+//    sf::VertexArray& tileVertices = *tile.vertices;
+//    tileVertices[0].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionStart, tvPositionStart));
+//    tileVertices[1].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionEnd, tvPositionStart));
+//    tileVertices[2].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionEnd, tvPositionEnd));
+//    tileVertices[3].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionStart, tvPositionEnd));
+//    tileVertices[4].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionStart, tvPositionStart));
 }

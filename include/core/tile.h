@@ -13,46 +13,36 @@
 enum class TileType
 {
     TRANSPARENT = 0,
-    BACKGROUND_PURPLE_WALL = 1,
-    TOP_CORNER_WALL_BROKEN_PURPLE = 2,
-    TOP_WALL_BROKEN_PURPLE = 3,
-    BORDER_WALL_BROKEN_PURPLE = 4,
-    BOTTOM_CORNER_WALL_BROKEN_PURPLE = 5,
-    BOTTOM_WALL_BROKEN_PURPLE = 6,
-    COLUMN_WALL_BROKEN_PURPLE = 7,
-    CENTRAL_WALL_SMALL_BROKEN_PURPLE = 8,
-    CENTRAL_WALL_MEDIUM_BROKEN_PURPLE = 9,
-    CENTRAL_WALL_LARGE_BROKEN_PURPLE = 10
+    BACKGROUND_PURPLE_WALL = 10,
+    TOP_CORNER_WALL_BROKEN_PURPLE = 1,
+    TOP_WALL_BROKEN_PURPLE = 2,
+    BORDER_WALL_BROKEN_PURPLE = 9,
+    BOTTOM_CORNER_WALL_BROKEN_PURPLE = 17,
+    BOTTOM_WALL_BROKEN_PURPLE = 18,
+    COLUMN_WALL_BROKEN_PURPLE = 36,
+    CENTRAL_WALL_SMALL_BROKEN_PURPLE = 25,
+    CENTRAL_WALL_MEDIUM_BROKEN_PURPLE = 11,
+    CENTRAL_WALL_LARGE_BROKEN_PURPLE = 37,
+
+
 };
 
 enum class TileRotation
 {
     NONE,
-    LEFT,
-    RIGHT,
-    TOP,
-    FLIPPED_LEFT,
-    FLIPPED_RIGHT
+    ROTATED_LEFT,
+    ROTATED_RIGHT,
+    FLIPPED_HORIZONTALLY,
+    FLIPPED_VERTICALLY
 };
 
 namespace Crucible
 {
-    // Flags currently used by Tiled map editor for horizontally,
-    // vertically and anti-diagonally flipped tiles
-    const unsigned long tiledRotationFlagsDiagonal = std::stoul("0x20000000", nullptr, 16);
-    const unsigned long tiledRotationFlagsHorizontal = std::stoul("0x80000000", nullptr, 16);
-    const unsigned long tiledRotationFlagsVertical = std::stoul("0x40000000", nullptr, 16);
-    // Resolved flags for an easier use of the flags above
-    // Left rotation is tiledRotationFlagsDiagonal + tiledRotationFlagsVertical
-    static inline const unsigned long LEFT = tiledRotationFlagsDiagonal + tiledRotationFlagsVertical;
-    // Right rotation is tiledRotationFlagsHorizontal + tiledRotationFlagsDiagonal
-    static inline const unsigned long RIGHT = tiledRotationFlagsHorizontal + tiledRotationFlagsDiagonal;
-    // Top rotation is tiledRotationFlagsHorizontal + tiledRotationFagsVertical
-    static inline const unsigned long TOP = tiledRotationFlagsHorizontal + tiledRotationFlagsVertical;
-    // x2 left rotation
-    static inline const unsigned long FLIPPED_LEFT = LEFT * 2;
-    // x2 right rotation
-    static inline const unsigned long FLIPPED_RIGHT = RIGHT * 2;
+    // Bits on the far end of the 32-bit global tile ID are used for tile flags
+    const unsigned FLIPPED_HORIZONTALLY_FLAG  = 0x80000000;
+    const unsigned FLIPPED_VERTICALLY_FLAG    = 0x40000000;
+    const unsigned FLIPPED_DIAGONALLY_FLAG    = 0x20000000;
+    const unsigned ROTATED_HEXAGONAL_120_FLAG = 0x10000000;
 }
 
 class Tile
