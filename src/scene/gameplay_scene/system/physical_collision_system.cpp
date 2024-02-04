@@ -9,27 +9,16 @@ void PhysicalCollisionSystem::execute()
 {
     std::vector<Entity> entities = m_entityManager.getEntities();
 
-    for (const Entity& entity : entities)
+    for (const Entity& entity: entities)
     {
         auto& entityRectangleShape = entity.getComponent<Component::CTile>();
         auto& entityTransform = entity.getComponent<Component::CTransform>();
         auto& entityCollider = entity.getComponent<Component::CCollider>();
 
-        for (const Entity& otherEntity : entities)
+        if (entity.hasComponent<Component::CCollider>())
         {
-            if (entity.getId() == otherEntity.getId())
-            {
-                // @Refactor: Can we do this a better way?
-                continue;
-            }
-
-            if (entity.hasComponent<Component::CCollider>() && otherEntity.hasComponent<Component::CCollider>())
-            {
-                auto& otherEntityRectangleShape = otherEntity.getComponent<Component::CTile>();
-                auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
-                resolvePhysicalCollisions(entityRectangleShape, entityTransform, entityCollider,
-                        otherEntityTransform, otherEntityRectangleShape);
-            }
+            checkForLevelObjectLayerCollisions(entityCollider, entityRectangleShape, entityTransform);
+            checkForOtherCollidableEntities(entities, entity, entityCollider, entityRectangleShape, entityTransform);
         }
 
         updateShapeVertexPositions(entityTransform, entityRectangleShape);
@@ -38,7 +27,7 @@ void PhysicalCollisionSystem::execute()
 
 void PhysicalCollisionSystem::resolvePhysicalCollisions(Component::CTile& entityRectangleShape,
         Component::CTransform& entityTransform, Component::CCollider entityCollider,
-        Component::CTransform& otherEntityTransform, Component::CTile& otherEntityRectangleShape)
+        const Crucible::Vec2& otherRectPos, std::shared_ptr<sf::VertexArray>& otherRectVertices)
 {
     if (entityCollider.immovable)
     {
@@ -46,17 +35,59 @@ void PhysicalCollisionSystem::resolvePhysicalCollisions(Component::CTile& entity
     }
 
     sf::FloatRect overlap;
-    if (isCollidingAABB(entityRectangleShape, otherEntityRectangleShape, overlap))
+    if (isCollidingAABB(entityRectangleShape, otherRectVertices, overlap))
     {
-        resolveCollision(entityRectangleShape, entityTransform, otherEntityRectangleShape, otherEntityTransform,
-                overlap);
+        resolveCollision(entityRectangleShape, entityTransform, otherRectPos, overlap);
+    }
+}
+
+void PhysicalCollisionSystem::checkForOtherCollidableEntities(std::vector<Entity>& entities,
+        const Entity& entity, Component::CCollider& entityCollider, Component::CTile& entityRectangleShape,
+        Component::CTransform& entityTransform) const
+{
+    for (const Entity& otherEntity: entities)
+    {
+        if (entity.getId() == otherEntity.getId())
+        {
+            // @Refactor: Can we do this a better way?
+            continue;
+        }
+
+        if (otherEntity.hasComponent<Component::CCollider>())
+        {
+            auto& otherEntityRectangleShape = otherEntity.getComponent<Component::CTile>();
+            auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
+
+            resolvePhysicalCollisions(entityRectangleShape,
+                    entityTransform,
+                    entityCollider,
+                    *otherEntityTransform.position,
+                    otherEntityRectangleShape.tile.vertices);
+        }
+    }
+}
+void PhysicalCollisionSystem::checkForLevelObjectLayerCollisions(Component::CCollider& entityCollider,
+        Component::CTile& entityRectangleShape, Component::CTransform& entityTransform) const
+{
+    for (ObjectLayer layer : LevelManager::activeLevel.objectLayers)
+    {
+        for (std::shared_ptr<sf::VertexArray>& vArr : layer.tileObjectVertices)
+        {
+            sf::Vertex v = (*vArr)[0];
+            resolvePhysicalCollisions(
+                    entityRectangleShape,
+                    entityTransform,
+                    entityCollider,
+                    {v.position.x, v.position.y},
+                    vArr);
+        }
     }
 }
 
 bool PhysicalCollisionSystem::isCollidingAABB(const Component::CTile& entityTile,
-        const Component::CTile& otherTile, sf::FloatRect& overlap)
+        const std::shared_ptr<sf::VertexArray>& otherRectVertices, sf::FloatRect& overlap)
 {
-    return entityTile.tile.vertices->getBounds().intersects(otherTile.tile.vertices->getBounds(), overlap);
+    return entityTile.tile.vertices->getBounds().intersects(otherRectVertices->getBounds(), overlap);
 }
 
 void PhysicalCollisionSystem::applyCollisionOverlapToEntityTransform(Component::CTransform& entityTransform,
@@ -98,7 +129,7 @@ void PhysicalCollisionSystem::updateShapeVertexPositions(const Component::CTrans
 }
 
 void PhysicalCollisionSystem::resolveCollision(Component::CTile& entityTile, Component::CTransform& entityTransform,
-        Component::CTile& otherEntityTile, Component::CTransform& otherEntityTransform, const sf::FloatRect& overlap)
+        const Crucible::Vec2& otherEntityPositionVec, const sf::FloatRect& overlap)
 {
     sf::VertexArray& tileVertices = *entityTile.tile.vertices;
     float xDiff = std::abs(tileVertices[0].position.x - tileVertices[1].position.x) / 2;
@@ -108,7 +139,7 @@ void PhysicalCollisionSystem::resolveCollision(Component::CTile& entityTile, Com
     float oyDiff = std::abs(tileVertices[0].position.y - tileVertices[2].position.y) / 2;
 
     const Crucible::Vec2& entityPosition = Crucible::Vec2(entityTransform.position->x - xDiff, entityTransform.position->y + yDiff);
-    const Crucible::Vec2& otherEntityPosition = Crucible::Vec2(otherEntityTransform.position->x - oxDiff, otherEntityTransform.position->y + oyDiff);
+    const Crucible::Vec2& otherEntityPosition = Crucible::Vec2(otherEntityPositionVec.x - oxDiff, otherEntityPositionVec.y + oyDiff);
     const Crucible::Vec2& result = entityPosition - otherEntityPosition;
 
     applyCollisionManifoldToTransform(entityTransform, overlap, result);

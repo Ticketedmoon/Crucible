@@ -23,9 +23,8 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
                 t.position.x *= Crucible::TILE_SIZE;
                 t.position.y *= Crucible::TILE_SIZE;
 
-                bool isCollidable = t.type != TileType::BACKGROUND_PURPLE_WALL;
                 bool isImmovable = t.type != TileType::BACKGROUND_PURPLE_WALL;
-                m_entitySpawner.createTile(t, isCollidable, isImmovable);
+                m_entitySpawner.createTile(t, false, isImmovable);
             }
         }
     }

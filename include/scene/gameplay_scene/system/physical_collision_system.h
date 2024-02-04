@@ -12,6 +12,7 @@
 #include "system.h"
 #include "entity_manager.h"
 #include "common_constants.h"
+#include "level_manager.h"
 
 class PhysicalCollisionSystem : public System
 {
@@ -22,16 +23,21 @@ class PhysicalCollisionSystem : public System
 
     private:
         static bool isCollidingAABB(const Component::CTile& entityTile,
-                const Component::CTile& otherTile, sf::FloatRect& overlap);
+                const std::shared_ptr<sf::VertexArray>& otherRectVertices, sf::FloatRect& overlap);
 
-        static void resolveCollision(Component::CTile& entityTile,
-                Component::CTransform& entityTransform,
-                Component::CTile& otherEntityTile, Component::CTransform& otherEntityTransform,
-                const sf::FloatRect& overlap);
+        static void resolveCollision(Component::CTile& entityTile, Component::CTransform& entityTransform,
+                const Crucible::Vec2& otherEntityPositionVec, const sf::FloatRect& overlap);
 
         static void resolvePhysicalCollisions(Component::CTile& entityRectangleShape,
                 Component::CTransform& entityTransform, Component::CCollider entityCollider,
-                Component::CTransform& otherEntityTransform, Component::CTile& otherEntityRectangleShape);
+                const Crucible::Vec2& otherRectPos, std::shared_ptr<sf::VertexArray>& otherRectVertices);
+
+        void checkForLevelObjectLayerCollisions(Component::CCollider& entityCollider, Component::CTile& entityRectangleShape,
+                Component::CTransform& entityTransform) const;
+
+        void checkForOtherCollidableEntities(std::vector<Entity>& entities, const Entity& entity,
+                Component::CCollider& entityCollider, Component::CTile& entityRectangleShape,
+                Component::CTransform& entityTransform) const;
 
         static void updateShapeVertexPositions(const Component::CTransform& entityTransform,
                 Component::CTile& entityTile);
