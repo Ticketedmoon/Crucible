@@ -20,7 +20,7 @@ void EntitySpawner::createPlayer()
 
     Tile playerTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
-            TileType::TOP_WALL_BROKEN_PURPLE,
+            TileType::CENTRAL_WALL_LARGE_BROKEN_PURPLE,
             TileRotation::NONE,
             vertices);
 
@@ -54,6 +54,7 @@ void EntitySpawner::createGuard(Crucible::Vec2 positionVec)
     e.addComponent<Component::CTile>(guardTile);
     e.addComponent<Component::CCollider>();
 
+    // TODO this should be read in from level file
     std::vector<Crucible::Vec2> path{
         *position,
         {position->x - (10 * Crucible::TILE_SIZE), position->y}
