@@ -31,7 +31,8 @@ void LightingSystem::execute()
     }
 }
 
-void LightingSystem::sortIntersectionsByAngleAscending(const Component::CTransform& entityTransform,
+void LightingSystem::sortIntersectionsByAngleAscending(
+        const Component::CTransform& entityTransform,
         std::vector<Crucible::LightRayIntersect>& intersections)
 {
     auto comparator =
@@ -49,7 +50,8 @@ void LightingSystem::sortIntersectionsByAngleAscending(const Component::CTransfo
     std::sort(intersections.begin(), intersections.end(), comparator);
 }
 
-std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionPoints(Component::CLightSource& entityLightSource,
+std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionPoints(
+        Component::CLightSource& entityLightSource,
         const Component::CTransform& entityTransform)
 {
     std::vector<Crucible::LightRayIntersect> collisionPoints;
@@ -69,8 +71,10 @@ std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionP
     return collisionPoints;
 }
 
-void LightingSystem::addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
-        const Component::CTransform& entityTransform, const std::vector<Crucible::LightRayIntersect>& intersections)
+void LightingSystem::addVerticesForLightCollisions(
+        Component::CLightSource& entityLightSource,
+        const Component::CTransform& entityTransform,
+        const std::vector<Crucible::LightRayIntersect>& intersections)
 {
     if (intersections.empty())
     {
@@ -78,22 +82,22 @@ void LightingSystem::addVerticesForLightCollisions(Component::CLightSource& enti
     }
 
     // Add transform position of player entity.
-    const sf::Color& lightColor{255, 255, 0};
-    entityLightSource.lightVertices.append({{entityTransform.position->x, entityTransform.position->y}, lightColor});
+    entityLightSource.lightVertices.append({{entityTransform.position->x, entityTransform.position->y}, LIGHTING_COLOR});
 
     // Add all collision points with
     for (const Crucible::LightRayIntersect& intersection : intersections)
     {
         entityLightSource.lightVertices.append({{intersection.collisionPoint.x, intersection.collisionPoint.y},
-                                                lightColor});
+                                                LIGHTING_COLOR});
     }
 
     // Add initial collision point again so the TriangleFan can connect forming a full-looking geometric shape displaying visibility.
     entityLightSource.lightVertices.append({{intersections[0].collisionPoint.x, intersections[0].collisionPoint.y},
-                                            lightColor});
+                                            LIGHTING_COLOR});
 }
 
-Crucible::LightRayIntersect LightingSystem::findClosestIntersectForLine(const Component::CTransform& entityTransform,
+Crucible::LightRayIntersect LightingSystem::findClosestIntersectForLine(
+        const Component::CTransform& entityTransform,
         std::vector<Crucible::LightRayIntersect>& intersectList)
 {
     Crucible::LightRayIntersect closestIntersect = intersectList[0];

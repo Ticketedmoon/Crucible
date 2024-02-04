@@ -25,6 +25,8 @@ class LightingSystem : public System
                 std::vector<Crucible::LightRayIntersect>& intersections) ;
 
     private:
+        static inline const sf::Color& LIGHTING_COLOR{255, 255, 0};
+
         EntityManager& m_entityManager;
 };
 

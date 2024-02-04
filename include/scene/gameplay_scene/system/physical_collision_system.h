@@ -32,7 +32,7 @@ class PhysicalCollisionSystem : public System
                 Component::CTransform& entityTransform, Component::CCollider entityCollider,
                 const Crucible::Vec2& otherRectPos, std::shared_ptr<sf::VertexArray>& otherRectVertices);
 
-        void checkForLevelObjectLayerCollisions(Component::CCollider& entityCollider, Component::CTile& entityRectangleShape,
+        void checkForLevelObjectLayerCollisions(Component::CCollider& entityCollider, Component::CTile& entityTile,
                 Component::CTransform& entityTransform) const;
 
         void checkForOtherCollidableEntities(std::vector<Entity>& entities, const Entity& entity,

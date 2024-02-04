@@ -8,9 +8,10 @@ void EntitySpawner::createPlayer()
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::PLAYER);
 
-    std::shared_ptr<Crucible::Vec2> player = std::make_shared<Crucible::Vec2>(2 * Crucible::TILE_SIZE, 4 * Crucible::TILE_SIZE);
+    std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(2 * Crucible::TILE_SIZE, 4 * Crucible::TILE_SIZE);
 
-    auto& playerTransform = e.addComponent<Component::CTransform>(player);
+    auto& playerTransform = e.addComponent<Component::CTransform>(position);
+
     std::shared_ptr<sf::VertexArray> vertices = std::make_shared<sf::VertexArray>(sf::Quads);
     vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y}));
     vertices->append(sf::Vertex({playerTransform.position->x + Crucible::TILE_SIZE, playerTransform.position->y}));
@@ -18,7 +19,7 @@ void EntitySpawner::createPlayer()
     vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y + Crucible::TILE_SIZE}));
 
     Tile playerTile(
-            {static_cast<unsigned int>(player->x), static_cast<unsigned int>(player->y)},
+            {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
             TileType::TOP_WALL_BROKEN_PURPLE,
             TileRotation::NONE,
             vertices);

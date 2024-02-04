@@ -109,17 +109,21 @@ void GameplayScene::registerActions()
 
 void GameplayScene::registerSystems()
 {
+    // Standard
     m_systemManager.registerSystem(
             std::make_shared<TransformSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
             std::make_shared<PhysicalCollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+
+    // Lighting
     m_systemManager.registerSystem(
             std::make_shared<RayAppenderSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
             std::make_shared<LightCollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
-
     m_systemManager.registerSystem(
             std::make_shared<LightingSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+
+    // Render
     m_systemManager.registerSystem(
             std::make_shared<RenderSystem>(gameEngine.m_renderTexture, m_entityManager), SystemManager::SystemType::RENDER);
 }

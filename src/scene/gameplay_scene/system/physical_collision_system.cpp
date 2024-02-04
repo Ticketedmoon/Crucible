@@ -11,17 +11,17 @@ void PhysicalCollisionSystem::execute()
 
     for (const Entity& entity: entities)
     {
-        auto& entityRectangleShape = entity.getComponent<Component::CTile>();
+        auto& entityTile = entity.getComponent<Component::CTile>();
         auto& entityTransform = entity.getComponent<Component::CTransform>();
         auto& entityCollider = entity.getComponent<Component::CCollider>();
 
         if (entity.hasComponent<Component::CCollider>())
         {
-            checkForLevelObjectLayerCollisions(entityCollider, entityRectangleShape, entityTransform);
-            checkForOtherCollidableEntities(entities, entity, entityCollider, entityRectangleShape, entityTransform);
+            checkForLevelObjectLayerCollisions(entityCollider, entityTile, entityTransform);
+            checkForOtherCollidableEntities(entities, entity, entityCollider, entityTile, entityTransform);
         }
 
-        updateShapeVertexPositions(entityTransform, entityRectangleShape);
+        updateShapeVertexPositions(entityTransform, entityTile);
     }
 }
 
@@ -67,7 +67,7 @@ void PhysicalCollisionSystem::checkForOtherCollidableEntities(std::vector<Entity
     }
 }
 void PhysicalCollisionSystem::checkForLevelObjectLayerCollisions(Component::CCollider& entityCollider,
-        Component::CTile& entityRectangleShape, Component::CTransform& entityTransform) const
+        Component::CTile& entityTile, Component::CTransform& entityTransform) const
 {
     for (ObjectLayer layer : LevelManager::activeLevel.objectLayers)
     {
@@ -75,7 +75,7 @@ void PhysicalCollisionSystem::checkForLevelObjectLayerCollisions(Component::CCol
         {
             sf::Vertex v = (*vArr)[0];
             resolvePhysicalCollisions(
-                    entityRectangleShape,
+                    entityTile,
                     entityTransform,
                     entityCollider,
                     {v.position.x, v.position.y},

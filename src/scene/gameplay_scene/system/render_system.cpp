@@ -25,14 +25,12 @@ void RenderSystem::drawEntities()
         {
             auto& cLightSource = e.getComponent<Component::CLightSource>();
             sf::VertexArray& lightVertices = cLightSource.lightVertices;
-
             m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::TriangleFan, lightSrcRenderStates);
         }
 
         if (e.hasComponent<Component::CTile>())
         {
             auto& cTile = e.getComponent<Component::CTile>();
-
             m_renderTarget.draw(*cTile.tile.vertices, tileRenderStates);
         }
     }
