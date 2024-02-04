@@ -45,6 +45,15 @@ namespace Component
         bool has{};
     };
 
+    struct CPathFollower
+    {
+        std::vector<Crucible::Vec2> path;
+
+        size_t destinationIndex{0};
+
+        bool has{};
+    };
+
     struct CLightSource
     {
         // Every 2 elements is a line, so to access the nth line, the index positions are: (v[i * 2], v[(i * 2) * 1])

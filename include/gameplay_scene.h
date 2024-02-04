@@ -42,6 +42,7 @@ class GameplayScene : public Scene
         EntitySpawner m_entitySpawner;
         SystemManager m_systemManager;
         LevelManager m_levelManager;
+        void createTilesForLevel(Level& level);
 };
 
 

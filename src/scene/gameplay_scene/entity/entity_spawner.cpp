@@ -36,6 +36,38 @@ void EntitySpawner::createPlayer()
     e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects);
 }
 
+void EntitySpawner::createGuard()
+{
+    auto e = m_entityManager.addEntity(Crucible::EntityType::GUARD);
+
+    std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(
+            18 * Crucible::TILE_SIZE,
+            Crucible::TILE_SIZE / 2);
+
+    auto& playerTransform = e.addComponent<Component::CTransform>(position);
+    std::shared_ptr<sf::VertexArray> vertices = std::make_shared<sf::VertexArray>(sf::Quads);
+    vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y}));
+    vertices->append(sf::Vertex({playerTransform.position->x + Crucible::TILE_SIZE, playerTransform.position->y}));
+    vertices->append(sf::Vertex({playerTransform.position->x + Crucible::TILE_SIZE, playerTransform.position->y + Crucible::TILE_SIZE}));
+    vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y + Crucible::TILE_SIZE}));
+
+    Tile guardTile(
+            {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
+            TileType::CENTRAL_WALL_LARGE_BROKEN_PURPLE,
+            TileRotation::NONE,
+            vertices);
+
+    updateTileTexture(guardTile);
+    e.addComponent<Component::CTile>(guardTile);
+    e.addComponent<Component::CCollider>();
+
+    std::vector<Crucible::Vec2> path{
+        *position,
+        {position->x - (15 * Crucible::TILE_SIZE), position->y}
+    };
+    e.addComponent<Component::CPathFollower>(path);
+}
+
 void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::TILE);

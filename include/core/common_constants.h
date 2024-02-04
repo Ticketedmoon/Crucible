@@ -23,6 +23,7 @@ namespace Crucible
     enum class EntityType
     {
         PLAYER,
+        GUARD,
         TILE,
         NONE
     };

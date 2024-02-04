@@ -7,27 +7,9 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     registerSystems();
 
     Level& level = m_levelManager.loadLevel();
-    for (TileLayer layer : level.tileLayers)
-    {
-        for (int row = 0; row < level.height; row++)
-        {
-            for (int col = 0; col < level.width; col++)
-            {
-                int textureIndex = col + (row * level.width);
-                Tile t = layer.data.at(textureIndex);
-                if (t.type == TileType::TRANSPARENT)
-                {
-                    continue;
-                }
+    createTilesForLevel(level);
 
-                t.position.x *= Crucible::TILE_SIZE;
-                t.position.y *= Crucible::TILE_SIZE;
-
-                bool isImmovable = t.type != TileType::BACKGROUND_PURPLE_WALL;
-                m_entitySpawner.createTile(t, false, isImmovable);
-            }
-        }
-    }
+    m_entitySpawner.createGuard();
 }
 
 void GameplayScene::update()
@@ -86,6 +68,31 @@ void GameplayScene::performAction(Action& action)
         if (Action::Type::MOVE_DOWN == action.getType())
         {
             cControllable.isMovingDown = action.getMode() == Action::Mode::PRESS;
+        }
+    }
+}
+
+void GameplayScene::createTilesForLevel(Level& level)
+{
+    for (TileLayer layer : level.tileLayers)
+    {
+        for (int row = 0; row < level.height; row++)
+        {
+            for (int col = 0; col < level.width; col++)
+            {
+                int textureIndex = col + (row * level.width);
+                Tile t = layer.data.at(textureIndex);
+                if (t.type == TileType::TRANSPARENT)
+                {
+                    continue;
+                }
+
+                t.position.x *= Crucible::TILE_SIZE;
+                t.position.y *= Crucible::TILE_SIZE;
+
+                bool isImmovable = t.type != TileType::BACKGROUND_PURPLE_WALL;
+                m_entitySpawner.createTile(t, false, isImmovable);
+            }
         }
     }
 }

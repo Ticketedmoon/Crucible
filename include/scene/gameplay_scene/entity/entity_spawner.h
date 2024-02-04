@@ -20,6 +20,7 @@ class EntitySpawner
         explicit EntitySpawner(EntityManager& entityManager);
 
         void createPlayer();
+        void createGuard();
         void createTile(Tile& t, bool isCollidable, bool immovable);
 
     private:

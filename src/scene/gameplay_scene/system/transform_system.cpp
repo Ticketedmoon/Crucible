@@ -16,6 +16,28 @@ void TransformSystem::execute()
         {
             resolveControllerMovementForEntity(entity, entityTransform);
         }
+
+        if (entity.hasComponent<Component::CPathFollower>())
+        {
+            auto& cPathFollower = entity.getComponent<Component::CPathFollower>();
+
+            // If destinationIndex is == path.size(), then reset to 0.
+            if (cPathFollower.destinationIndex == cPathFollower.path.size())
+            {
+                cPathFollower.destinationIndex = 0;
+            }
+
+            // If at point, move to next destination
+            if (*entityTransform.position == cPathFollower.path[cPathFollower.destinationIndex])
+            {
+                cPathFollower.destinationIndex++;
+            }
+
+            // Move towards destination point
+            int sign = entityTransform.position->x < cPathFollower.path[cPathFollower.destinationIndex].x ? 1 : -1;
+            entityTransform.position->x += sign;
+            //entityTransform.position->y = 0;
+        }
     }
 }
 
