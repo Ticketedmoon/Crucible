@@ -16,7 +16,6 @@ void EntitySpawner::createPlayer()
     vertices->append(sf::Vertex({playerTransform.position->x + Crucible::TILE_SIZE, playerTransform.position->y}));
     vertices->append(sf::Vertex({playerTransform.position->x + Crucible::TILE_SIZE, playerTransform.position->y + Crucible::TILE_SIZE}));
     vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y + Crucible::TILE_SIZE}));
-    vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y}));
 
     Tile playerTile(
             {static_cast<unsigned int>(player->x), static_cast<unsigned int>(player->y)},
@@ -47,19 +46,19 @@ void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
         e.addComponent<Component::CCollider>(immovable);
     }
 
-    std::shared_ptr<sf::VertexArray> vertices = std::make_shared<sf::VertexArray>(sf::Quads);
-    vertices->append(sf::Vertex({position.x, position.y}));
-    vertices->append(sf::Vertex({position.x + Crucible::TILE_SIZE, position.y}));
-    vertices->append(sf::Vertex({position.x + Crucible::TILE_SIZE, position.y + Crucible::TILE_SIZE}));
-    vertices->append(sf::Vertex({position.x, position.y + Crucible::TILE_SIZE}));
-    vertices->append(sf::Vertex({position.x, position.y}));
+    sf::VertexArray vertices(sf::Quads);
+
+    vertices.append(sf::Vertex({position.x, position.y}));
+    vertices.append(sf::Vertex({position.x + Crucible::TILE_SIZE, position.y}));
+    vertices.append(sf::Vertex({position.x + Crucible::TILE_SIZE, position.y + Crucible::TILE_SIZE}));
+    vertices.append(sf::Vertex({position.x, position.y + Crucible::TILE_SIZE}));
 
 //    if (t.type == TileType::ARROW_BLOCK)
 //    {
 //        LevelManager::activeLevel.objectLayers[0].tileObjectVertices.emplace_back(vertices);
 //    }
 
-    t.vertices = vertices;
+    t.vertices = std::make_shared<sf::VertexArray>(vertices);
 
     updateTileTexture(t);
     e.addComponent<Component::CTile>(t);
@@ -88,42 +87,42 @@ std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& play
     return rays;
 }
 
+/**
+ * rotation guide:
+ * None: [top-left vertex -> bottom-left vertex, closewise]
+ * 90 degree anti-clockwise texture rotation: [top-right vertex -> top-left vertex, clockwise]
+ * 90 degree clockwise texture rotation: [bottom-left vertex -> bottom-right vertex, clockwise]
+ * flip horizontally: [top-right -> bottom-right, anti-clockwise]
+ */
 void EntitySpawner::updateTileTexture(Tile& tile)
 {
+    sf::VertexArray& tileVertices = *tile.vertices;
+    assert(tileVertices.getVertexCount() == 4);
+
     int tileTypeValue = static_cast<int>(tile.type) - 1;
     float tu = (tileTypeValue % (LevelManager::tileSheetTexture->getSize().x / Crucible::TILE_SIZE));
     float tv = tileTypeValue / (LevelManager::tileSheetTexture->getSize().x / Crucible::TILE_SIZE);
 
     float tuPositionStart = tu * Crucible::TILE_SIZE;
     float tuPositionEnd = (tu + 1) * Crucible::TILE_SIZE;
-
     float tvPositionStart = tv * Crucible::TILE_SIZE;
     float tvPositionEnd = (tv + 1) * Crucible::TILE_SIZE;
 
-    sf::VertexArray& tileVertices = *tile.vertices;
-    tileVertices[0].texCoords = sf::Vector2f(tuPositionStart, tvPositionStart);
-    tileVertices[1].texCoords = sf::Vector2f(tuPositionEnd, tvPositionStart);
-    tileVertices[2].texCoords = sf::Vector2f(tuPositionEnd, tvPositionEnd);
-    tileVertices[3].texCoords = sf::Vector2f(tuPositionStart, tvPositionEnd);
-    tileVertices[4].texCoords = sf::Vector2f(tuPositionStart, tvPositionStart);
+    if (tile.rotation == TileRotation::NONE)
+    {
+        tileVertices[0].texCoords = {tuPositionStart, tvPositionStart};
+        tileVertices[1].texCoords = {tuPositionEnd, tvPositionStart};
+        tileVertices[2].texCoords = {tuPositionEnd, tvPositionEnd};
+        tileVertices[3].texCoords = {tuPositionStart, tvPositionEnd};
+        return;
+    }
 
-//    // define a translation transform
-//    sf::Transform translation;
-//    translation.translate(1, 1);
-//    // define a rotation transform
-//    sf::Transform rotation;
-//    rotation.rotate(180);
-//    // combine them
-//    sf::Transform transform = translation * rotation;
-//    // use the result to transform stuff...
-//    //sf::Vector2f point = transform.transformPoint(10, 20);
-//    //sf::FloatRect rect = transform.transformRect(sf::FloatRect(0, 0, 10, 100));
-//
-//    // Apply rotation
-//    sf::VertexArray& tileVertices = *tile.vertices;
-//    tileVertices[0].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionStart, tvPositionStart));
-//    tileVertices[1].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionEnd, tvPositionStart));
-//    tileVertices[2].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionEnd, tvPositionEnd));
-//    tileVertices[3].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionStart, tvPositionEnd));
-//    tileVertices[4].texCoords = rotation.transformPoint(sf::Vector2f(tuPositionStart, tvPositionStart));
+    if (tile.rotation == TileRotation::FLIPPED_HORIZONTALLY)
+    {
+        tileVertices[0].texCoords = sf::Vector2f(tuPositionEnd, tvPositionStart);
+        tileVertices[1].texCoords = sf::Vector2f(tuPositionStart, tvPositionStart);
+        tileVertices[2].texCoords = sf::Vector2f(tuPositionStart, tvPositionEnd);
+        tileVertices[3].texCoords = sf::Vector2f(tuPositionEnd, tvPositionEnd);
+        return;
+    }
 }
