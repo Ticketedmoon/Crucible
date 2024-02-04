@@ -34,6 +34,7 @@ void TransformSystem::execute()
             }
 
             // Move towards destination point
+            // TODO move towards destination via vector math rather than a simple sign flip.
             int sign = entityTransform.position->x < cPathFollower.path[cPathFollower.destinationIndex].x ? 1 : -1;
             entityTransform.position->x += sign;
             //entityTransform.position->y = 0;

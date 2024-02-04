@@ -29,27 +29,20 @@ void EntitySpawner::createPlayer()
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CCollider>();
     e.addComponent<Component::CTile>(playerTile);
-
-    std::vector<Crucible::Ray> rays = createRays(playerTransform);
-    std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
-            std::vector<std::vector<Crucible::LightRayIntersect>>(rays.size(), std::vector<Crucible::LightRayIntersect>());
-    e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects);
 }
 
-void EntitySpawner::createGuard()
+void EntitySpawner::createGuard(Crucible::Vec2 positionVec)
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::GUARD);
 
-    std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(
-            18 * Crucible::TILE_SIZE,
-            Crucible::TILE_SIZE / 2);
+    std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(positionVec);
 
-    auto& playerTransform = e.addComponent<Component::CTransform>(position);
+    auto& transform = e.addComponent<Component::CTransform>(position);
     std::shared_ptr<sf::VertexArray> vertices = std::make_shared<sf::VertexArray>(sf::Quads);
-    vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y}));
-    vertices->append(sf::Vertex({playerTransform.position->x + Crucible::TILE_SIZE, playerTransform.position->y}));
-    vertices->append(sf::Vertex({playerTransform.position->x + Crucible::TILE_SIZE, playerTransform.position->y + Crucible::TILE_SIZE}));
-    vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y + Crucible::TILE_SIZE}));
+    vertices->append(sf::Vertex({transform.position->x, transform.position->y}));
+    vertices->append(sf::Vertex({transform.position->x + Crucible::TILE_SIZE, transform.position->y}));
+    vertices->append(sf::Vertex({transform.position->x + Crucible::TILE_SIZE, transform.position->y + Crucible::TILE_SIZE}));
+    vertices->append(sf::Vertex({transform.position->x, transform.position->y + Crucible::TILE_SIZE}));
 
     Tile guardTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
@@ -63,9 +56,14 @@ void EntitySpawner::createGuard()
 
     std::vector<Crucible::Vec2> path{
         *position,
-        {position->x - (15 * Crucible::TILE_SIZE), position->y}
+        {position->x - (10 * Crucible::TILE_SIZE), position->y}
     };
     e.addComponent<Component::CPathFollower>(path);
+
+    std::vector<Crucible::Ray> rays = createRays(transform);
+    std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
+            std::vector<std::vector<Crucible::LightRayIntersect>>(rays.size(), std::vector<Crucible::LightRayIntersect>());
+    e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects);
 }
 
 void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)

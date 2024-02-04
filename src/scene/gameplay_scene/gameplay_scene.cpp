@@ -9,7 +9,11 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     Level& level = m_levelManager.loadLevel();
     createTilesForLevel(level);
 
-    m_entitySpawner.createGuard();
+
+    Crucible::Vec2 guardStartPosA{18 * Crucible::TILE_SIZE, Crucible::TILE_SIZE / 2 + 8};
+    Crucible::Vec2 guardStartPosB{18 * Crucible::TILE_SIZE, Crucible::TILE_SIZE * 11 - (Crucible::TILE_SIZE / 2 + 8)};
+    m_entitySpawner.createGuard(guardStartPosA);
+    m_entitySpawner.createGuard(guardStartPosB);
 }
 
 void GameplayScene::update()
