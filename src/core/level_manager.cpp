@@ -78,6 +78,7 @@ Level LevelManager::loadMapData()
             ObjectLayer layer;
             layer.name = data[LEVEL_FILE_LAYERS_KEY][layerIdx]["name"];
             layer.type = layerType;
+
             for (size_t i = 0; i < data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY].size(); i++)
             {
                 sf::FloatRect r;
@@ -91,14 +92,13 @@ Level LevelManager::loadMapData()
                 verts->append({{r.left + r.width, r.top}});
                 verts->append({{r.left + r.width, r.top + r.height}});
                 verts->append({{r.left, r.top + r.height}});
+                // TODO @investigate: currently this vert is required, but it may not be necessary
                 verts->append({{r.left, r.top}});
-                layer.tileObjectVertices.emplace_back(verts);
-            }
 
-            level.objectLayers.emplace_back(layer);
+                level.layerNameToObjectLayer[layer.name].data.emplace_back(verts);
+            }
         }
     }
-
 
     return level;
 }
@@ -139,7 +139,7 @@ std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nl
     return tiles;
 }
 
-void LevelManager::buildTileSheet(const char* tileSheetFilePath)
+void LevelManager::buildTileSheet(const std::string tileSheetFilePath)
 {
     if (!m_textureManager.hasTexture(tileSheetFilePath))
     {

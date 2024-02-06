@@ -20,11 +20,11 @@ class EntitySpawner
         explicit EntitySpawner(EntityManager& entityManager);
 
         void createPlayer();
-        void createGuard(Crucible::Vec2 positionVec);
+        void createGuard(const std::string& lightingObjectLayerName, const std::string& pathingObjectLayerName);
         void createTile(Tile& t, bool isCollidable, bool immovable);
 
     private:
-        std::vector<Crucible::Ray> createRays(Component::CTransform& playerTransform);
+        static std::vector<Crucible::Ray> createRays(Component::CTransform& playerTransform, const std::string& layerName);
         static void updateTileTexture(Tile& tile);
 
     private:

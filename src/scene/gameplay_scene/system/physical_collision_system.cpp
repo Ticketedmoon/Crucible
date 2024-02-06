@@ -27,7 +27,7 @@ void PhysicalCollisionSystem::execute()
 
 void PhysicalCollisionSystem::resolvePhysicalCollisions(Component::CTile& entityRectangleShape,
         Component::CTransform& entityTransform, Component::CCollider entityCollider,
-        const Crucible::Vec2& otherRectPos, std::shared_ptr<sf::VertexArray>& otherRectVertices)
+        const Crucible::Vec2& otherRectPos, const std::shared_ptr<sf::VertexArray>& otherRectVertices)
 {
     if (entityCollider.immovable)
     {
@@ -69,18 +69,27 @@ void PhysicalCollisionSystem::checkForOtherCollidableEntities(std::vector<Entity
 void PhysicalCollisionSystem::checkForLevelObjectLayerCollisions(Component::CCollider& entityCollider,
         Component::CTile& entityTile, Component::CTransform& entityTransform) const
 {
-    for (ObjectLayer layer : LevelManager::activeLevel.objectLayers)
+    ObjectLayer lightingObjectLayerA
+        = LevelManager::activeLevel.layerNameToObjectLayer.at(LevelManager::LIGHTING_OBJECT_LAYER_A_NAME);
+    ObjectLayer lightingObjectLayerB
+            = LevelManager::activeLevel.layerNameToObjectLayer.at(LevelManager::LIGHTING_OBJECT_LAYER_B_NAME);
+
+    resolvePhysicalCollisionsForObjectLayer(entityCollider, entityTile, entityTransform, lightingObjectLayerA);
+    resolvePhysicalCollisionsForObjectLayer(entityCollider, entityTile, entityTransform, lightingObjectLayerB);
+}
+
+void PhysicalCollisionSystem::resolvePhysicalCollisionsForObjectLayer(Component::CCollider& entityCollider,
+        Component::CTile& entityTile, Component::CTransform& entityTransform, ObjectLayer& lightingObjectLayer)
+{
+    for (const std::shared_ptr<sf::VertexArray>& vArr: lightingObjectLayer.data)
     {
-        for (std::shared_ptr<sf::VertexArray>& vArr : layer.tileObjectVertices)
-        {
-            sf::Vertex v = (*vArr)[0];
-            resolvePhysicalCollisions(
-                    entityTile,
-                    entityTransform,
-                    entityCollider,
-                    {v.position.x, v.position.y},
-                    vArr);
-        }
+        sf::Vertex v = (*vArr)[0];
+        resolvePhysicalCollisions(
+                entityTile,
+                entityTransform,
+                entityCollider,
+                {v.position.x, v.position.y},
+                vArr);
     }
 }
 

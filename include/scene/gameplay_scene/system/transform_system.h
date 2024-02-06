@@ -25,8 +25,11 @@ class TransformSystem : public System
 
     private:
         static void resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform);
+        static float distance(Crucible::Vec2 p1, Crucible::Vec2 p2);
 
     private:
+        static inline const float SPEED = 1.4f;
+
         EntityManager& m_entityManager;
 };
 

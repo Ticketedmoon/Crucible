@@ -10,10 +10,8 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     createTilesForLevel(level);
 
 
-    Crucible::Vec2 guardStartPosA{18 * Crucible::TILE_SIZE, Crucible::TILE_SIZE / 2 + 8};
-    Crucible::Vec2 guardStartPosB{18 * Crucible::TILE_SIZE, Crucible::TILE_SIZE * 11 - (Crucible::TILE_SIZE / 2 + 8)};
-    m_entitySpawner.createGuard(guardStartPosA);
-    m_entitySpawner.createGuard(guardStartPosB);
+    m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_A_NAME, LevelManager::GUARD_PATHING_LAYER_A);
+    m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_B_NAME, LevelManager::GUARD_PATHING_LAYER_B);
 }
 
 void GameplayScene::update()

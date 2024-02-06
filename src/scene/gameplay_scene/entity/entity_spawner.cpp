@@ -31,11 +31,22 @@ void EntitySpawner::createPlayer()
     e.addComponent<Component::CTile>(playerTile);
 }
 
-void EntitySpawner::createGuard(Crucible::Vec2 positionVec)
+void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, const std::string& pathingObjectLayerName)
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::GUARD);
+    ObjectLayer pathingObjectLayer = LevelManager::activeLevel.layerNameToObjectLayer.at(pathingObjectLayerName);
 
-    std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(positionVec);
+    std::vector<Crucible::Vec2> path;
+    for (auto& guardPath : pathingObjectLayer.data)
+    {
+        sf::VertexArray vArr = *guardPath;
+        sf::Vertex v{vArr[0]};
+        path.emplace_back(v.position.x, v.position.y);
+    }
+
+    e.addComponent<Component::CPathFollower>(path, pathingObjectLayerName);
+
+    std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(path.at(0));
 
     auto& transform = e.addComponent<Component::CTransform>(position);
     std::shared_ptr<sf::VertexArray> vertices = std::make_shared<sf::VertexArray>(sf::Quads);
@@ -54,17 +65,10 @@ void EntitySpawner::createGuard(Crucible::Vec2 positionVec)
     e.addComponent<Component::CTile>(guardTile);
     e.addComponent<Component::CCollider>();
 
-    // TODO this should be read in from level file
-    std::vector<Crucible::Vec2> path{
-        *position,
-        {position->x - (10 * Crucible::TILE_SIZE), position->y}
-    };
-    e.addComponent<Component::CPathFollower>(path);
-
-    std::vector<Crucible::Ray> rays = createRays(transform);
+    std::vector<Crucible::Ray> rays = createRays(transform, lightingObjectLayerName);
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
             std::vector<std::vector<Crucible::LightRayIntersect>>(rays.size(), std::vector<Crucible::LightRayIntersect>());
-    e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects);
+    e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects, lightingObjectLayerName);
 }
 
 void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
@@ -87,7 +91,7 @@ void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
 
 //    if (t.type == TileType::ARROW_BLOCK)
 //    {
-//        LevelManager::activeLevel.objectLayers[0].tileObjectVertices.emplace_back(vertices);
+//        LevelManager::activeLevel.layerNameToObjectLayer[0].tileObjectVertices.emplace_back(vertices);
 //    }
 
     t.vertices = std::make_shared<sf::VertexArray>(vertices);
@@ -96,12 +100,14 @@ void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
     e.addComponent<Component::CTile>(t);
 }
 
-std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& playerTransform)
+std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& playerTransform, const std::string& layerName)
 {
     std::vector<Crucible::Ray> rays = std::vector<Crucible::Ray>();
     std::vector<Crucible::Ray> additionalRays = std::vector<Crucible::Ray>();
 
-    for (const std::shared_ptr<sf::VertexArray>& tileObjectVertices : LevelManager::activeLevel.objectLayers[0].tileObjectVertices)
+    ObjectLayer& objectLayer = LevelManager::activeLevel.layerNameToObjectLayer.at(layerName);
+
+    for (const std::shared_ptr<sf::VertexArray>& tileObjectVertices : objectLayer.data)
     {
         for (size_t i = 0; i < tileObjectVertices->getVertexCount(); i++)
         {

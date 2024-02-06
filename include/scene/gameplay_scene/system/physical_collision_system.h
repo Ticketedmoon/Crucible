@@ -28,9 +28,12 @@ class PhysicalCollisionSystem : public System
         static void resolveCollision(Component::CTile& entityTile, Component::CTransform& entityTransform,
                 const Crucible::Vec2& otherEntityPositionVec, const sf::FloatRect& overlap);
 
+        static void resolvePhysicalCollisionsForObjectLayer(Component::CCollider& entityCollider, Component::CTile& entityTile,
+                Component::CTransform& entityTransform, ObjectLayer& lightingObjectLayer) ;
+
         static void resolvePhysicalCollisions(Component::CTile& entityRectangleShape,
                 Component::CTransform& entityTransform, Component::CCollider entityCollider,
-                const Crucible::Vec2& otherRectPos, std::shared_ptr<sf::VertexArray>& otherRectVertices);
+                const Crucible::Vec2& otherRectPos, const std::shared_ptr<sf::VertexArray>& otherRectVertices);
 
         void checkForLevelObjectLayerCollisions(Component::CCollider& entityCollider, Component::CTile& entityTile,
                 Component::CTransform& entityTransform) const;

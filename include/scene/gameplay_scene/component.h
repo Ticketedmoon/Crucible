@@ -49,6 +49,8 @@ namespace Component
     {
         std::vector<Crucible::Vec2> path;
 
+        std::string pathingObjectLayerName;
+
         size_t destinationIndex{0};
 
         bool has{};
@@ -62,6 +64,8 @@ namespace Component
         sf::VertexArray lightVertices;
 
         std::vector<std::vector<Crucible::LightRayIntersect>> lightRayIntersects;
+
+        std::string lightingObjectLayerName;
 
         bool has{};
     };

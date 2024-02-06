@@ -24,7 +24,7 @@ struct TileLayer : Layer
 
 struct ObjectLayer : Layer
 {
-    std::vector<std::shared_ptr<sf::VertexArray>> tileObjectVertices;
+    std::vector<std::shared_ptr<sf::VertexArray>> data;
 };
 
 class Level
@@ -33,7 +33,7 @@ class Level
         uint8_t width;
         uint8_t height;
         std::vector<TileLayer> tileLayers;
-        std::vector<ObjectLayer> objectLayers;
+        std::unordered_map<std::string, ObjectLayer> layerNameToObjectLayer;
         std::unordered_map<TileType, uint32_t> tileTypeToId;
 };
 

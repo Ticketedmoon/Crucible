@@ -21,31 +21,38 @@ void TransformSystem::execute()
         {
             auto& cPathFollower = entity.getComponent<Component::CPathFollower>();
 
-            // If destinationIndex is == path.size(), then reset to 0.
-            if (cPathFollower.destinationIndex == cPathFollower.path.size())
-            {
-                cPathFollower.destinationIndex = 0;
-            }
-
             // If at point, move to next destination
-            if (*entityTransform.position == cPathFollower.path[cPathFollower.destinationIndex])
+            Crucible::Vec2 waypoint = cPathFollower.path[cPathFollower.destinationIndex];
+            float distanceToWaypoint = distance(waypoint, *entityTransform.position);
+            if (distanceToWaypoint < 1)
             {
                 cPathFollower.destinationIndex++;
             }
 
-            // Move towards destination point
-            // TODO move towards destination via vector math rather than a simple sign flip.
-            int sign = entityTransform.position->x < cPathFollower.path[cPathFollower.destinationIndex].x ? 1 : -1;
-            entityTransform.position->x += sign;
-            //entityTransform.position->y = 0;
+            // If destinationIndex is == path.size(), then reset to 0.
+            if (cPathFollower.destinationIndex == cPathFollower.path.size())
+            {
+                cPathFollower.destinationIndex = 0;
+                waypoint = cPathFollower.path[cPathFollower.destinationIndex];
+            }
+
+            // move forward (into the waypoint, based on the current object rotation)
+            float r = std::atan2(waypoint.y - entityTransform.position->y, waypoint.x - entityTransform.position->x);
+            entityTransform.position->x += std::cos(r) * SPEED;
+            entityTransform.position->y += std::sin(r) * SPEED;
         }
     }
+}
+
+float TransformSystem::distance(Crucible::Vec2 p1, Crucible::Vec2 p2) {
+    float xb = p2.x - p1.x;
+    float yb = p2.y - p1.y;
+    return std::sqrt((xb * xb) + (yb * yb));
 }
 
 void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform)
 {
     auto& controllable = e.getComponent<Component::CControllable>();
-    float SPEED = 2.5f;
 
     if (controllable.isMovingLeft)
     {
