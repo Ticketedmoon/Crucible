@@ -18,34 +18,31 @@
 class LevelManager
 {
     public:
-        explicit LevelManager(EntityManager& entityManager);
+        explicit LevelManager(EntityManager& entityManager, TextureManager& textureManager);
 
         Level& loadLevel();
 
     public:
+        static inline const std::string PLAYER_SPRITE_SHEET_PATH = "resources/assets/texture/player_crucible_64x64.png";
+        static inline const std::string BASIC_TILE_SHEET_PATH = "resources/maps/basic_tileset.png";
+        static inline const std::string DUNGEON_TILE_SHEET_PATH = "resources/maps/dungeon_bricks_shadow_tileset.png";
+        static inline const std::string MAP_DATA_PATH = "resources/maps/level_one_map_dungeon_tileset.json";
+
         static inline const std::string LIGHTING_OBJECT_LAYER_A_NAME = "lighting_object_layer_a";
         static inline const std::string LIGHTING_OBJECT_LAYER_B_NAME = "lighting_object_layer_b";
         static inline const std::string GUARD_PATHING_LAYER_A = "guard_pathing_layer_a";
         static inline const std::string GUARD_PATHING_LAYER_B = "guard_pathing_layer_b";
 
-        // TODO: improve this, why are these public?
-        static inline std::shared_ptr<sf::Texture> dungeonTileSheetTexture;
-        static inline std::shared_ptr<sf::Texture> basicTileSheetTexture;
-
         static inline Level activeLevel;
 
     private:
         Level loadMapData();
-        static void buildTileSheet(const std::string& tileSheetFilePath);
+        void loadTexture(const std::string& tileSheetFilePath);
         std::vector<Tile> createTilesForWorld(const Level& level, const nlohmann::json& data, size_t layerIdx);
         uint32_t getPositionForTile(const Level& level, uint32_t x, uint32_t y);
         TileType lookupTileTypeForObject(size_t layerIdx, size_t i, nlohmann::json& data) const;
 
     private:
-        const std::string basicTileSheetPath = "resources/maps/basic_tileset.png";
-        const std::string dungeonTileSheetPath = "resources/maps/dungeon_bricks_shadow_tileset.png";
-        const std::string mapFilePath = "resources/maps/level_one_map_dungeon_tileset.json";
-
         const std::string LEVEL_FILE_LAYERS_KEY = "layers";
         const std::string LEVEL_FILE_TILESETS_KEY = "tilesets";
         const std::string LEVEL_FILE_TILES_KEY = "tiles";
@@ -67,9 +64,8 @@ class LevelManager
                 {"CENTRAL_WALL_LARGE_BROKEN_PURPLE",  TileType::CENTRAL_WALL_LARGE_BROKEN_PURPLE},
         };
 
-        static inline TextureManager m_textureManager;
-
         EntityManager& m_entityManager;
+        TextureManager& m_textureManager;
 };
 
 

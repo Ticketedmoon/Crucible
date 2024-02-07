@@ -1,6 +1,7 @@
 #include "level_manager.h"
 
-LevelManager::LevelManager(EntityManager& entityManager) : m_entityManager(entityManager)
+LevelManager::LevelManager(EntityManager& entityManager, TextureManager& textureManager)
+    : m_entityManager(entityManager), m_textureManager(textureManager)
 {
 }
 
@@ -9,12 +10,12 @@ Level& LevelManager::loadLevel()
     // Level
     activeLevel = loadMapData();
 
-    // Build Tile sheet
-    buildTileSheet(basicTileSheetPath);
-    buildTileSheet(dungeonTileSheetPath);
+    // Build player sprite sheet
+    loadTexture(PLAYER_SPRITE_SHEET_PATH);
 
-    basicTileSheetTexture = m_textureManager.getTexture(basicTileSheetPath);
-    dungeonTileSheetTexture = m_textureManager.getTexture(dungeonTileSheetPath);
+    // Build Tile sheet
+    loadTexture(BASIC_TILE_SHEET_PATH);
+    loadTexture(DUNGEON_TILE_SHEET_PATH);
 
     return activeLevel;
 }
@@ -28,7 +29,7 @@ uint32_t LevelManager::getPositionForTile(const Level& level, uint32_t x, uint32
 
 Level LevelManager::loadMapData()
 {
-    std::ifstream f(mapFilePath);
+    std::ifstream f(MAP_DATA_PATH);
     nlohmann::json data = nlohmann::json::parse(f);
 
     Level level;
@@ -144,7 +145,7 @@ std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nl
     return tiles;
 }
 
-void LevelManager::buildTileSheet(const std::string& tileSheetFilePath)
+void LevelManager::loadTexture(const std::string& tileSheetFilePath)
 {
     if (!m_textureManager.hasTexture(tileSheetFilePath))
     {

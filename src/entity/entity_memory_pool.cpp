@@ -29,10 +29,10 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
         m_types.insert(m_types.begin() + i, Crucible::EntityType::NONE);
         m_alive.insert(m_alive.begin() + i, false);
 
-        transformComponents.insert(transformComponents.begin() + i, {{}, false});
+        transformComponents.insert(transformComponents.begin() + i, {{}, {}, false});
         controllableComponents.insert(controllableComponents.begin() + i, {{}, false});
         collisionComponents.insert(collisionComponents.begin() + i, {{}});
-        tileComponents.insert(tileComponents.begin() + i, {{}, false});
+        tileComponents.insert(tileComponents.begin() + i, {{}, {}, false});
         lightSourceComponents.insert(lightSourceComponents.begin() + i, {{}, {}, {}, {}, false});
         pathFollowerComponents.insert(pathFollowerComponents.begin() + i, {{}, {}, false});
     }

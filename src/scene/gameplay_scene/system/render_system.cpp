@@ -16,8 +16,6 @@ void RenderSystem::drawEntities()
 {
     std::vector<Entity> entities = m_entityManager.getEntities();
 
-    const sf::RenderStates basicTileRenderStates{LevelManager::basicTileSheetTexture.get()};
-    const sf::RenderStates dungeonTileRenderStates{LevelManager::dungeonTileSheetTexture.get()};
     const sf::RenderStates lightSrcRenderStates{sf::BlendMultiply};
 
     for (const Entity e : entities)
@@ -32,15 +30,8 @@ void RenderSystem::drawEntities()
         if (e.hasComponent<Component::CTile>())
         {
             auto& cTile = e.getComponent<Component::CTile>();
-
-            if (cTile.tile.type == TileType::SPAWN_ZONE || cTile.tile.type == TileType::END_ZONE)
-            {
-                m_renderTarget.draw(*cTile.tile.vertices, basicTileRenderStates);
-            }
-            else
-            {
-                m_renderTarget.draw(*cTile.tile.vertices, dungeonTileRenderStates);
-            }
+            sf::RenderStates renderStates{cTile.texture.get()};
+            m_renderTarget.draw(*cTile.tile.vertices, renderStates);
         }
     }
 }

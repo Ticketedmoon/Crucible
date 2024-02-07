@@ -42,6 +42,7 @@ class GameplayScene : public Scene
 
         EntityManager m_entityManager;
         EntitySpawner m_entitySpawner;
+        TextureManager m_textureManager;
         SystemManager m_systemManager;
         LevelManager m_levelManager;
 };

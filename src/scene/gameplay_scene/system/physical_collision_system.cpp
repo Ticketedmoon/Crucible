@@ -21,6 +21,7 @@ void PhysicalCollisionSystem::execute()
             checkForOtherCollidableEntities(entities, entity, entityCollider, entityTile, entityTransform);
         }
 
+        // TODO Consider moving me elsewhere
         updateShapeVertexPositions(entityTransform, entityTile);
     }
 }
@@ -136,9 +137,10 @@ void PhysicalCollisionSystem::updateShapeVertexPositions(const Component::CTrans
     // Update rect based on transform points
     sf::VertexArray& tileVertices = *entityTile.tile.vertices;
     tileVertices[0].position = {entityTransform.position->x, entityTransform.position->y};
-    tileVertices[1].position = {entityTransform.position->x + Crucible::TILE_SIZE, entityTransform.position->y};
-    tileVertices[2].position = {entityTransform.position->x + Crucible::TILE_SIZE, entityTransform.position->y + Crucible::TILE_SIZE };
-    tileVertices[3].position = {entityTransform.position->x, entityTransform.position->y + Crucible::TILE_SIZE };
+    tileVertices[1].position = {entityTransform.position->x + entityTransform.dimensions.x, entityTransform.position->y};
+    tileVertices[2].position = {entityTransform.position->x + entityTransform.dimensions.x,
+                                entityTransform.position->y + entityTransform.dimensions.y };
+    tileVertices[3].position = {entityTransform.position->x, entityTransform.position->y + entityTransform.dimensions.y };
     tileVertices[4].position = {entityTransform.position->x, entityTransform.position->y};
 }
 

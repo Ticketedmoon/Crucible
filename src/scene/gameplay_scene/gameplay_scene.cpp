@@ -1,14 +1,14 @@
 #include "gameplay_scene.h"
 
 GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
-    m_entitySpawner(m_entityManager), m_levelManager(m_entityManager)
+    m_entitySpawner(m_entityManager, m_textureManager),
+    m_levelManager(m_entityManager, m_textureManager)
 {
     registerActions();
     registerSystems();
 
     Level& level = m_levelManager.loadLevel();
     createTilesForLevel(level);
-
 
     m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_A_NAME, LevelManager::GUARD_PATHING_LAYER_A);
     m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_B_NAME, LevelManager::GUARD_PATHING_LAYER_B);

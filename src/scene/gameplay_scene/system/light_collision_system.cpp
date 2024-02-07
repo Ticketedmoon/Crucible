@@ -27,7 +27,7 @@ void LightCollisionSystem::resolveLightCollisions(const Entity& entity)
     {
         // @Refactor: If ray collision with shape, we don't need to check window border collisions.
         Crucible::Ray& ray = lightSource.rays[rayIndex];
-        checkForLightIntersectWithShape(lightSource, ray, rayIndex);
+        checkForLightIntersectWithObject(lightSource, ray, rayIndex);
 
         // top
         checkForLightIntersectWithWindowBorderSide(lightSource, ray, rayIndex,
@@ -61,7 +61,7 @@ void LightCollisionSystem::checkForLightIntersectWithWindowBorderSide(Component:
     }
 }
 
-void LightCollisionSystem::checkForLightIntersectWithShape(
+void LightCollisionSystem::checkForLightIntersectWithObject(
         Component::CLightSource& lightSource, Crucible::Ray& ray, size_t lineIndex)
 {
     // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.

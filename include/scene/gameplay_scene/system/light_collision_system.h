@@ -24,7 +24,7 @@ class LightCollisionSystem : public System
     private:
         static void resolveLightCollisions(const Entity& entity);
 
-        static void checkForLightIntersectWithShape(
+        static void checkForLightIntersectWithObject(
                 Component::CLightSource& lightSource, Crucible::Ray& ray, size_t lineIndex);
 
         static void checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource, Crucible::Ray& ray,

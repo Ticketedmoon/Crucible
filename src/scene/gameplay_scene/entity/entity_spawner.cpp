@@ -1,6 +1,7 @@
 #include "scene/gameplay_scene/entity/entity_spawner.h"
 
-EntitySpawner::EntitySpawner(EntityManager& entityManager) : m_entityManager(entityManager)
+EntitySpawner::EntitySpawner(EntityManager& entityManager, TextureManager& textureManager)
+    : m_entityManager(entityManager), m_textureManager(textureManager)
 {
 }
 
@@ -8,27 +9,29 @@ void EntitySpawner::createPlayer()
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::PLAYER);
 
+    Crucible::Vec2 playerDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
     std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(2 * Crucible::TILE_SIZE, 3 * Crucible::TILE_SIZE);
 
-    auto& playerTransform = e.addComponent<Component::CTransform>(position);
+    auto& playerTransform = e.addComponent<Component::CTransform>(position, playerDimensions);
 
     std::shared_ptr<sf::VertexArray> vertices = std::make_shared<sf::VertexArray>(sf::Quads);
     vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y}));
-    vertices->append(sf::Vertex({playerTransform.position->x + Crucible::TILE_SIZE, playerTransform.position->y}));
-    vertices->append(sf::Vertex({playerTransform.position->x + Crucible::TILE_SIZE, playerTransform.position->y + Crucible::TILE_SIZE}));
+    vertices->append(sf::Vertex({playerTransform.position->x + playerDimensions.x, playerTransform.position->y}));
+    vertices->append(sf::Vertex({playerTransform.position->x + playerDimensions.x, playerTransform.position->y + playerDimensions.y}));
     vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y + Crucible::TILE_SIZE}));
 
     Tile playerTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
-            TileType::CENTRAL_WALL_LARGE_BROKEN_PURPLE,
+            TileType::PLAYER_WALK_DOWN_B,
             TileRotation::NONE,
             vertices);
 
-    updateTileTexture(playerTile, LevelManager::dungeonTileSheetTexture);
+    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::PLAYER_SPRITE_SHEET_PATH);
+    updateTileTexture(playerTile, texture, playerDimensions.x, playerDimensions.y);
 
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CCollider>();
-    e.addComponent<Component::CTile>(playerTile);
+    e.addComponent<Component::CTile>(playerTile, texture);
 }
 
 void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, const std::string& pathingObjectLayerName)
@@ -48,11 +51,14 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
 
     std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(path.at(0));
 
-    auto& transform = e.addComponent<Component::CTransform>(position);
+    Crucible::Vec2 guardDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
+
+    auto& transform = e.addComponent<Component::CTransform>(position, guardDimensions);
+
     std::shared_ptr<sf::VertexArray> vertices = std::make_shared<sf::VertexArray>(sf::Quads);
     vertices->append(sf::Vertex({transform.position->x, transform.position->y}));
-    vertices->append(sf::Vertex({transform.position->x + Crucible::TILE_SIZE, transform.position->y}));
-    vertices->append(sf::Vertex({transform.position->x + Crucible::TILE_SIZE, transform.position->y + Crucible::TILE_SIZE}));
+    vertices->append(sf::Vertex({transform.position->x + guardDimensions.x, transform.position->y}));
+    vertices->append(sf::Vertex({transform.position->x + guardDimensions.x, transform.position->y + guardDimensions.y}));
     vertices->append(sf::Vertex({transform.position->x, transform.position->y + Crucible::TILE_SIZE}));
 
     Tile guardTile(
@@ -61,8 +67,10 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
             TileRotation::NONE,
             vertices);
 
-    updateTileTexture(guardTile, LevelManager::dungeonTileSheetTexture);
-    e.addComponent<Component::CTile>(guardTile);
+    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::DUNGEON_TILE_SHEET_PATH);
+    updateTileTexture(guardTile, texture, Crucible::TILE_SIZE, Crucible::TILE_SIZE);
+
+    e.addComponent<Component::CTile>(guardTile, texture);
     e.addComponent<Component::CCollider>();
 
     std::vector<Crucible::Ray> rays = createRays(transform, lightingObjectLayerName);
@@ -76,7 +84,9 @@ void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
     auto e = m_entityManager.addEntity(Crucible::EntityType::TILE);
     Crucible::Vec2 position{static_cast<float>(t.position.x), static_cast<float>(t.position.y)};
 
-    e.addComponent<Component::CTransform>(std::make_shared<Crucible::Vec2>(position));
+    Crucible::Vec2 tileDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
+
+    e.addComponent<Component::CTransform>(std::make_shared<Crucible::Vec2>(position), tileDimensions);
     if (isCollidable)
     {
         e.addComponent<Component::CCollider>(immovable);
@@ -84,8 +94,8 @@ void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
 
     sf::VertexArray vertices(sf::Quads);
     vertices.append(sf::Vertex({position.x, position.y}));
-    vertices.append(sf::Vertex({position.x + Crucible::TILE_SIZE, position.y}));
-    vertices.append(sf::Vertex({position.x + Crucible::TILE_SIZE, position.y + Crucible::TILE_SIZE}));
+    vertices.append(sf::Vertex({position.x + tileDimensions.x, position.y}));
+    vertices.append(sf::Vertex({position.x + tileDimensions.x, position.y + tileDimensions.y}));
     vertices.append(sf::Vertex({position.x, position.y + Crucible::TILE_SIZE}));
 
 //    if (t.type == TileType::ARROW_BLOCK)
@@ -93,17 +103,20 @@ void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
 //        LevelManager::activeLevel.layerNameToObjectLayer[0].tileObjectVertices.emplace_back(vertices);
 //    }
 
+    std::shared_ptr<sf::Texture> texture;
     t.vertices = std::make_shared<sf::VertexArray>(vertices);
 
     if (t.type == TileType::SPAWN_ZONE || t.type == TileType::END_ZONE)
     {
-        updateTileTexture(t, LevelManager::basicTileSheetTexture);
+        texture = m_textureManager.getTexture(LevelManager::BASIC_TILE_SHEET_PATH);
+        updateTileTexture(t, texture, Crucible::TILE_SIZE, Crucible::TILE_SIZE);
     }
     else
     {
-        updateTileTexture(t, LevelManager::dungeonTileSheetTexture);
+        texture = m_textureManager.getTexture(LevelManager::DUNGEON_TILE_SHEET_PATH);
+        updateTileTexture(t, texture, Crucible::TILE_SIZE, Crucible::TILE_SIZE);
     }
-    e.addComponent<Component::CTile>(t);
+    e.addComponent<Component::CTile>(t, texture);
 }
 
 std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& playerTransform, const std::string& layerName)
@@ -139,19 +152,23 @@ std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& play
  * 90 degree clockwise texture rotation: [bottom-left vertex -> bottom-right vertex, clockwise]
  * flip horizontally: [top-right -> bottom-right, anti-clockwise]
  */
-void EntitySpawner::updateTileTexture(Tile& tile, const std::shared_ptr<sf::Texture>& tileSheetTexture)
+void EntitySpawner::updateTileTexture(
+        Tile& tile,
+        const std::shared_ptr<sf::Texture>& tileSheetTexture,
+        const uint8_t tileSizeX,
+        const uint8_t tileSizeY)
 {
     sf::VertexArray& tileVertices = *tile.vertices;
     assert(tileVertices.getVertexCount() == 4);
 
     int tileTypeValue = static_cast<int>(tile.type) - 1;
-    float tu = (tileTypeValue % (tileSheetTexture->getSize().x / Crucible::TILE_SIZE));
-    float tv = tileTypeValue / (tileSheetTexture->getSize().x / Crucible::TILE_SIZE);
+    float tu = (tileTypeValue % (tileSheetTexture->getSize().x / tileSizeX));
+    float tv = tileTypeValue / (tileSheetTexture->getSize().x / tileSizeY);
 
-    float tuPositionStart = tu * Crucible::TILE_SIZE;
-    float tuPositionEnd = (tu + 1) * Crucible::TILE_SIZE;
-    float tvPositionStart = tv * Crucible::TILE_SIZE;
-    float tvPositionEnd = (tv + 1) * Crucible::TILE_SIZE;
+    float tuPositionStart = tu * tileSizeX;
+    float tuPositionEnd = (tu + 1) * tileSizeX;
+    float tvPositionStart = tv * tileSizeY;
+    float tvPositionEnd = (tv + 1) * tileSizeY;
 
     if (tile.rotation == TileRotation::NONE)
     {

@@ -15,6 +15,11 @@ enum class TileType
     NONE = -1,
     TRANSPARENT = 0,
 
+    // player tileset
+    PLAYER_WALK_DOWN_A = 1,
+    PLAYER_WALK_DOWN_B = 2,
+    PLAYER_WALK_DOWN_C = 3,
+
     // basic tileset
     SPAWN_ZONE = 23,
     END_ZONE = 24,

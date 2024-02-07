@@ -7,6 +7,7 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include "vec2.h"
 #include <SFML/System/Vector3.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include "common_constants.h"
 #include "vertex.h"
 #include "ray.h"
@@ -17,6 +18,7 @@ namespace Component
     struct CTransform
     {
         std::shared_ptr<Crucible::Vec2> position;
+        Crucible::Vec2 dimensions;
 
         bool has{};
     };
@@ -41,6 +43,8 @@ namespace Component
     struct CTile
     {
         Tile tile;
+
+        std::shared_ptr<sf::Texture> texture;
 
         bool has{};
     };
