@@ -101,7 +101,7 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1088,
+                 "x":1140,
                  "y":496
                 }],
          "opacity":1,
@@ -161,7 +161,7 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1088,
+                 "x":1140,
                  "y":240
                 }],
          "opacity":1,
@@ -180,6 +180,12 @@
                  "height":64,
                  "id":26,
                  "name":"spawn zone B",
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"SPAWN_ZONE"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -191,6 +197,12 @@
                  "height":64,
                  "id":30,
                  "name":"end zone B",
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"END_ZONE"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -379,6 +391,12 @@
                  "height":64,
                  "id":1,
                  "name":"spawn zone A",
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"SPAWN_ZONE"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -434,6 +452,12 @@
                  "height":64,
                  "id":6,
                  "name":"end zone A",
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"END_ZONE"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,

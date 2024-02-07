@@ -111,7 +111,7 @@
   <object id="21" name="middle B" x="1140" y="656">
    <point/>
   </object>
-  <object id="23" name="end B" x="1088" y="496">
+  <object id="23" name="end B" x="1140" y="496">
    <point/>
   </object>
  </objectgroup>
@@ -125,13 +125,21 @@
   <object id="19" name="middle A" x="1140" y="48">
    <point/>
   </object>
-  <object id="20" name="end A" x="1088" y="240">
+  <object id="20" name="end A" x="1140" y="240">
    <point/>
   </object>
  </objectgroup>
  <objectgroup id="7" name="lighting_object_layer_b" locked="1">
-  <object id="26" name="spawn zone B" x="128" y="512" width="64" height="64"/>
-  <object id="30" name="end zone B" x="1152" y="512" width="64" height="64"/>
+  <object id="26" name="spawn zone B" x="128" y="512" width="64" height="64">
+   <properties>
+    <property name="type" value="SPAWN_ZONE"/>
+   </properties>
+  </object>
+  <object id="30" name="end zone B" x="1152" y="512" width="64" height="64">
+   <properties>
+    <property name="type" value="END_ZONE"/>
+   </properties>
+  </object>
   <object id="10" name="wall 3 sub wall B" x="912" y="512" width="112" height="64"/>
   <object id="13" name="bottom border B" x="0" y="736" width="1280" height="32"/>
   <object id="32" name="left border B" x="0" y="382" width="48" height="352"/>
@@ -149,12 +157,20 @@
   <object id="52" name="wall 2 sub wall B" x="716" y="512" width="52" height="64"/>
  </objectgroup>
  <objectgroup id="2" name="lighting_object_layer_a" locked="1">
-  <object id="1" name="spawn zone A" x="128" y="192" width="64" height="64"/>
+  <object id="1" name="spawn zone A" x="128" y="192" width="64" height="64">
+   <properties>
+    <property name="type" value="SPAWN_ZONE"/>
+   </properties>
+  </object>
   <object id="2" name="wall 1 column A" x="256" y="128" width="64" height="256"/>
   <object id="3" name="wall 2 column A" x="512" y="128" width="64" height="256"/>
   <object id="4" name="wall 3 column A" x="768" y="128" width="64" height="256"/>
   <object id="5" name="wall 4 column A" x="1024" y="128" width="64" height="256"/>
-  <object id="6" name="end zone A" x="1152" y="192" width="64" height="64"/>
+  <object id="6" name="end zone A" x="1152" y="192" width="64" height="64">
+   <properties>
+    <property name="type" value="END_ZONE"/>
+   </properties>
+  </object>
   <object id="7" name="wall 1 middle wall A" x="48" y="320" width="208" height="64"/>
   <object id="27" name="wall 2 middle wall A" x="320" y="320" width="192" height="64"/>
   <object id="8" name="wall 3 middle wall A" x="575" y="320" width="192" height="64"/>

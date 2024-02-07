@@ -37,10 +37,10 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     ObjectLayer pathingObjectLayer = LevelManager::activeLevel.layerNameToObjectLayer.at(pathingObjectLayerName);
 
     std::vector<Crucible::Vec2> path;
-    for (auto& guardPath : pathingObjectLayer.data)
+    for (auto& guardPath : pathingObjectLayer.lightingObjectData)
     {
-        sf::VertexArray vArr = *guardPath;
-        sf::Vertex v{vArr[0]};
+        sf::VertexArray& objectVertData = *guardPath.objectVertices;
+        sf::Vertex v{objectVertData[0]};
         path.emplace_back(v.position.x, v.position.y);
     }
 
@@ -113,8 +113,9 @@ std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& play
 
     ObjectLayer& objectLayer = LevelManager::activeLevel.layerNameToObjectLayer.at(layerName);
 
-    for (const std::shared_ptr<sf::VertexArray>& tileObjectVertices : objectLayer.data)
+    for (const Object& tileObject : objectLayer.lightingObjectData)
     {
+        std::shared_ptr<sf::VertexArray> tileObjectVertices = tileObject.objectVertices;
         for (size_t i = 0; i < tileObjectVertices->getVertexCount(); i++)
         {
             const sf::Vertex& v = (*tileObjectVertices)[i];

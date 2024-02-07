@@ -19,12 +19,6 @@ Level& LevelManager::loadLevel()
     return activeLevel;
 }
 
-Tile& LevelManager::getTile(Level& level, uint32_t x, uint32_t y)
-{
-    uint32_t positionForTile = getPositionForTile(level, x, y);
-    return level.tileLayers[0].data.at(positionForTile);
-}
-
 uint32_t LevelManager::getPositionForTile(const Level& level, uint32_t x, uint32_t y)
 {
     uint32_t row = level.width * y;
@@ -40,27 +34,6 @@ Level LevelManager::loadMapData()
     Level level;
     level.width = data["width"];
     level.height = data["height"];
-
-    for (size_t tilesetIdx = 0; tilesetIdx < data[LEVEL_FILE_TILESETS_KEY].size(); tilesetIdx++)
-    {
-        size_t totalTiles = data[LEVEL_FILE_TILESETS_KEY][tilesetIdx][LEVEL_FILE_TILES_KEY].size();
-        for (size_t tileIdx = 0; tileIdx < totalTiles; tileIdx++)
-        {
-            std::vector<std::unordered_map<std::string, std::string>> properties =
-                    data[LEVEL_FILE_TILESETS_KEY][tilesetIdx][LEVEL_FILE_TILES_KEY][tileIdx]["properties"];
-            uint32_t tileId =
-                    data[LEVEL_FILE_TILESETS_KEY][tilesetIdx][LEVEL_FILE_TILES_KEY][tileIdx]["id"];
-
-            for (std::unordered_map<std::string, std::string> p : properties)
-            {
-                if (p.contains("type"))
-                {
-                    TileType tileType = TILE_TYPE_LOOKUP_TABLE.at(p.at("value"));
-                    level.tileTypeToId.insert({{tileType, tileId}});
-                }
-            }
-        }
-    }
 
     for (size_t layerIdx = 0; layerIdx < data[LEVEL_FILE_LAYERS_KEY].size(); layerIdx++)
     {
@@ -97,7 +70,9 @@ Level LevelManager::loadMapData()
                 // TODO @investigate: currently this vert is required, but it may not be necessary
                 verts->append({{r.left, r.top}});
 
-                level.layerNameToObjectLayer[layer.name].data.emplace_back(verts);
+                TileType tileType = lookupTileTypeForObject(layerIdx, i, data);
+                Object levelObject{tileType, verts};
+                level.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
             }
         }
     }
@@ -105,13 +80,33 @@ Level LevelManager::loadMapData()
     return level;
 }
 
+TileType LevelManager::lookupTileTypeForObject(size_t layerIdx, size_t i, nlohmann::json& data) const
+{
+    TileType tileType{TileType::NONE};
+    if (data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i].contains("properties"))
+    {
+        std::vector<std::unordered_map<std::string, std::string>> properties =
+                data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["properties"];
+
+        for (std::unordered_map<std::string, std::string> p: properties)
+        {
+            if (p["name"] == "type")
+            {
+                tileType = TILE_TYPE_LOOKUP_TABLE.at(p["value"]);
+                break;
+            }
+        }
+    }
+    return tileType;
+}
+
 std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nlohmann::json& data, const size_t layerIdx)
 {
     std::vector<Tile> tiles;
     std::vector<long> tileValues = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_DATA_KEY].get<std::vector<long>>();
 
-    long firstGidDungeonTileset = data[LEVEL_FILE_TILESETS_KEY][0]["firstgid"].get<long>();
-    long firstGidBasicTileset = data[LEVEL_FILE_TILESETS_KEY][1]["firstgid"].get<long>();
+    unsigned long firstGidDungeonTileset = data[LEVEL_FILE_TILESETS_KEY][0]["firstgid"].get<long>();
+    unsigned long firstGidBasicTileset = data[LEVEL_FILE_TILESETS_KEY][1]["firstgid"].get<long>();
 
     for (unsigned int y = 0; y < level.height; y++)
     {

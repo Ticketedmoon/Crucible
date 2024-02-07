@@ -38,8 +38,8 @@ class LevelManager
         Level loadMapData();
         static void buildTileSheet(const std::string& tileSheetFilePath);
         std::vector<Tile> createTilesForWorld(const Level& level, const nlohmann::json& data, size_t layerIdx);
-        Tile& getTile(Level& level, uint32_t x, uint32_t y);
         uint32_t getPositionForTile(const Level& level, uint32_t x, uint32_t y);
+        TileType lookupTileTypeForObject(size_t layerIdx, size_t i, nlohmann::json& data) const;
 
     private:
         const std::string basicTileSheetPath = "resources/maps/basic_tileset.png";

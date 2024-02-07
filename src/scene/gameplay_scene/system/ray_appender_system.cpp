@@ -21,14 +21,15 @@ void RayAppenderSystem::execute()
             = LevelManager::activeLevel.layerNameToObjectLayer.at(entityLightSource.lightingObjectLayerName);
 
         int otherShapeIndex = 0;
-        for (std::shared_ptr<sf::VertexArray>& objectVertices : lightingLayerForLightSrc.data)
+        for (Object& object : lightingLayerForLightSrc.lightingObjectData)
         {
-            const size_t totalShapeVertices = objectVertices->getVertexCount();
+            sf::VertexArray objectVertices = *object.objectVertices;
+            const size_t totalShapeVertices = objectVertices.getVertexCount();
             const size_t totalAdditionalRaysPerEntity = totalShapeVertices * totalRaysPerVertex;
 
             for (size_t vertIndex = 0; vertIndex < totalAdditionalRaysPerEntity; vertIndex += totalRaysPerVertex)
             {
-                const sf::Vertex& v = (*objectVertices)[vertIndex / totalRaysPerVertex];
+                const sf::Vertex& v = objectVertices[vertIndex / totalRaysPerVertex];
 
                 // Update ray vector to point left and right of endV with large RAY_SCALE.
                 const size_t additionalRayIndex = TOTAL_CORE_RAYS + vertIndex +

@@ -81,8 +81,13 @@ void PhysicalCollisionSystem::checkForLevelObjectLayerCollisions(Component::CCol
 void PhysicalCollisionSystem::resolvePhysicalCollisionsForObjectLayer(Component::CCollider& entityCollider,
         Component::CTile& entityTile, Component::CTransform& entityTransform, ObjectLayer& lightingObjectLayer)
 {
-    for (const std::shared_ptr<sf::VertexArray>& vArr: lightingObjectLayer.data)
+    for (const Object& object: lightingObjectLayer.lightingObjectData)
     {
+        if (object.type == TileType::SPAWN_ZONE || object.type == TileType::END_ZONE)
+        {
+            continue;
+        }
+        const std::shared_ptr<sf::VertexArray>& vArr = object.objectVertices;
         sf::Vertex v = (*vArr)[0];
         resolvePhysicalCollisions(
                 entityTile,

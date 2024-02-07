@@ -12,6 +12,7 @@
 
 enum class TileType
 {
+    NONE = -1,
     TRANSPARENT = 0,
 
     // basic tileset
@@ -43,9 +44,9 @@ enum class TileRotation
 namespace Crucible
 {
     // Bits on the far end of the 32-bit global tile ID are used for tile flags
-    const unsigned FLIPPED_HORIZONTALLY_FLAG  = 0x80000000;
-    const unsigned FLIPPED_VERTICALLY_FLAG    = 0x40000000;
-    const unsigned FLIPPED_DIAGONALLY_FLAG    = 0x20000000;
+    const unsigned FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+    const unsigned FLIPPED_VERTICALLY_FLAG = 0x40000000;
+    const unsigned FLIPPED_DIAGONALLY_FLAG = 0x20000000;
     const unsigned ROTATED_HEXAGONAL_120_FLAG = 0x10000000;
 }
 
@@ -53,7 +54,8 @@ class Tile
 {
     public:
         Tile();
-        Tile(sf::Vector2u position, TileType type, TileRotation tileRotation, std::shared_ptr<sf::VertexArray> vertices);
+        Tile(sf::Vector2u position, TileType type, TileRotation tileRotation,
+                std::shared_ptr<sf::VertexArray> vertices);
 
     public:
         sf::Vector2u position;
