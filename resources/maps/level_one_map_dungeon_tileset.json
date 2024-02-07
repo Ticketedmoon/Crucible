@@ -578,11 +578,11 @@
         {
          "columns":4,
          "firstgid":1,
-         "image":"dungeon_bricks_shadow_tilset.png",
+         "image":"dungeon_bricks_shadow_tileset.png",
          "imageheight":768,
          "imagewidth":256,
          "margin":0,
-         "name":"dungeon_bricks_shadow_tilset",
+         "name":"dungeon_bricks_shadow_tileset",
          "spacing":0,
          "tilecount":48,
          "tileheight":64,
@@ -690,6 +690,25 @@
          "spacing":0,
          "tilecount":28,
          "tileheight":64,
+         "tiles":[
+                {
+                 "id":22,
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"SPAWN_ZONE"
+                        }]
+                }, 
+                {
+                 "id":23,
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"END_ZONE"
+                        }]
+                }],
          "tilewidth":64
         }],
  "tilewidth":64,

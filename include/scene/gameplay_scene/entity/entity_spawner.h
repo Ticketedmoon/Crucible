@@ -25,7 +25,7 @@ class EntitySpawner
 
     private:
         static std::vector<Crucible::Ray> createRays(Component::CTransform& playerTransform, const std::string& layerName);
-        static void updateTileTexture(Tile& tile);
+        static void updateTileTexture(Tile& tile, const std::shared_ptr<sf::Texture>& tileSheetTexture);
 
     private:
         EntityManager& m_entityManager;

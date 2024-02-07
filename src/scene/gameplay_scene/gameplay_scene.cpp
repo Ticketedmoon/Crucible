@@ -92,7 +92,9 @@ void GameplayScene::createTilesForLevel(Level& level)
                 t.position.x *= Crucible::TILE_SIZE;
                 t.position.y *= Crucible::TILE_SIZE;
 
-                bool isImmovable = t.type != TileType::BACKGROUND_PURPLE_WALL;
+                bool isImmovable = t.type != TileType::BACKGROUND_PURPLE_WALL
+                        && t.type != TileType::SPAWN_ZONE
+                        && t.type != TileType::END_ZONE;
                 m_entitySpawner.createTile(t, false, isImmovable);
             }
         }

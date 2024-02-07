@@ -3,8 +3,8 @@
  <editorsettings>
   <export target="level_one_map_dungeon_tileset.json" format="json"/>
  </editorsettings>
- <tileset firstgid="1" name="dungeon_bricks_shadow_tilset" tilewidth="64" tileheight="64" tilecount="48" columns="4">
-  <image source="dungeon_bricks_shadow_tilset.png" width="256" height="768"/>
+ <tileset firstgid="1" name="dungeon_bricks_shadow_tileset" tilewidth="64" tileheight="64" tilecount="48" columns="4">
+  <image source="dungeon_bricks_shadow_tileset.png" width="256" height="768"/>
   <tile id="0">
    <properties>
     <property name="type" value="TOP_CORNER_WALL_BROKEN_PURPLE"/>
@@ -58,6 +58,16 @@
  </tileset>
  <tileset firstgid="49" name="basic_tileset" tilewidth="64" tileheight="64" tilecount="28" columns="4">
   <image source="basic_tileset.png" width="256" height="448"/>
+  <tile id="22">
+   <properties>
+    <property name="type" value="SPAWN_ZONE"/>
+   </properties>
+  </tile>
+  <tile id="23">
+   <properties>
+    <property name="type" value="END_ZONE"/>
+   </properties>
+  </tile>
  </tileset>
  <layer id="1" name="background" width="20" height="12" locked="1">
   <data encoding="csv">

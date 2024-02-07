@@ -24,7 +24,7 @@ void EntitySpawner::createPlayer()
             TileRotation::NONE,
             vertices);
 
-    updateTileTexture(playerTile);
+    updateTileTexture(playerTile, LevelManager::dungeonTileSheetTexture);
 
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CCollider>();
@@ -61,7 +61,7 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
             TileRotation::NONE,
             vertices);
 
-    updateTileTexture(guardTile);
+    updateTileTexture(guardTile, LevelManager::dungeonTileSheetTexture);
     e.addComponent<Component::CTile>(guardTile);
     e.addComponent<Component::CCollider>();
 
@@ -83,7 +83,6 @@ void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
     }
 
     sf::VertexArray vertices(sf::Quads);
-
     vertices.append(sf::Vertex({position.x, position.y}));
     vertices.append(sf::Vertex({position.x + Crucible::TILE_SIZE, position.y}));
     vertices.append(sf::Vertex({position.x + Crucible::TILE_SIZE, position.y + Crucible::TILE_SIZE}));
@@ -96,7 +95,14 @@ void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
 
     t.vertices = std::make_shared<sf::VertexArray>(vertices);
 
-    updateTileTexture(t);
+    if (t.type == TileType::SPAWN_ZONE || t.type == TileType::END_ZONE)
+    {
+        updateTileTexture(t, LevelManager::basicTileSheetTexture);
+    }
+    else
+    {
+        updateTileTexture(t, LevelManager::dungeonTileSheetTexture);
+    }
     e.addComponent<Component::CTile>(t);
 }
 
@@ -132,14 +138,14 @@ std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& play
  * 90 degree clockwise texture rotation: [bottom-left vertex -> bottom-right vertex, clockwise]
  * flip horizontally: [top-right -> bottom-right, anti-clockwise]
  */
-void EntitySpawner::updateTileTexture(Tile& tile)
+void EntitySpawner::updateTileTexture(Tile& tile, const std::shared_ptr<sf::Texture>& tileSheetTexture)
 {
     sf::VertexArray& tileVertices = *tile.vertices;
     assert(tileVertices.getVertexCount() == 4);
 
     int tileTypeValue = static_cast<int>(tile.type) - 1;
-    float tu = (tileTypeValue % (LevelManager::tileSheetTexture->getSize().x / Crucible::TILE_SIZE));
-    float tv = tileTypeValue / (LevelManager::tileSheetTexture->getSize().x / Crucible::TILE_SIZE);
+    float tu = (tileTypeValue % (tileSheetTexture->getSize().x / Crucible::TILE_SIZE));
+    float tv = tileTypeValue / (tileSheetTexture->getSize().x / Crucible::TILE_SIZE);
 
     float tuPositionStart = tu * Crucible::TILE_SIZE;
     float tuPositionEnd = (tu + 1) * Crucible::TILE_SIZE;

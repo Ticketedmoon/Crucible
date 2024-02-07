@@ -29,18 +29,21 @@ class LevelManager
         static inline const std::string GUARD_PATHING_LAYER_B = "guard_pathing_layer_b";
 
         // TODO: improve this, why are these public?
-        static inline std::shared_ptr<sf::Texture> tileSheetTexture;
+        static inline std::shared_ptr<sf::Texture> dungeonTileSheetTexture;
+        static inline std::shared_ptr<sf::Texture> basicTileSheetTexture;
+
         static inline Level activeLevel;
 
     private:
         Level loadMapData();
-        static void buildTileSheet(std::string tileSheetFilePath);
+        static void buildTileSheet(const std::string& tileSheetFilePath);
         std::vector<Tile> createTilesForWorld(const Level& level, const nlohmann::json& data, size_t layerIdx);
         Tile& getTile(Level& level, uint32_t x, uint32_t y);
         uint32_t getPositionForTile(const Level& level, uint32_t x, uint32_t y);
 
     private:
-        const std::string tileSheetFilePath = "resources/maps/dungeon_bricks_shadow_tilset.png";
+        const std::string basicTileSheetPath = "resources/maps/basic_tileset.png";
+        const std::string dungeonTileSheetPath = "resources/maps/dungeon_bricks_shadow_tileset.png";
         const std::string mapFilePath = "resources/maps/level_one_map_dungeon_tileset.json";
 
         const std::string LEVEL_FILE_LAYERS_KEY = "layers";
@@ -50,6 +53,8 @@ class LevelManager
         const std::string LEVEL_FILE_DATA_KEY = "data";
 
         static inline const std::unordered_map<std::string, TileType> TILE_TYPE_LOOKUP_TABLE = {
+                {"SPAWN_ZONE",                        TileType::SPAWN_ZONE},
+                {"END_ZONE",                          TileType::END_ZONE},
                 {"BACKGROUND_PURPLE_WALL",            TileType::BACKGROUND_PURPLE_WALL},
                 {"TOP_CORNER_WALL_BROKEN_PURPLE",     TileType::TOP_CORNER_WALL_BROKEN_PURPLE},
                 {"TOP_WALL_BROKEN_PURPLE",            TileType::TOP_WALL_BROKEN_PURPLE},

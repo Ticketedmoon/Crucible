@@ -13,6 +13,12 @@
 enum class TileType
 {
     TRANSPARENT = 0,
+
+    // basic tileset
+    SPAWN_ZONE = 23,
+    END_ZONE = 24,
+
+    // dungeon tileset
     BACKGROUND_PURPLE_WALL = 10,
     TOP_CORNER_WALL_BROKEN_PURPLE = 1,
     TOP_WALL_BROKEN_PURPLE = 2,
@@ -23,8 +29,6 @@ enum class TileType
     CENTRAL_WALL_SMALL_BROKEN_PURPLE = 25,
     CENTRAL_WALL_MEDIUM_BROKEN_PURPLE = 11,
     CENTRAL_WALL_LARGE_BROKEN_PURPLE = 37,
-
-
 };
 
 enum class TileRotation

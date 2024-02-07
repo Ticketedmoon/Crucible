@@ -10,9 +10,11 @@ Level& LevelManager::loadLevel()
     activeLevel = loadMapData();
 
     // Build Tile sheet
-    buildTileSheet(tileSheetFilePath);
+    buildTileSheet(basicTileSheetPath);
+    buildTileSheet(dungeonTileSheetPath);
 
-    tileSheetTexture = m_textureManager.getTexture(tileSheetFilePath);
+    basicTileSheetTexture = m_textureManager.getTexture(basicTileSheetPath);
+    dungeonTileSheetTexture = m_textureManager.getTexture(dungeonTileSheetPath);
 
     return activeLevel;
 }
@@ -107,6 +109,10 @@ std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nl
 {
     std::vector<Tile> tiles;
     std::vector<long> tileValues = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_DATA_KEY].get<std::vector<long>>();
+
+    long firstGidDungeonTileset = data[LEVEL_FILE_TILESETS_KEY][0]["firstgid"].get<long>();
+    long firstGidBasicTileset = data[LEVEL_FILE_TILESETS_KEY][1]["firstgid"].get<long>();
+
     for (unsigned int y = 0; y < level.height; y++)
     {
         for (unsigned int x = 0; x < level.width; x++)
@@ -130,7 +136,11 @@ std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nl
                     : flippedVertically ? TileRotation::FLIPPED_VERTICALLY
                     : TileRotation::NONE;
 
-            auto tileType = static_cast<TileType>(globalTileId);
+            unsigned long localTileId = globalTileId >= firstGidBasicTileset
+                    ? (globalTileId - firstGidBasicTileset) + 1
+                    : (globalTileId - firstGidDungeonTileset) + 1;
+
+            auto tileType = static_cast<TileType>(localTileId);
             sf::Vector2u pos{x, y};
             Tile tile(pos, tileType, rotation, {});
             tiles.emplace_back(tile);
@@ -139,7 +149,7 @@ std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nl
     return tiles;
 }
 
-void LevelManager::buildTileSheet(const std::string tileSheetFilePath)
+void LevelManager::buildTileSheet(const std::string& tileSheetFilePath)
 {
     if (!m_textureManager.hasTexture(tileSheetFilePath))
     {
