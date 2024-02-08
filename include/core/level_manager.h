@@ -23,7 +23,7 @@ class LevelManager
         Level& loadLevel();
 
     public:
-        static inline const std::string PLAYER_SPRITE_SHEET_PATH = "resources/assets/texture/player_crucible_64x64.png";
+        static inline const std::string PLAYER_SPRITE_SHEET_PATH = "resources/assets/texture/player_crucible_64x64_6pr.png";
         static inline const std::string BASIC_TILE_SHEET_PATH = "resources/maps/basic_tileset.png";
         static inline const std::string DUNGEON_TILE_SHEET_PATH = "resources/maps/dungeon_bricks_shadow_tileset.png";
         static inline const std::string MAP_DATA_PATH = "resources/maps/level_one_map_dungeon_tileset.json";

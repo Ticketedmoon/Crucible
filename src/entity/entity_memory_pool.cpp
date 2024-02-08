@@ -16,6 +16,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
     auto& tileComponents = std::get<std::vector<Component::CTile>>(m_pool);
     auto& lightSourceComponents = std::get<std::vector<Component::CLightSource>>(m_pool);
     auto& pathFollowerComponents = std::get<std::vector<Component::CPathFollower>>(m_pool);
+    auto& animationComponents = std::get<std::vector<Component::CAnimation>>(m_pool);
 
     transformComponents.reserve(maxNumEntities);
     controllableComponents.reserve(maxNumEntities);
@@ -23,6 +24,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
     tileComponents.reserve(maxNumEntities);
     lightSourceComponents.reserve(maxNumEntities);
     pathFollowerComponents.reserve(maxNumEntities);
+    animationComponents.reserve(maxNumEntities);
 
     for (size_t i = 0; i < maxNumEntities; i++)
     {
@@ -35,6 +37,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
         tileComponents.insert(tileComponents.begin() + i, {{}, {}, false});
         lightSourceComponents.insert(lightSourceComponents.begin() + i, {{}, {}, {}, {}, false});
         pathFollowerComponents.insert(pathFollowerComponents.begin() + i, {{}, {}, false});
+        animationComponents.insert(animationComponents.begin() + i, {{}, {}, false});
     }
 
     assert(std::tuple_size_v<EntityComponentVectorTuple> == TOTAL_RESERVED_COMPONENT_TYPE_GROUPS);

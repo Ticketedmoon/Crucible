@@ -11,8 +11,8 @@
 #include <cassert>
 #include <utility>
 
-const inline uint8_t TOTAL_EXPECTED_COMPONENT_TYPES = 6;
-const inline uint8_t TOTAL_RESERVED_COMPONENT_TYPE_GROUPS = 6;
+const inline uint8_t TOTAL_EXPECTED_COMPONENT_TYPES = 7;
+const inline uint8_t TOTAL_RESERVED_COMPONENT_TYPE_GROUPS = 7;
 
 typedef std::tuple<
         std::vector<Component::CTransform>,
@@ -20,7 +20,8 @@ typedef std::tuple<
         std::vector<Component::CCollider>,
         std::vector<Component::CTile>,
         std::vector<Component::CLightSource>,
-        std::vector<Component::CPathFollower>
+        std::vector<Component::CPathFollower>,
+        std::vector<Component::CAnimation>
 > EntityComponentVectorTuple;
 
 static size_t MAX_NUM_ENTITIES = 1000;

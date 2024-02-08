@@ -53,21 +53,41 @@ float TransformSystem::distance(Crucible::Vec2 p1, Crucible::Vec2 p2) {
 void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform)
 {
     auto& controllable = e.getComponent<Component::CControllable>();
+    auto& animation = e.getComponent<Component::CAnimation>();
 
-    if (controllable.isMovingLeft)
+    // TODO @Refactor
+    animation.animationList = {};
+
+    if (controllable.isMovingDown)
     {
-        cTransform.position->x -= SPEED;
-    }
-    if (controllable.isMovingRight)
-    {
-        cTransform.position->x += SPEED;
+        cTransform.position->y += SPEED;
+        animation.animationList = {
+                TileType::PLAYER_WALK_DOWN_A, TileType::PLAYER_WALK_DOWN_B, TileType::PLAYER_WALK_DOWN_C,
+                TileType::PLAYER_WALK_DOWN_D, TileType::PLAYER_WALK_DOWN_E, TileType::PLAYER_WALK_DOWN_F,
+        };
     }
     if (controllable.isMovingUp)
     {
         cTransform.position->y -= SPEED;
+        animation.animationList = {
+                TileType::PLAYER_WALK_UP_A, TileType::PLAYER_WALK_UP_B, TileType::PLAYER_WALK_UP_C,
+                TileType::PLAYER_WALK_UP_D, TileType::PLAYER_WALK_UP_E, TileType::PLAYER_WALK_UP_F,
+                };
     }
-    if (controllable.isMovingDown)
+    if (controllable.isMovingLeft)
     {
-        cTransform.position->y += SPEED;
+        cTransform.position->x -= SPEED;
+        animation.animationList = {
+                TileType::PLAYER_WALK_LEFT_A, TileType::PLAYER_WALK_LEFT_B, TileType::PLAYER_WALK_LEFT_C,
+                TileType::PLAYER_WALK_LEFT_D, TileType::PLAYER_WALK_LEFT_E, TileType::PLAYER_WALK_LEFT_F
+        };
+    }
+    if (controllable.isMovingRight)
+    {
+        cTransform.position->x += SPEED;
+        animation.animationList = {
+                TileType::PLAYER_WALK_RIGHT_A, TileType::PLAYER_WALK_RIGHT_B, TileType::PLAYER_WALK_RIGHT_C,
+                TileType::PLAYER_WALK_RIGHT_D, TileType::PLAYER_WALK_RIGHT_E, TileType::PLAYER_WALK_RIGHT_F,
+        };
     }
 }

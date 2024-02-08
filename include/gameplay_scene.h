@@ -11,6 +11,7 @@
 #include "scene/gameplay_scene/entity/entity_spawner.h"
 
 #include "system.h"
+#include "animation_system.h"
 #include "render_system.h"
 #include "transform_system.h"
 #include "physical_collision_system.h"

@@ -13,6 +13,12 @@
 #include "ray.h"
 #include "tile.h"
 
+struct SpriteAnimationTicker
+{
+    float timeBeforeAnimationUpdate;
+    float animationUpdateTime;
+};
+
 namespace Component
 {
     struct CTransform
@@ -70,6 +76,19 @@ namespace Component
         std::vector<std::vector<Crucible::LightRayIntersect>> lightRayIntersects;
 
         std::string lightingObjectLayerName;
+
+        bool has{};
+    };
+
+    struct CAnimation
+    {
+        std::string animationSpriteSheetPath;
+
+        std::vector<TileType> animationList{};
+
+        uint8_t currentAnimationFrameIdx;
+
+        SpriteAnimationTicker animationTicker{0, 1.0f/6.0f};
 
         bool has{};
     };

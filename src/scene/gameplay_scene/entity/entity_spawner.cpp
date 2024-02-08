@@ -27,8 +27,8 @@ void EntitySpawner::createPlayer()
             vertices);
 
     std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::PLAYER_SPRITE_SHEET_PATH);
-    updateTileTexture(playerTile, texture, playerDimensions.x, playerDimensions.y);
 
+    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH);
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CCollider>();
     e.addComponent<Component::CTile>(playerTile, texture);
@@ -68,15 +68,15 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
             vertices);
 
     std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::DUNGEON_TILE_SHEET_PATH);
-    updateTileTexture(guardTile, texture, Crucible::TILE_SIZE, Crucible::TILE_SIZE);
-
-    e.addComponent<Component::CTile>(guardTile, texture);
-    e.addComponent<Component::CCollider>();
 
     std::vector<Crucible::Ray> rays = createRays(transform, lightingObjectLayerName);
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
             std::vector<std::vector<Crucible::LightRayIntersect>>(rays.size(), std::vector<Crucible::LightRayIntersect>());
     e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects, lightingObjectLayerName);
+    e.addComponent<Component::CTile>(guardTile, texture);
+    e.addComponent<Component::CCollider>();
+    e.addComponent<Component::CAnimation>(LevelManager::DUNGEON_TILE_SHEET_PATH);
+
 }
 
 void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
@@ -109,12 +109,12 @@ void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
     if (t.type == TileType::SPAWN_ZONE || t.type == TileType::END_ZONE)
     {
         texture = m_textureManager.getTexture(LevelManager::BASIC_TILE_SHEET_PATH);
-        updateTileTexture(t, texture, Crucible::TILE_SIZE, Crucible::TILE_SIZE);
+        e.addComponent<Component::CAnimation>(LevelManager::BASIC_TILE_SHEET_PATH);
     }
     else
     {
         texture = m_textureManager.getTexture(LevelManager::DUNGEON_TILE_SHEET_PATH);
-        updateTileTexture(t, texture, Crucible::TILE_SIZE, Crucible::TILE_SIZE);
+        e.addComponent<Component::CAnimation>(LevelManager::DUNGEON_TILE_SHEET_PATH);
     }
     e.addComponent<Component::CTile>(t, texture);
 }
@@ -143,48 +143,4 @@ std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& play
     rays.insert(rays.end(), additionalRays.begin(), additionalRays.end());
     std::cout << "Configured: [" << rays.size() << "] light rays" << '\n';
     return rays;
-}
-
-/**
- * rotation guide:
- * None: [top-left vertex -> bottom-left vertex, closewise]
- * 90 degree anti-clockwise texture rotation: [top-right vertex -> top-left vertex, clockwise]
- * 90 degree clockwise texture rotation: [bottom-left vertex -> bottom-right vertex, clockwise]
- * flip horizontally: [top-right -> bottom-right, anti-clockwise]
- */
-void EntitySpawner::updateTileTexture(
-        Tile& tile,
-        const std::shared_ptr<sf::Texture>& tileSheetTexture,
-        const uint8_t tileSizeX,
-        const uint8_t tileSizeY)
-{
-    sf::VertexArray& tileVertices = *tile.vertices;
-    assert(tileVertices.getVertexCount() == 4);
-
-    int tileTypeValue = static_cast<int>(tile.type) - 1;
-    float tu = (tileTypeValue % (tileSheetTexture->getSize().x / tileSizeX));
-    float tv = tileTypeValue / (tileSheetTexture->getSize().x / tileSizeY);
-
-    float tuPositionStart = tu * tileSizeX;
-    float tuPositionEnd = (tu + 1) * tileSizeX;
-    float tvPositionStart = tv * tileSizeY;
-    float tvPositionEnd = (tv + 1) * tileSizeY;
-
-    if (tile.rotation == TileRotation::NONE)
-    {
-        tileVertices[0].texCoords = {tuPositionStart, tvPositionStart};
-        tileVertices[1].texCoords = {tuPositionEnd, tvPositionStart};
-        tileVertices[2].texCoords = {tuPositionEnd, tvPositionEnd};
-        tileVertices[3].texCoords = {tuPositionStart, tvPositionEnd};
-        return;
-    }
-
-    if (tile.rotation == TileRotation::FLIPPED_HORIZONTALLY)
-    {
-        tileVertices[0].texCoords = sf::Vector2f(tuPositionEnd, tvPositionStart);
-        tileVertices[1].texCoords = sf::Vector2f(tuPositionStart, tvPositionStart);
-        tileVertices[2].texCoords = sf::Vector2f(tuPositionStart, tvPositionEnd);
-        tileVertices[3].texCoords = sf::Vector2f(tuPositionEnd, tvPositionEnd);
-        return;
-    }
 }
