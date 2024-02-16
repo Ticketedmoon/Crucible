@@ -31,6 +31,7 @@ namespace Crucible
     struct LightRayIntersect
     {
         bool hasIntersection{};
+        EntityType entityType{};
         Vec2 collisionPoint;
     };
 }

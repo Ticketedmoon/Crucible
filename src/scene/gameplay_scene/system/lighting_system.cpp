@@ -64,6 +64,12 @@ std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionP
         }
 
         Crucible::LightRayIntersect closestIntersect = findClosestIntersectForLine(entityTransform, intersectList);
+
+        if (closestIntersect.entityType == Crucible::EntityType::PLAYER)
+        {
+            std::cout << "single ray hit player" << '\n';
+        }
+
         collisionPoints.emplace_back(closestIntersect);
 
         intersectList.clear();
@@ -96,6 +102,8 @@ void LightingSystem::addVerticesForLightCollisions(
                                             LIGHTING_COLOR});
 }
 
+// TODO Instead of this approach, we should sort the intersect list by lowest distance to player.
+//      Take top 2 intersection locations. If the closer of the two is the player, then take the second.
 Crucible::LightRayIntersect LightingSystem::findClosestIntersectForLine(
         const Component::CTransform& entityTransform,
         std::vector<Crucible::LightRayIntersect>& intersectList)

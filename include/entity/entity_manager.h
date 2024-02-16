@@ -17,6 +17,7 @@ class EntityManager
         void update();
         Entity addEntity(Crucible::EntityType type);
         std::vector<Entity> getEntities();
+        std::vector<Entity>& getEntitiesByEntityType(Crucible::EntityType entityType);
 
         template<typename T>
         std::vector<Entity> getEntitiesByComponentType()
@@ -46,7 +47,7 @@ class EntityManager
 
     private:
         std::vector<Entity> m_entities;
-        std::vector<Entity> m_entitiesToAdd; // Holds enemies to add each frame, will be added to m_entities on next frame update
+        std::vector<std::pair<Crucible::EntityType, Entity>> m_entitiesToAdd;
         std::unordered_map<Crucible::EntityType, std::vector<Entity>> m_entitiesByType;
 
 };

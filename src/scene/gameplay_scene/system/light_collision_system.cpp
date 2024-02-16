@@ -23,66 +23,48 @@ void LightCollisionSystem::execute()
 void LightCollisionSystem::resolveLightCollisions(const Entity& entity)
 {
     auto& lightSource = entity.getComponent<Component::CLightSource>();
+    std::vector<Entity> players = m_entityManager.getEntitiesByEntityType(Crucible::EntityType::PLAYER);
+
     for (size_t rayIndex = 0; rayIndex < lightSource.rays.size(); rayIndex++)
     {
-        // @Refactor: If ray collision with shape, we don't need to check window border collisions.
         Crucible::Ray& ray = lightSource.rays[rayIndex];
-        checkForLightIntersectWithObject(lightSource, ray, rayIndex);
 
-        // top
-        checkForLightIntersectWithWindowBorderSide(lightSource, ray, rayIndex,
-                Crucible::Vec2(0, 0),
-                Crucible::Vec2(Crucible::WINDOW_WIDTH, 0));
-        // right
-        checkForLightIntersectWithWindowBorderSide(lightSource, ray, rayIndex,
-                Crucible::Vec2(Crucible::WINDOW_WIDTH, 0),
-                Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
-        // bottom
-        checkForLightIntersectWithWindowBorderSide(lightSource, ray, rayIndex,
-                Crucible::Vec2(0, Crucible::WINDOW_HEIGHT),
-                Crucible::Vec2(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
-        // left
-        checkForLightIntersectWithWindowBorderSide(lightSource, ray, rayIndex,
-                Crucible::Vec2(0, 0),
-                Crucible::Vec2(0, Crucible::WINDOW_HEIGHT));
-    }
-}
+        ObjectLayer& layer = LevelManager::activeLevel.layerNameToObjectLayer.at(lightSource.lightingObjectLayerName);
+        checkForLightIntersectWithObject(lightSource, layer.lightingObjectData, ray, rayIndex);
 
-void LightCollisionSystem::checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource, Crucible::Ray& ray,
-        size_t rayIndex, Crucible::Vec2 windowBorderVertexA, Crucible::Vec2 windowBorderVertexB)
-{
-    Crucible::Vec2 rayStartPos = {ray.getStartVertex()->x, ray.getStartVertex()->y};
-    Crucible::Vec2 rayEndPos = {ray.getEndVertex().x, ray.getEndVertex().y};
-    Crucible::LightRayIntersect windowBorderIntersection = isLineIntersecting(rayStartPos,
-            rayEndPos, windowBorderVertexA, windowBorderVertexB);
-    if (windowBorderIntersection.hasIntersection)
-    {
-        lightSource.lightRayIntersects[rayIndex].emplace_back(windowBorderIntersection);
+        for (Entity& playerEntity : players)
+        {
+            auto& cTile = playerEntity.getComponent<Component::CTile>();
+            std::vector<Object> playerObjects{
+                    {Crucible::EntityType::PLAYER, cTile.tile.type, cTile.tile.vertices}
+            };
+
+            checkForLightIntersectWithObject(lightSource, playerObjects, ray, rayIndex);
+        }
     }
 }
 
 void LightCollisionSystem::checkForLightIntersectWithObject(
-        Component::CLightSource& lightSource, Crucible::Ray& ray, size_t lineIndex)
+        Component::CLightSource& lightSource,
+        const std::vector<Object>& lightObjects,
+        Crucible::Ray& ray,
+        size_t lineIndex)
 {
     // @Refactor: Rather than order these in reverse, sort by closest distance to line for a more scalable solution.
     // [0, 1] = top, [1, 2] = right, [2, 3] = bottom, [3, 4] = left
-    ObjectLayer& layer = LevelManager::activeLevel.layerNameToObjectLayer.at(lightSource.lightingObjectLayerName);
-    for (const Object& object : layer.lightingObjectData)
+    for (const Object& object : lightObjects)
     {
         const sf::VertexArray& objectVertices = *object.objectVertices;
         for (size_t shapeSideIndex = 0; shapeSideIndex < objectVertices.getVertexCount() - 1; shapeSideIndex++)
         {
-            Crucible::Vec2 rayStartPos{ray.getStartVertex()->x, ray.getStartVertex()->y};
-            Crucible::Vec2 rayEndPos{ray.getEndVertex().x, ray.getEndVertex().y};
-
+            const Crucible::Vec2 rayStartPos{ray.getStartVertex()->x, ray.getStartVertex()->y};
+            const Crucible::Vec2 rayEndPos{ray.getEndVertex().x, ray.getEndVertex().y};
             const sf::Vertex& objectStartVert = objectVertices[shapeSideIndex];
             const sf::Vertex& objectEndVert = objectVertices[shapeSideIndex + 1];
-
-            Crucible::Vec2 shapeLineStartPos{objectStartVert.position.x, objectStartVert.position.y};
-            Crucible::Vec2 shapeLineEndPos{objectEndVert.position.x, objectEndVert.position.y};
-
-            Crucible::LightRayIntersect lightRayIntersect = isLineIntersecting(rayStartPos, rayEndPos,
-                    shapeLineStartPos, shapeLineEndPos);
+            const Crucible::Vec2 shapeLineStartPos{objectStartVert.position.x, objectStartVert.position.y};
+            const Crucible::Vec2 shapeLineEndPos{objectEndVert.position.x, objectEndVert.position.y};
+            const Crucible::LightRayIntersect lightRayIntersect = isLineIntersecting(rayStartPos, rayEndPos,
+                    shapeLineStartPos, shapeLineEndPos, object.entityType);
 
             if (!lightRayIntersect.hasIntersection)
             {
@@ -95,7 +77,7 @@ void LightCollisionSystem::checkForLightIntersectWithObject(
 }
 
 Crucible::LightRayIntersect LightCollisionSystem::isLineIntersecting(Crucible::Vec2 vertexA,
-        Crucible::Vec2 vertexB, Crucible::Vec2 vertexC, Crucible::Vec2 vertexD)
+        Crucible::Vec2 vertexB, Crucible::Vec2 vertexC, Crucible::Vec2 vertexD, const Crucible::EntityType entityType)
 {
     Crucible::Vec2 r = (vertexB - vertexA);
     Crucible::Vec2 s = (vertexD - vertexC);
@@ -112,10 +94,10 @@ Crucible::LightRayIntersect LightCollisionSystem::isLineIntersecting(Crucible::V
     {
         float collisionVertexX = vertexA.x + (t * r.x);
         float collisionVertexY = vertexA.y + (t * r.y);
-        return {true, Crucible::Vec2(collisionVertexX, collisionVertexY)};
+        return {true, entityType, Crucible::Vec2(collisionVertexX, collisionVertexY)};
     }
 
-    return {false, Crucible::Vec2(0, 0)};
+    return {false, entityType, Crucible::Vec2(0, 0)};
 }
 
 float LightCollisionSystem::crossProduct(Crucible::Vec2 a, Crucible::Vec2 b)

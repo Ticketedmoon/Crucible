@@ -22,18 +22,21 @@ class LightCollisionSystem : public System
         void execute() override;
 
     private:
-        static void resolveLightCollisions(const Entity& entity);
+        void resolveLightCollisions(const Entity& entity);
 
-        static void checkForLightIntersectWithObject(
-                Component::CLightSource& lightSource, Crucible::Ray& ray, size_t lineIndex);
-
-        static void checkForLightIntersectWithWindowBorderSide(Component::CLightSource& lightSource, Crucible::Ray& ray,
-                size_t rayIndex, Crucible::Vec2 windowBorderVertexA, Crucible::Vec2 windowBorderVertexB);
+        void checkForLightIntersectWithObject(
+                Component::CLightSource& lightSource,
+                const std::vector<Object>& lightObjects,
+                Crucible::Ray& ray,
+                size_t lineIndex);
 
         static float crossProduct(Crucible::Vec2 a, Crucible::Vec2 b);
 
-        static Crucible::LightRayIntersect isLineIntersecting(Crucible::Vec2 vertexA, Crucible::Vec2 vertexB,
-                Crucible::Vec2 vertexC, Crucible::Vec2 vertexD);
+        Crucible::LightRayIntersect isLineIntersecting(Crucible::Vec2 vertexA,
+                Crucible::Vec2 vertexB,
+                Crucible::Vec2 vertexC,
+                Crucible::Vec2 vertexD,
+                Crucible::EntityType entityType);
 
     private:
         EntityManager& m_entityManager;

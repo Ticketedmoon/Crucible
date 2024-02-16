@@ -10,6 +10,7 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     Level& level = m_levelManager.loadLevel();
     createTilesForLevel(level);
 
+    m_entitySpawner.createPlayer();
     m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_A_NAME, LevelManager::GUARD_PATHING_LAYER_A);
     m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_B_NAME, LevelManager::GUARD_PATHING_LAYER_B);
 }
@@ -18,11 +19,6 @@ void GameplayScene::update()
 {
     m_entityManager.update();
     m_systemManager.update();
-
-    if (m_entityManager.getEntitiesByComponentType<Component::CControllable>().empty())
-    {
-        m_entitySpawner.createPlayer();
-    }
 }
 
 void GameplayScene::render()

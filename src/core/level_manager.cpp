@@ -72,7 +72,7 @@ Level LevelManager::loadMapData()
                 verts->append({{r.left, r.top}});
 
                 TileType tileType = lookupTileTypeForObject(layerIdx, i, data);
-                Object levelObject{tileType, verts};
+                Object levelObject{Crucible::EntityType::TILE, tileType, verts};
                 level.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
             }
         }

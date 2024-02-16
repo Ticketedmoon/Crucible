@@ -10,6 +10,7 @@
 #include <memory>
 #include "tile.h"
 #include "vec2.h"
+#include "common_constants.h"
 
 struct Layer
 {
@@ -19,6 +20,7 @@ struct Layer
 
 struct Object
 {
+    Crucible::EntityType entityType;
     TileType type;
     std::shared_ptr<sf::VertexArray> objectVertices;
 };
