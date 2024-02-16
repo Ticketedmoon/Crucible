@@ -18,11 +18,11 @@ void EntitySpawner::createPlayer()
     vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y}));
     vertices->append(sf::Vertex({playerTransform.position->x + playerDimensions.x, playerTransform.position->y}));
     vertices->append(sf::Vertex({playerTransform.position->x + playerDimensions.x, playerTransform.position->y + playerDimensions.y}));
-    vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y + Crucible::TILE_SIZE}));
+    vertices->append(sf::Vertex({playerTransform.position->x, playerTransform.position->y + playerDimensions.y}));
 
     Tile playerTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
-            TileType::PLAYER_WALK_DOWN_B,
+            TileType::PLAYER_WALK_DOWN_A,
             TileRotation::NONE,
             vertices);
 

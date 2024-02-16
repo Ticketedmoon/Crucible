@@ -63,14 +63,25 @@ std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionP
             continue;
         }
 
-        Crucible::LightRayIntersect closestIntersect = findClosestIntersectForLine(entityTransform, intersectList);
+        sortLightIntersectionsByDistanceToEntity(entityTransform, intersectList);
 
-        if (closestIntersect.entityType == Crucible::EntityType::PLAYER)
+        if (intersectList[0].entityType == Crucible::EntityType::PLAYER)
         {
-            std::cout << "single ray hit player" << '\n';
+            // Add intersect that is not player
+            auto closestIntersectThatIsNotPlayer= *std::ranges::find_if(intersectList,
+                    [](const auto& intersect) {
+                        return intersect.entityType != Crucible::EntityType::PLAYER;
+                    });
+            collisionPoints.emplace_back(closestIntersectThatIsNotPlayer);
+
+            // @Temporary
+            exit(0);
+        }
+        else
+        {
+            collisionPoints.emplace_back(intersectList[0]);
         }
 
-        collisionPoints.emplace_back(closestIntersect);
 
         intersectList.clear();
     }
@@ -102,22 +113,16 @@ void LightingSystem::addVerticesForLightCollisions(
                                             LIGHTING_COLOR});
 }
 
-// TODO Instead of this approach, we should sort the intersect list by lowest distance to player.
-//      Take top 2 intersection locations. If the closer of the two is the player, then take the second.
-Crucible::LightRayIntersect LightingSystem::findClosestIntersectForLine(
+Crucible::LightRayIntersect LightingSystem::sortLightIntersectionsByDistanceToEntity(
         const Component::CTransform& entityTransform,
         std::vector<Crucible::LightRayIntersect>& intersectList)
 {
-    Crucible::LightRayIntersect closestIntersect = intersectList[0];
-    double distToPlayer = entityTransform.position->dist(intersectList[0].collisionPoint);
-    for (Crucible::LightRayIntersect intersect: intersectList)
-    {
-        double nextDistToPlayer = entityTransform.position->dist(intersect.collisionPoint);
-        if (nextDistToPlayer < distToPlayer)
-        {
-            distToPlayer = nextDistToPlayer;
-            closestIntersect = intersect;
-        }
-    }
-    return closestIntersect;
+    auto comparator =
+            [&entityTransform](const Crucible::LightRayIntersect& intersectA, const Crucible::LightRayIntersect& intersectB) {
+                double playerDistToIntersectA = entityTransform.position->dist(intersectA.collisionPoint);
+                double playerDistToIntersectB = entityTransform.position->dist(intersectB.collisionPoint);
+                return playerDistToIntersectA < playerDistToIntersectB;
+            };
+
+    std::sort(intersectList.begin(), intersectList.end(), comparator);
 }

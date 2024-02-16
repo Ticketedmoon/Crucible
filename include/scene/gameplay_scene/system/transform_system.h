@@ -28,7 +28,8 @@ class TransformSystem : public System
         static float distance(Crucible::Vec2 p1, Crucible::Vec2 p2);
 
     private:
-        static inline const float SPEED = 1.4f;
+        static inline const float PLAYER_SPEED = 1.65f;
+        static inline const float GUARD_SPEED = 1.05f;
 
         EntityManager& m_entityManager;
 };

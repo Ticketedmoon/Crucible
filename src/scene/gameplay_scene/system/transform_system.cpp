@@ -38,8 +38,8 @@ void TransformSystem::execute()
 
             // move forward (into the waypoint, based on the current object rotation)
             float r = std::atan2(waypoint.y - entityTransform.position->y, waypoint.x - entityTransform.position->x);
-            entityTransform.position->x += std::cos(r) * SPEED;
-            entityTransform.position->y += std::sin(r) * SPEED;
+            entityTransform.position->x += std::cos(r) * GUARD_SPEED;
+            entityTransform.position->y += std::sin(r) * GUARD_SPEED;
         }
     }
 }
@@ -60,7 +60,7 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
 
     if (controllable.isMovingDown)
     {
-        cTransform.position->y += SPEED;
+        cTransform.position->y += PLAYER_SPEED;
         animation.animationList = {
                 TileType::PLAYER_WALK_DOWN_A, TileType::PLAYER_WALK_DOWN_B, TileType::PLAYER_WALK_DOWN_C,
                 TileType::PLAYER_WALK_DOWN_D, TileType::PLAYER_WALK_DOWN_E, TileType::PLAYER_WALK_DOWN_F,
@@ -68,7 +68,7 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
     }
     if (controllable.isMovingUp)
     {
-        cTransform.position->y -= SPEED;
+        cTransform.position->y -= PLAYER_SPEED;
         animation.animationList = {
                 TileType::PLAYER_WALK_UP_A, TileType::PLAYER_WALK_UP_B, TileType::PLAYER_WALK_UP_C,
                 TileType::PLAYER_WALK_UP_D, TileType::PLAYER_WALK_UP_E, TileType::PLAYER_WALK_UP_F,
@@ -76,7 +76,7 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
     }
     if (controllable.isMovingLeft)
     {
-        cTransform.position->x -= SPEED;
+        cTransform.position->x -= PLAYER_SPEED;
         animation.animationList = {
                 TileType::PLAYER_WALK_LEFT_A, TileType::PLAYER_WALK_LEFT_B, TileType::PLAYER_WALK_LEFT_C,
                 TileType::PLAYER_WALK_LEFT_D, TileType::PLAYER_WALK_LEFT_E, TileType::PLAYER_WALK_LEFT_F
@@ -84,7 +84,7 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
     }
     if (controllable.isMovingRight)
     {
-        cTransform.position->x += SPEED;
+        cTransform.position->x += PLAYER_SPEED;
         animation.animationList = {
                 TileType::PLAYER_WALK_RIGHT_A, TileType::PLAYER_WALK_RIGHT_B, TileType::PLAYER_WALK_RIGHT_C,
                 TileType::PLAYER_WALK_RIGHT_D, TileType::PLAYER_WALK_RIGHT_E, TileType::PLAYER_WALK_RIGHT_F,

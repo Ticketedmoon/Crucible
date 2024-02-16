@@ -19,7 +19,7 @@ class LightingSystem : public System
                 const Component::CTransform& entityTransform) ;
         static void addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
                 const Component::CTransform& entityTransform, const std::vector<Crucible::LightRayIntersect>& intersections) ;
-        static Crucible::LightRayIntersect findClosestIntersectForLine(const Component::CTransform& entityTransform,
+        static Crucible::LightRayIntersect sortLightIntersectionsByDistanceToEntity(const Component::CTransform& entityTransform,
                 std::vector<Crucible::LightRayIntersect>& intersectList) ;
         static void sortIntersectionsByAngleAscending(const Component::CTransform& entityTransform,
                 std::vector<Crucible::LightRayIntersect>& intersections) ;
