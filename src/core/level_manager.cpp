@@ -73,6 +73,24 @@ Level LevelManager::loadMapData()
 
                 TileType tileType = lookupTileTypeForObject(layerIdx, i, data);
                 Object levelObject{Crucible::EntityType::TILE, tileType, verts};
+
+                if (data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i].contains("properties"))
+                {
+                    // TODO this points to 0th index - make scalable in future
+                    const std::string& name = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["properties"][0]["name"];
+                    const std::string& type = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["properties"][0]["type"];
+                    const std::string& value = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["properties"][0]["value"];
+
+                    if (levelObject.customProperties.contains(name))
+                    {
+                        levelObject.customProperties.at(name).emplace_back(name, type, value);
+                    }
+                    else
+                    {
+                        levelObject.customProperties[name] = {{name, type, value}};
+                    }
+                }
+
                 level.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
             }
         }

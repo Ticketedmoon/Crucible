@@ -39,17 +39,21 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     auto e = m_entityManager.addEntity(Crucible::EntityType::GUARD);
     ObjectLayer pathingObjectLayer = LevelManager::activeLevel.layerNameToObjectLayer.at(pathingObjectLayerName);
 
-    std::vector<Crucible::Vec2> path;
+    std::vector<Waypoint> path;
     for (auto& guardPath : pathingObjectLayer.lightingObjectData)
     {
         sf::VertexArray& objectVertData = *guardPath.objectVertices;
         sf::Vertex v{objectVertData[0]};
-        path.emplace_back(v.position.x, v.position.y);
+
+        uint32_t waitPeriodMs = guardPath.customProperties.contains("wait_period")
+                ? std::stoi(guardPath.customProperties.at("wait_period").at(0).value)
+                : 0;
+        path.emplace_back(Waypoint({v.position.x, v.position.y}, waitPeriodMs));
     }
 
     e.addComponent<Component::CPathFollower>(path, pathingObjectLayerName);
 
-    std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(path.at(0));
+    std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(path.at(0).position);
 
     Crucible::Vec2 guardDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
 

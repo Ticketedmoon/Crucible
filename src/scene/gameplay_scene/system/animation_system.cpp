@@ -69,8 +69,8 @@ int AnimationSystem::updateAnimation(Tile& tile, Component::CAnimation& animatio
     {
         tileTypeValue = static_cast<int>(animation.animationList[animation.currentAnimationFrameIdx]) - 1;
 
-        float& spriteAnimationTime = animation.animationTicker.timeBeforeAnimationUpdate;
-        float animationCompletionTime = animation.animationTicker.animationUpdateTime;
+        double& spriteAnimationTime = animation.animationTicker.timeUntilUpdate;
+        double animationCompletionTime = animation.animationTicker.currentTime;
         spriteAnimationTime += Crucible::DT;
 
         if (spriteAnimationTime >= animationCompletionTime)

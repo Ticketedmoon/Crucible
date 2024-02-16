@@ -19,19 +19,21 @@
 class TransformSystem : public System
 {
     public:
-        explicit TransformSystem(EntityManager& entityManager);
+        explicit TransformSystem(EntityManager& entityManager, sf::Clock& gameClock);
 
         void execute() override;
 
     private:
         static void resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform);
         static float distance(Crucible::Vec2 p1, Crucible::Vec2 p2);
+        void moveToNextWaypoint(Component::CTransform& entityTransform, Component::CPathFollower& cPathFollower) const;
 
     private:
         static inline const float PLAYER_SPEED = 1.65f;
         static inline const float GUARD_SPEED = 1.05f;
 
         EntityManager& m_entityManager;
+        sf::Clock& m_gameClock;
 };
 
 

@@ -11,6 +11,7 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     createTilesForLevel(level);
 
     m_entitySpawner.createPlayer();
+
     m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_A_NAME, LevelManager::GUARD_PATHING_LAYER_A);
     m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_B_NAME, LevelManager::GUARD_PATHING_LAYER_B);
 }
@@ -123,7 +124,7 @@ void GameplayScene::registerSystems()
 {
     // Standard
     m_systemManager.registerSystem(
-            std::make_shared<TransformSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+            std::make_shared<TransformSystem>(m_entityManager, gameEngine.gameClock), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
             std::make_shared<PhysicalCollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(

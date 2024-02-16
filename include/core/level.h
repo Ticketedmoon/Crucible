@@ -12,6 +12,13 @@
 #include "vec2.h"
 #include "common_constants.h"
 
+struct CustomProperty
+{
+    std::string name;
+    std::string type;
+    std::string value;
+};
+
 struct Layer
 {
     std::string name;
@@ -23,6 +30,7 @@ struct Object
     Crucible::EntityType entityType;
     TileType type;
     std::shared_ptr<sf::VertexArray> objectVertices;
+    std::unordered_map<std::string, std::vector<CustomProperty>> customProperties;
 };
 
 struct TileLayer : Layer

@@ -1,6 +1,7 @@
 #include "transform_system.h"
 
-TransformSystem::TransformSystem(EntityManager& entityManager) : m_entityManager(entityManager)
+TransformSystem::TransformSystem(EntityManager& entityManager, sf::Clock& gameClock)
+    : m_entityManager(entityManager), m_gameClock(gameClock)
 {
 }
 
@@ -21,27 +22,40 @@ void TransformSystem::execute()
         {
             auto& cPathFollower = entity.getComponent<Component::CPathFollower>();
 
-            // If at point, move to next destination
-            Crucible::Vec2 waypoint = cPathFollower.path[cPathFollower.destinationIndex];
-            float distanceToWaypoint = distance(waypoint, *entityTransform.position);
-            if (distanceToWaypoint < 1)
+            if (m_gameClock.getElapsedTime().asMilliseconds() < cPathFollower.gameTimeTicker.timeUntilUpdate)
             {
-                cPathFollower.destinationIndex++;
+                continue;
             }
 
-            // If destinationIndex is == path.size(), then reset to 0.
-            if (cPathFollower.destinationIndex == cPathFollower.path.size())
-            {
-                cPathFollower.destinationIndex = 0;
-                waypoint = cPathFollower.path[cPathFollower.destinationIndex];
-            }
-
-            // move forward (into the waypoint, based on the current object rotation)
-            float r = std::atan2(waypoint.y - entityTransform.position->y, waypoint.x - entityTransform.position->x);
-            entityTransform.position->x += std::cos(r) * GUARD_SPEED;
-            entityTransform.position->y += std::sin(r) * GUARD_SPEED;
+            moveToNextWaypoint(entityTransform, cPathFollower);
         }
     }
+}
+
+void TransformSystem::moveToNextWaypoint(
+        Component::CTransform& entityTransform,
+        Component::CPathFollower& cPathFollower) const
+{
+    Waypoint waypoint = cPathFollower.path[cPathFollower.destinationIndex];
+    float distanceToWaypoint = distance(waypoint.position, *entityTransform.position);
+
+    if (distanceToWaypoint < 1)
+    {
+        cPathFollower.gameTimeTicker.timeUntilUpdate = m_gameClock.getElapsedTime().asMilliseconds() + waypoint.waitPeriodMs;
+        cPathFollower.destinationIndex++;
+    }
+
+    // If destinationIndex is == path.size(), then reset to 0.
+    if (cPathFollower.destinationIndex == cPathFollower.path.size())
+    {
+        cPathFollower.destinationIndex = 0;
+        waypoint = cPathFollower.path[cPathFollower.destinationIndex];
+    }
+
+    // move forward (into the waypoint, based on the current object rotation)
+    float r = std::atan2(waypoint.position.y - entityTransform.position->y, waypoint.position.x - entityTransform.position->x);
+    entityTransform.position->x += std::cos(r) * GUARD_SPEED;
+    entityTransform.position->y += std::sin(r) * GUARD_SPEED;
 }
 
 float TransformSystem::distance(Crucible::Vec2 p1, Crucible::Vec2 p2) {

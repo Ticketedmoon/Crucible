@@ -13,10 +13,16 @@
 #include "ray.h"
 #include "tile.h"
 
-struct SpriteAnimationTicker
+struct GameTimeTicker
 {
-    float timeBeforeAnimationUpdate;
-    float animationUpdateTime;
+    double timeUntilUpdate;
+    double currentTime;
+};
+
+struct Waypoint
+{
+    Crucible::Vec2 position;
+    uint32_t waitPeriodMs{0};
 };
 
 namespace Component
@@ -57,11 +63,13 @@ namespace Component
 
     struct CPathFollower
     {
-        std::vector<Crucible::Vec2> path;
+        std::vector<Waypoint> path;
 
         std::string pathingObjectLayerName;
 
         size_t destinationIndex{0};
+
+        GameTimeTicker gameTimeTicker{0, 0};
 
         bool has{};
     };
@@ -88,7 +96,7 @@ namespace Component
 
         uint8_t currentAnimationFrameIdx;
 
-        SpriteAnimationTicker animationTicker{0, 1.0f/6.0f};
+        GameTimeTicker animationTicker{0, 1.0f/6.0f};
 
         bool has{};
     };
