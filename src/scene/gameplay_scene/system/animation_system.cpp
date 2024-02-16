@@ -32,26 +32,7 @@ void AnimationSystem::updateTileTexture(
     sf::VertexArray& tileVertices = *tile.vertices;
     assert(tileVertices.getVertexCount() == 4);
 
-    int tileTypeValue = static_cast<int>(tile.type) - 1;
-
-    if (!animation.animationList.empty() )
-    {
-        tileTypeValue = static_cast<int>(animation.animationList[animation.currentAnimationFrameIdx]) - 1;
-
-        float& spriteAnimationTime = animation.animationTicker.timeBeforeAnimationUpdate;
-        float animationCompletionTime = animation.animationTicker.animationUpdateTime;
-        spriteAnimationTime += Crucible::DT;
-
-        if (spriteAnimationTime >= animationCompletionTime)
-        {
-            animation.currentAnimationFrameIdx++;
-            if (animation.currentAnimationFrameIdx == animation.animationList.size())
-            {
-                animation.currentAnimationFrameIdx = 0;
-            }
-            spriteAnimationTime = 0;
-        }
-    }
+    int tileTypeValue = updateAnimation(tile, animation);
 
     // TODO the below logic only needs to be called once for static entities, we are doing additional work here unnecessarily.
     float tu = (tileTypeValue % (tileSheetTexture->getSize().x / static_cast<uint8_t>(transform.dimensions.x)));
@@ -79,4 +60,28 @@ void AnimationSystem::updateTileTexture(
         tileVertices[3].texCoords = sf::Vector2f(tuPositionEnd, tvPositionEnd);
         return;
     }
+}
+
+int AnimationSystem::updateAnimation(Tile& tile, Component::CAnimation& animation)
+{
+    int tileTypeValue = static_cast<int>(tile.type) - 1;
+    if (!animation.animationList.empty() )
+    {
+        tileTypeValue = static_cast<int>(animation.animationList[animation.currentAnimationFrameIdx]) - 1;
+
+        float& spriteAnimationTime = animation.animationTicker.timeBeforeAnimationUpdate;
+        float animationCompletionTime = animation.animationTicker.animationUpdateTime;
+        spriteAnimationTime += Crucible::DT;
+
+        if (spriteAnimationTime >= animationCompletionTime)
+        {
+            animation.currentAnimationFrameIdx++;
+            if (animation.currentAnimationFrameIdx == animation.animationList.size())
+            {
+                animation.currentAnimationFrameIdx = 0;
+            }
+            spriteAnimationTime = 0;
+        }
+    }
+    return tileTypeValue;
 }

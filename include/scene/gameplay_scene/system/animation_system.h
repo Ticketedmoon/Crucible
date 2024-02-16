@@ -32,6 +32,8 @@ class AnimationSystem : public System
                 const Component::CTransform& transform,
                 Component::CAnimation& animation);
 
+        static int updateAnimation(Tile& tile, Component::CAnimation& animation) ;
+
     private:
         EntityManager& m_entityManager;
 };
