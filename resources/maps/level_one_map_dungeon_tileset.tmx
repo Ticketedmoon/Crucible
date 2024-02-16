@@ -115,8 +115,11 @@
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="5" name="guard_pathing_layer_a" locked="1">
+ <objectgroup id="5" name="guard_pathing_layer_a">
   <object id="20" name="start A" x="1140" y="240">
+   <properties>
+    <property name="wait_period" value="1500"/>
+   </properties>
    <point/>
   </object>
   <object id="16" name="top right corner A" x="1140" y="48">
@@ -125,7 +128,7 @@
   <object id="59" name="cell entrance A" x="960" y="48">
    <point/>
   </object>
-  <object id="56" name="cell room A" x="960" y="172">
+  <object id="56" name="cell room A" x="960" y="180">
    <properties>
     <property name="wait_period" value="3000"/>
    </properties>
@@ -137,7 +140,7 @@
   <object id="58" name="cell entrance B" x="592" y="48">
    <point/>
   </object>
-  <object id="55" name="cell room B" x="592" y="172">
+  <object id="55" name="cell room B" x="640" y="128">
    <properties>
     <property name="wait_period" value="3000"/>
    </properties>
@@ -149,7 +152,7 @@
   <object id="17" name="start A" x="448" y="48">
    <point/>
   </object>
-  <object id="54" name="cell room A" x="448" y="172">
+  <object id="54" name="cell room A" x="448" y="180">
    <properties>
     <property name="wait_period" value="3000"/>
    </properties>

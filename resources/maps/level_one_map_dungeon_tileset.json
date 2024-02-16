@@ -113,7 +113,6 @@
         {
          "draworder":"topdown",
          "id":5,
-         "locked":true,
          "name":"guard_pathing_layer_a",
          "objects":[
                 {
@@ -121,6 +120,12 @@
                  "id":20,
                  "name":"start A",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"wait_period",
+                         "type":"string",
+                         "value":"1500"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -168,7 +173,7 @@
                  "visible":true,
                  "width":0,
                  "x":960,
-                 "y":172
+                 "y":180
                 }, 
                 {
                  "height":0,
@@ -209,8 +214,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":592,
-                 "y":172
+                 "x":640,
+                 "y":128
                 }, 
                 {
                  "height":0,
@@ -252,7 +257,7 @@
                  "visible":true,
                  "width":0,
                  "x":448,
-                 "y":172
+                 "y":180
                 }, 
                 {
                  "height":0,
