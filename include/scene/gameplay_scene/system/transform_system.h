@@ -29,8 +29,8 @@ class TransformSystem : public System
         void moveToNextWaypoint(Component::CTransform& entityTransform, Component::CPathFollower& cPathFollower) const;
 
     private:
-        static inline const float PLAYER_SPEED = 1.75f;
-        static inline const float GUARD_SPEED = 1.8f;
+        static inline const float PLAYER_SPEED = 1.95f;
+        static inline const float GUARD_SPEED = 1.75f;
 
         EntityManager& m_entityManager;
         sf::Clock& m_gameClock;

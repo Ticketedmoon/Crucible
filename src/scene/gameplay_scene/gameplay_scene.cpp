@@ -24,11 +24,6 @@ void GameplayScene::update()
 
 void GameplayScene::render()
 {
-    if (m_entityManager.getEntitiesByComponentType<Component::CControllable>().empty())
-    {
-        return;
-    }
-
     gameEngine.m_renderTexture.clear(LEVEL_BACKGROUND_COLOR);
     m_systemManager.render();
     gameEngine.m_renderTexture.display();
