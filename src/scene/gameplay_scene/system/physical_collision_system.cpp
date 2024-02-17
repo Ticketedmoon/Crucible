@@ -1,6 +1,7 @@
 #include "physical_collision_system.h"
 
-PhysicalCollisionSystem::PhysicalCollisionSystem(EntityManager& entityManager) : m_entityManager(entityManager)
+PhysicalCollisionSystem::PhysicalCollisionSystem(GameEngine& gameEngine, EntityManager& entityManager)
+    : m_gameEngine(gameEngine), m_entityManager(entityManager)
 {
 
 }
@@ -11,24 +12,23 @@ void PhysicalCollisionSystem::execute()
 
     for (const Entity& entity: entities)
     {
-        auto& entityTile = entity.getComponent<Component::CTile>();
-        auto& entityTransform = entity.getComponent<Component::CTransform>();
-        auto& entityCollider = entity.getComponent<Component::CCollider>();
-
         if (entity.hasComponent<Component::CCollider>())
         {
-            checkForLevelObjectLayerCollisions(entityCollider, entityTile, entityTransform);
-            checkForOtherCollidableEntities(entities, entity, entityCollider, entityTile, entityTransform);
+            auto& entityCollider = entity.getComponent<Component::CCollider>();
+            checkForLevelObjectLayerCollisions(entity, entityCollider);
+            checkForOtherCollidableEntities(entities, entity, entityCollider);
         }
 
         // TODO Consider moving me elsewhere
+        auto& entityTile = entity.getComponent<Component::CTile>();
+        auto& entityTransform = entity.getComponent<Component::CTransform>();
         updateShapeVertexPositions(entityTransform, entityTile);
     }
 }
 
-void PhysicalCollisionSystem::resolvePhysicalCollisions(Component::CTile& entityRectangleShape,
+void PhysicalCollisionSystem::resolvePhysicalCollisions(Component::CTile& entityTile,
         Component::CTransform& entityTransform, Component::CCollider entityCollider,
-        const Crucible::Vec2& otherRectPos, const std::shared_ptr<sf::VertexArray>& otherRectVertices)
+        const Crucible::Vec2& otherRectPos, const std::shared_ptr<sf::VertexArray>& otherTileVertices)
 {
     if (entityCollider.immovable)
     {
@@ -36,15 +36,14 @@ void PhysicalCollisionSystem::resolvePhysicalCollisions(Component::CTile& entity
     }
 
     sf::FloatRect overlap;
-    if (isCollidingAABB(entityRectangleShape, otherRectVertices, overlap))
+    if (isCollidingAABB(entityTile, otherTileVertices, overlap))
     {
-        resolveCollision(entityRectangleShape, entityTransform, otherRectPos, overlap);
+        resolveCollision(entityTile, entityTransform, otherRectPos, overlap);
     }
 }
 
 void PhysicalCollisionSystem::checkForOtherCollidableEntities(std::vector<Entity>& entities,
-        const Entity& entity, Component::CCollider& entityCollider, Component::CTile& entityRectangleShape,
-        Component::CTransform& entityTransform) const
+        const Entity& entity, Component::CCollider& entityCollider)
 {
     for (const Entity& otherEntity: entities)
     {
@@ -56,40 +55,59 @@ void PhysicalCollisionSystem::checkForOtherCollidableEntities(std::vector<Entity
 
         if (otherEntity.hasComponent<Component::CCollider>())
         {
-            auto& otherEntityRectangleShape = otherEntity.getComponent<Component::CTile>();
+            auto& entityTile = entity.getComponent<Component::CTile>();
+            auto& entityTransform = entity.getComponent<Component::CTransform>();
+            auto& otherEntityTile = otherEntity.getComponent<Component::CTile>();
             auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
 
-            resolvePhysicalCollisions(entityRectangleShape,
+            resolvePhysicalCollisions(entityTile,
                     entityTransform,
                     entityCollider,
                     *otherEntityTransform.position,
-                    otherEntityRectangleShape.tile.vertices);
+                    otherEntityTile.tile.vertices);
         }
     }
 }
-void PhysicalCollisionSystem::checkForLevelObjectLayerCollisions(Component::CCollider& entityCollider,
-        Component::CTile& entityTile, Component::CTransform& entityTransform) const
+void PhysicalCollisionSystem::checkForLevelObjectLayerCollisions(const Entity& entity, Component::CCollider& entityCollider)
 {
     ObjectLayer lightingObjectLayerA
         = LevelManager::activeLevel.layerNameToObjectLayer.at(LevelManager::LIGHTING_OBJECT_LAYER_A_NAME);
     ObjectLayer lightingObjectLayerB
             = LevelManager::activeLevel.layerNameToObjectLayer.at(LevelManager::LIGHTING_OBJECT_LAYER_B_NAME);
 
-    resolvePhysicalCollisionsForObjectLayer(entityCollider, entityTile, entityTransform, lightingObjectLayerA);
-    resolvePhysicalCollisionsForObjectLayer(entityCollider, entityTile, entityTransform, lightingObjectLayerB);
+    resolvePhysicalCollisionsForObjectLayer(entityCollider, entity, lightingObjectLayerA);
+    resolvePhysicalCollisionsForObjectLayer(entityCollider, entity, lightingObjectLayerB);
 }
 
 void PhysicalCollisionSystem::resolvePhysicalCollisionsForObjectLayer(Component::CCollider& entityCollider,
-        Component::CTile& entityTile, Component::CTransform& entityTransform, ObjectLayer& lightingObjectLayer)
+        const Entity& entity, ObjectLayer& lightingObjectLayer)
 {
     for (const Object& object: lightingObjectLayer.lightingObjectData)
     {
-        if (object.type == TileType::SPAWN_ZONE || object.type == TileType::END_ZONE)
+        // FIXME: Problem here, we need to separate out the different tile sheets to enum values.
+        //        It is jarring for the different enum key to share the same values and causes some difficult-to-debug issues.
+        if (object.type == TileType::SPAWN_ZONE)
         {
             continue;
         }
+
+        if (object.type == TileType::END_ZONE)
+        {
+            sf::FloatRect overlap;
+            Component::CTile& entityTile = entity.getComponent<Component::CTile>();
+            if (entity.hasComponent<Component::CControllable>() && isCollidingAABB(entityTile, object.objectVertices, overlap))
+            {
+                m_gameEngine.changeScene(Scene::Type::VICTORY_SCREEN, std::make_shared<VictoryScene>(m_gameEngine));
+            }
+
+            continue;
+        }
+
         const std::shared_ptr<sf::VertexArray>& vArr = object.objectVertices;
         sf::Vertex v = (*vArr)[0];
+
+        Component::CTile entityTile = entity.getComponent<Component::CTile>();
+        Component::CTransform entityTransform = entity.getComponent<Component::CTransform>();
         resolvePhysicalCollisions(
                 entityTile,
                 entityTransform,
@@ -166,7 +184,7 @@ void PhysicalCollisionSystem::applyCollisionManifoldToTransform(Component::CTran
 {
     sf::Vector2f collisionNormal{result.x, result.y};
     sf::Vector3f manifoldDist = getManifold(overlap, collisionNormal);
-    sf::Vector2f collisionOverlap = {overlap.width, overlap.height};
+    sf::Vector2f collisionOverlap{overlap.width, overlap.height};
 
     applyCollisionOverlapToEntityTransform(cTransform, manifoldDist, collisionOverlap);
 }

@@ -1,18 +1,18 @@
 #include "render_system.h"
 
-RenderSystem::RenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager)
+GameplayRenderSystem::GameplayRenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager)
     : m_renderTarget(renderTarget), m_entityManager(entityManager)
 {
     configureTextRendering();
 }
 
-void RenderSystem::execute()
+void GameplayRenderSystem::execute()
 {
     drawEntities();
     drawGuiData();
 }
 
-void RenderSystem::drawEntities()
+void GameplayRenderSystem::drawEntities()
 {
     std::vector<Entity> entities = m_entityManager.getEntities();
 
@@ -36,13 +36,13 @@ void RenderSystem::drawEntities()
     }
 }
 
-void RenderSystem::drawGuiData()
+void GameplayRenderSystem::drawGuiData()
 {
 
 }
 
 // TODO move to engine for inter-scene text drawing?
-void RenderSystem::drawText(sf::Text& text, const sf::Color& fillColour, const uint8_t characterSize, sf::Vector2f position)
+void GameplayRenderSystem::drawText(sf::Text& text, const sf::Color& fillColour, const uint8_t characterSize, sf::Vector2f position)
 {
     text.setFillColor(fillColour);
     text.setCharacterSize(characterSize); // in pixels, not points!
@@ -55,10 +55,7 @@ void RenderSystem::drawText(sf::Text& text, const sf::Color& fillColour, const u
     m_renderTarget.draw(text);
 }
 
-void RenderSystem::configureTextRendering()
+void GameplayRenderSystem::configureTextRendering()
 {
-    bool isFontLoaded = m_font.loadFromFile(FONT_PATH);
-    assert(isFontLoaded);
-
-    m_ammoText = sf::Text("", m_font);
+    // NOT IMPLEMENTED
 }

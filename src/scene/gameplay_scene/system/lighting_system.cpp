@@ -82,7 +82,6 @@ std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionP
             collisionPoints.emplace_back(intersectList[0]);
         }
 
-
         intersectList.clear();
     }
     return collisionPoints;
@@ -113,7 +112,7 @@ void LightingSystem::addVerticesForLightCollisions(
                                             LIGHTING_COLOR});
 }
 
-Crucible::LightRayIntersect LightingSystem::sortLightIntersectionsByDistanceToEntity(
+void LightingSystem::sortLightIntersectionsByDistanceToEntity(
         const Component::CTransform& entityTransform,
         std::vector<Crucible::LightRayIntersect>& intersectList)
 {

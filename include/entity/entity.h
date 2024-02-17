@@ -42,25 +42,6 @@ class Entity
             return EntityMemoryPool::instance().hasComponent<T>(m_id);
         }
 
-        template<typename T>
-        bool hasComponents(std::vector<T> components) const
-        {
-            for (T component: components)
-            {
-                if (!EntityMemoryPool::instance().hasComponent<T>(m_id))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        template <typename T>
-        void removeComponent()
-        {
-            EntityMemoryPool::instance().removeComponent<T>(m_id);
-        }
-
     private:
         size_t m_id;
 

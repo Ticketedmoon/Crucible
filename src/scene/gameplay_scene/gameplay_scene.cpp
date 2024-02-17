@@ -1,4 +1,4 @@
-#include "gameplay_scene.h"
+#include "gameplay_scene/gameplay_scene.h"
 
 GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     m_entitySpawner(m_entityManager, m_textureManager),
@@ -126,7 +126,7 @@ void GameplayScene::registerSystems()
     m_systemManager.registerSystem(
             std::make_shared<TransformSystem>(m_entityManager, gameEngine.gameClock), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
-            std::make_shared<PhysicalCollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+            std::make_shared<PhysicalCollisionSystem>(gameEngine, m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
             std::make_shared<AnimationSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
 
@@ -140,5 +140,5 @@ void GameplayScene::registerSystems()
 
     // Render
     m_systemManager.registerSystem(
-            std::make_shared<RenderSystem>(gameEngine.m_renderTexture, m_entityManager), SystemManager::SystemType::RENDER);
+            std::make_shared<GameplayRenderSystem>(gameEngine.m_renderTexture, m_entityManager), SystemManager::SystemType::RENDER);
 }

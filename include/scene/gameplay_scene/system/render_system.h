@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef CRUCIBLE_RENDER_SYSTEM_H
-#define CRUCIBLE_RENDER_SYSTEM_H
+#ifndef CRUCIBLE_GAMEPLAY_RENDER_SYSTEM_H
+#define CRUCIBLE_GAMEPLAY_RENDER_SYSTEM_H
 
 #include <cmath>
 #include <cassert>
@@ -16,10 +16,10 @@
 #include "scene/gameplay_scene/system/render_system.h"
 #include "level_manager.h"
 
-class RenderSystem : public System
+class GameplayRenderSystem : public System
 {
     public:
-        explicit RenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager);
+        explicit GameplayRenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager);
 
         void execute() override;
 
@@ -31,14 +31,10 @@ class RenderSystem : public System
         void drawText(sf::Text& text, const sf::Color& fillColour, uint8_t characterSize, sf::Vector2f position);
 
     private:
-        static const inline std::string FONT_PATH = "resources/fonts/breathe_fire.ttf";
-
         sf::RenderTarget& m_renderTarget;
         EntityManager& m_entityManager;
-
-        static inline sf::Text m_ammoText;
         static inline sf::Font m_font;
 };
 
 
-#endif //CRUCIBLE_RENDER_SYSTEM_H
+#endif //CRUCIBLE_GAMEPLAY_RENDER_SYSTEM_H

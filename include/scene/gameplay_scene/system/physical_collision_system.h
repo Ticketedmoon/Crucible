@@ -13,47 +13,53 @@
 #include "entity_manager.h"
 #include "common_constants.h"
 #include "level_manager.h"
+#include "game_engine.h"
 
 class PhysicalCollisionSystem : public System
 {
     public:
-        explicit PhysicalCollisionSystem(EntityManager& entityManager);
+        explicit PhysicalCollisionSystem(GameEngine& gameEngine, EntityManager& entityManager);
 
         void execute() override;
 
     private:
-        static bool isCollidingAABB(const Component::CTile& entityTile,
+        bool isCollidingAABB(const Component::CTile& entityTile,
                 const std::shared_ptr<sf::VertexArray>& otherRectVertices, sf::FloatRect& overlap);
 
-        static void resolveCollision(Component::CTile& entityTile, Component::CTransform& entityTransform,
+        void resolveCollision(Component::CTile& entityTile, Component::CTransform& entityTransform,
                 const Crucible::Vec2& otherEntityPositionVec, const sf::FloatRect& overlap);
 
-        static void resolvePhysicalCollisionsForObjectLayer(Component::CCollider& entityCollider, Component::CTile& entityTile,
-                Component::CTransform& entityTransform, ObjectLayer& lightingObjectLayer) ;
+        void resolvePhysicalCollisionsForObjectLayer(
+                Component::CCollider& entityCollider,
+                const Entity& entity,
+                ObjectLayer& lightingObjectLayer);
 
-        static void resolvePhysicalCollisions(Component::CTile& entityRectangleShape,
-                Component::CTransform& entityTransform, Component::CCollider entityCollider,
-                const Crucible::Vec2& otherRectPos, const std::shared_ptr<sf::VertexArray>& otherRectVertices);
+        void resolvePhysicalCollisions(Component::CTile& entityTile,
+                Component::CTransform& entityTransform,
+                Component::CCollider entityCollider,
+                const Crucible::Vec2& otherRectPos,
+                const std::shared_ptr<sf::VertexArray>& otherTileVertices);
 
-        void checkForLevelObjectLayerCollisions(Component::CCollider& entityCollider, Component::CTile& entityTile,
-                Component::CTransform& entityTransform) const;
+        void checkForLevelObjectLayerCollisions(const Entity& entity,
+                Component::CCollider& entityCollider);
 
-        void checkForOtherCollidableEntities(std::vector<Entity>& entities, const Entity& entity,
-                Component::CCollider& entityCollider, Component::CTile& entityRectangleShape,
-                Component::CTransform& entityTransform) const;
+        void checkForOtherCollidableEntities(std::vector<Entity>& entities,
+                const Entity& entity,
+                Component::CCollider& entityCollider);
 
-        static void updateShapeVertexPositions(const Component::CTransform& entityTransform,
+        void updateShapeVertexPositions(const Component::CTransform& entityTransform,
                 Component::CTile& entityTile);
 
-        static void applyCollisionOverlapToEntityTransform(Component::CTransform& entityTransform,
+        void applyCollisionOverlapToEntityTransform(Component::CTransform& entityTransform,
                 sf::Vector3f manifoldDist, sf::Vector2f collisionOverlap);
 
-        static sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
+        sf::Vector3f getManifold(const sf::FloatRect& overlap, const sf::Vector2f& collisionNormal);
 
-        static void applyCollisionManifoldToTransform(Component::CTransform& cTransform,
+        void applyCollisionManifoldToTransform(Component::CTransform& cTransform,
                 const sf::FloatRect& overlap, const Crucible::Vec2& result);
 
     private:
+        GameEngine& m_gameEngine;
         EntityManager& m_entityManager;
 };
 

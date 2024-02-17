@@ -10,7 +10,7 @@ void EntitySpawner::createPlayer()
     auto e = m_entityManager.addEntity(Crucible::EntityType::PLAYER);
 
     Crucible::Vec2 playerDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
-    std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(2 * Crucible::TILE_SIZE, 3 * Crucible::TILE_SIZE);
+    std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(Crucible::PLAYER_SPAWN_LOCATIONS[0]);
 
     auto& playerTransform = e.addComponent<Component::CTransform>(position, playerDimensions);
 

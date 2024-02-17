@@ -91,6 +91,7 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
     if (controllable.isMovingLeft)
     {
         cTransform.position->x -= PLAYER_SPEED;
+        // TODO add other anims
         animation.animationList = {
                 TileType::PLAYER_WALK_LEFT_A, TileType::PLAYER_WALK_LEFT_B, TileType::PLAYER_WALK_LEFT_C,
                 TileType::PLAYER_WALK_LEFT_D, TileType::PLAYER_WALK_LEFT_E, TileType::PLAYER_WALK_LEFT_F
