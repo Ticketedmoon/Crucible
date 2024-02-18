@@ -1,7 +1,8 @@
 #include "render_system.h"
 
-GameplayRenderSystem::GameplayRenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager)
-    : m_renderTarget(renderTarget), m_entityManager(entityManager)
+GameplayRenderSystem::GameplayRenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager,
+        TextureManager& textureManager)
+    : m_renderTarget(renderTarget), m_entityManager(entityManager), m_textureManager(textureManager)
 {
     configureTextRendering();
 }
@@ -27,12 +28,19 @@ void GameplayRenderSystem::drawEntities()
             m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::TriangleFan, lightSrcRenderStates);
         }
 
-        if (e.hasComponent<Component::CTile>())
+        for (TileLayer layer : LevelManager::activeLevel.tileLayers)
         {
-            auto& cTile = e.getComponent<Component::CTile>();
-            sf::RenderStates renderStates{cTile.texture.get()};
-            m_renderTarget.draw(*cTile.tile.vertices, renderStates);
+            sf::Texture* pTexture = m_textureManager.getTexture(LevelManager::CATACOMB_TILESET_PATH).get();
+            sf::RenderStates renderStates{pTexture};
+            m_renderTarget.draw(layer.data, renderStates);
         }
+
+//        if (e.hasComponent<Component::CTile>())
+//        {
+//            auto& cTile = e.getComponent<Component::CTile>();
+//            sf::RenderStates renderStates{cTile.texture.get()};
+//            m_renderTarget.draw(*cTile.tile.vertices, renderStates);
+//        }
     }
 }
 

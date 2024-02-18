@@ -19,7 +19,8 @@
 class GameplayRenderSystem : public System
 {
     public:
-        explicit GameplayRenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager);
+        explicit GameplayRenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager,
+                TextureManager& textureManager);
 
         void execute() override;
 
@@ -31,9 +32,11 @@ class GameplayRenderSystem : public System
         void drawText(sf::Text& text, const sf::Color& fillColour, uint8_t characterSize, sf::Vector2f position);
 
     private:
+        static inline sf::Font m_font;
+
         sf::RenderTarget& m_renderTarget;
         EntityManager& m_entityManager;
-        static inline sf::Font m_font;
+        TextureManager& m_textureManager;
 };
 
 

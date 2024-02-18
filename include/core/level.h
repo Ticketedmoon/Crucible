@@ -34,7 +34,7 @@ struct Object
 
 struct TileLayer : Layer
 {
-    std::vector<Tile> data;
+    sf::VertexArray data;
 };
 
 struct ObjectLayer : Layer

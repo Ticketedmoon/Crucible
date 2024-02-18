@@ -7,9 +7,6 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     registerActions();
     registerSystems();
 
-    Level& level = m_levelManager.loadLevel();
-    createTilesForLevel(level);
-
     m_entitySpawner.createPlayer();
     m_entitySpawner.createGuard(LevelManager::COLLISION_LAYER_PLAYER_A, LevelManager::GUARD_PATHING_LAYER_A);
     //m_entitySpawner.createGuard(LevelManager::COLLISION_LAYER_PLAYER_B, LevelManager::GUARD_PATHING_LAYER_B);
@@ -70,26 +67,6 @@ void GameplayScene::performAction(Action& action)
     }
 }
 
-void GameplayScene::createTilesForLevel(Level& level)
-{
-    for (TileLayer layer : level.tileLayers)
-    {
-        for (int row = 0; row < level.height; row++)
-        {
-            for (int col = 0; col < level.width; col++)
-            {
-                int textureIndex = col + (row * level.width);
-                Tile t = layer.data.at(textureIndex);
-
-                t.position.x *= Crucible::TILE_SIZE;
-                t.position.y *= Crucible::TILE_SIZE;
-
-                m_entitySpawner.createTile(t, false, false);
-            }
-        }
-    }
-}
-
 void GameplayScene::registerActions()
 {
     // Escape
@@ -127,5 +104,6 @@ void GameplayScene::registerSystems()
 
     // Render
     m_systemManager.registerSystem(
-            std::make_shared<GameplayRenderSystem>(gameEngine.m_renderTexture, m_entityManager), SystemManager::SystemType::RENDER);
+            std::make_shared<GameplayRenderSystem>(gameEngine.m_renderTexture, m_entityManager, m_textureManager),
+                    SystemManager::SystemType::RENDER);
 }

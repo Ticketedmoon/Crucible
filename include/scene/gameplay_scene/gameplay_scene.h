@@ -36,8 +36,6 @@ class GameplayScene : public Scene
         void registerSystems();
         void registerActions();
 
-        void createTilesForLevel(Level& level);
-
     private:
         static const inline sf::Color LEVEL_BACKGROUND_COLOR = sf::Color{0, 32, 32};
 

@@ -20,8 +20,6 @@ class LevelManager
     public:
         explicit LevelManager(EntityManager& entityManager, TextureManager& textureManager);
 
-        Level& loadLevel();
-
     public:
         static inline const std::string PLAYER_SPRITE_SHEET_PATH = "resources/assets/texture/player_crucible_16x32_6pr.png";
         static inline const std::string CATACOMB_TILESET_PATH = "resources/maps/catacomb/mainlevbuild.png";
@@ -35,9 +33,10 @@ class LevelManager
         static inline Level activeLevel;
 
     private:
+        void loadLevel();
         Level loadMapData();
         void loadTexture(const std::string& tileSheetFilePath);
-        std::vector<Tile> createTilesForWorld(const Level& level, const nlohmann::json& data, size_t layerIdx);
+        sf::VertexArray createTilesForWorld(const Level& level, const nlohmann::json& data, const size_t layerIdx);
         static uint32_t getPositionForTile(const Level& level, uint32_t x, uint32_t y);
         size_t lookupTileTypeForObject(size_t layerIdx, size_t i, nlohmann::json& data) const;
 

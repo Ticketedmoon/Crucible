@@ -3,17 +3,16 @@
 LevelManager::LevelManager(EntityManager& entityManager, TextureManager& textureManager)
     : m_entityManager(entityManager), m_textureManager(textureManager)
 {
+    loadLevel();
 }
 
-Level& LevelManager::loadLevel()
+void LevelManager::loadLevel()
 {
-    // Level
-    activeLevel = loadMapData();
-
     loadTexture(PLAYER_SPRITE_SHEET_PATH);
     loadTexture(CATACOMB_TILESET_PATH);
 
-    return activeLevel;
+    // Level
+    activeLevel = loadMapData();
 }
 
 Level LevelManager::loadMapData()
@@ -119,14 +118,17 @@ size_t LevelManager::lookupTileTypeForObject(size_t layerIdx, size_t i, nlohmann
     }
 }
 
-std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nlohmann::json& data, const size_t layerIdx)
+sf::VertexArray LevelManager::createTilesForWorld(const Level& level, const nlohmann::json& data, const size_t layerIdx)
 {
-    std::vector<Tile> tiles;
+    sf::VertexArray vertexArrayForLayer(sf::Quads);
     std::vector<long> tileValues = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_DATA_KEY].get<std::vector<long>>();
 
+    // TODO make dynamic
     unsigned long mainTilesetFirstGid = data[LEVEL_FILE_TILESETS_KEY][0]["firstgid"].get<long>();
     unsigned long decorativeTilesetFirstGid = data[LEVEL_FILE_TILESETS_KEY][1]["firstgid"].get<long>();
     unsigned long torchTilesetFirstGid = data[LEVEL_FILE_TILESETS_KEY][2]["firstgid"].get<long>();
+
+    sf::Vector2u tileDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
 
     for (unsigned int y = 0; y < level.height; y++)
     {
@@ -147,22 +149,63 @@ std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nl
                     Crucible::FLIPPED_DIAGONALLY_FLAG |
                     Crucible::ROTATED_HEXAGONAL_120_FLAG);
 
-            TileRotation rotation = flippedHorizontally ? TileRotation::FLIPPED_HORIZONTALLY
-                    : flippedVertically ? TileRotation::FLIPPED_VERTICALLY
-                    : TileRotation::NONE;
-
             unsigned long localTileId = globalTileId >= torchTilesetFirstGid
-                    ? (globalTileId - torchTilesetFirstGid) + 1
+                    ? globalTileId - torchTilesetFirstGid
                     : globalTileId >= decorativeTilesetFirstGid
-                        ? (globalTileId - decorativeTilesetFirstGid) + 1
-                        : (globalTileId - mainTilesetFirstGid) + 1;
+                            ? globalTileId - decorativeTilesetFirstGid + 1
+                            : globalTileId - mainTilesetFirstGid;
 
-            sf::Vector2u pos{x, y};
-            Tile tile(pos, localTileId, rotation, {});
-            tiles.emplace_back(tile);
+            if (localTileId == 0)
+            {
+                continue;
+            }
+
+            sf::Vector2f pos{
+                static_cast<float>(x * Crucible::TILE_SIZE),
+                static_cast<float>(y * Crucible::TILE_SIZE)
+            };
+
+            sf::Vertex vertexA = sf::Vertex({pos.x, pos.y});
+            sf::Vertex vertexB = sf::Vertex({pos.x + tileDimensions.x, pos.y});
+            sf::Vertex vertexC = sf::Vertex({pos.x + tileDimensions.x, pos.y + tileDimensions.y});
+            sf::Vertex vertexD = sf::Vertex({pos.x, pos.y + tileDimensions.y});
+
+            std::shared_ptr<sf::Texture>& tileSheetTexture = m_textureManager.getTexture(CATACOMB_TILESET_PATH);
+            float tu = (localTileId % (tileSheetTexture->getSize().x / tileDimensions.x));
+            float tv = (localTileId / (tileSheetTexture->getSize().x /tileDimensions.y));
+
+            float tuPositionStart = tu * tileDimensions.x;
+            float tuPositionEnd = (tu + 1) * tileDimensions.x;
+            float tvPositionStart = tv * tileDimensions.y;
+            float tvPositionEnd = (tv + 1) * tileDimensions.y;
+
+            if (flippedHorizontally)
+            {
+                vertexA.texCoords = sf::Vector2f(tuPositionEnd, tvPositionStart);
+                vertexB.texCoords = sf::Vector2f(tuPositionStart, tvPositionStart);
+                vertexC.texCoords = sf::Vector2f(tuPositionStart, tvPositionEnd);
+                vertexD.texCoords = sf::Vector2f(tuPositionEnd, tvPositionEnd);
+            }
+            else if (flippedVertically)
+            {
+
+            }
+            else
+            {
+                vertexA.texCoords = {tuPositionStart, tvPositionStart};
+                vertexB.texCoords = {tuPositionEnd, tvPositionStart};
+                vertexC.texCoords = {tuPositionEnd, tvPositionEnd};
+                vertexD.texCoords = {tuPositionStart, tvPositionEnd};
+            }
+
+            vertexArrayForLayer.append(vertexA);
+            vertexArrayForLayer.append(vertexB);
+            vertexArrayForLayer.append(vertexC);
+            vertexArrayForLayer.append(vertexD);
         }
     }
-    return tiles;
+
+    return vertexArrayForLayer;
 }
 
 uint32_t LevelManager::getPositionForTile(const Level& level, uint32_t x, uint32_t y)
