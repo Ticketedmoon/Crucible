@@ -23,15 +23,14 @@ class LevelManager
         Level& loadLevel();
 
     public:
-        static inline const std::string PLAYER_SPRITE_SHEET_PATH = "resources/assets/texture/player_crucible_64x64_6pr.png";
-        static inline const std::string BASIC_TILE_SHEET_PATH = "resources/maps/basic_tileset.png";
-        static inline const std::string DUNGEON_TILE_SHEET_PATH = "resources/maps/dungeon_bricks_shadow_tileset.png";
-        static inline const std::string MAP_DATA_PATH = "resources/maps/level_one_map_dungeon_tileset.json";
+        static inline const std::string PLAYER_SPRITE_SHEET_PATH = "resources/assets/texture/player_crucible_16x32_6pr.png";
+        static inline const std::string CATACOMB_TILESET_PATH = "resources/maps/catacomb/mainlevbuild.png";
+        static inline const std::string MAP_DATA_PATH = "resources/maps/catacomb/catacombs.json";
 
-        static inline const std::string LIGHTING_OBJECT_LAYER_A_NAME = "lighting_object_layer_a";
-        static inline const std::string LIGHTING_OBJECT_LAYER_B_NAME = "lighting_object_layer_b";
-        static inline const std::string GUARD_PATHING_LAYER_A = "guard_pathing_layer_a";
-        static inline const std::string GUARD_PATHING_LAYER_B = "guard_pathing_layer_b";
+        static inline const std::string COLLISION_LAYER_PLAYER_A = "collision_layer_player_a";
+        static inline const std::string COLLISION_LAYER_PLAYER_B = "collision_layer_player_b";
+        static inline const std::string GUARD_PATHING_LAYER_A = "guard_pathing_layer_player_a";
+        static inline const std::string GUARD_PATHING_LAYER_B = "guard_pathing_layer_player_b";
 
         static inline Level activeLevel;
 
@@ -39,8 +38,8 @@ class LevelManager
         Level loadMapData();
         void loadTexture(const std::string& tileSheetFilePath);
         std::vector<Tile> createTilesForWorld(const Level& level, const nlohmann::json& data, size_t layerIdx);
-        uint32_t getPositionForTile(const Level& level, uint32_t x, uint32_t y);
-        TileType lookupTileTypeForObject(size_t layerIdx, size_t i, nlohmann::json& data) const;
+        static uint32_t getPositionForTile(const Level& level, uint32_t x, uint32_t y);
+        size_t lookupTileTypeForObject(size_t layerIdx, size_t i, nlohmann::json& data) const;
 
     private:
         const std::string LEVEL_FILE_LAYERS_KEY = "layers";
@@ -49,20 +48,7 @@ class LevelManager
         const std::string LEVEL_FILE_OBJECTS_KEY = "objects";
         const std::string LEVEL_FILE_DATA_KEY = "data";
 
-        static inline const std::unordered_map<std::string, TileType> TILE_TYPE_LOOKUP_TABLE = {
-                {"SPAWN_ZONE",                        TileType::SPAWN_ZONE},
-                {"END_ZONE",                          TileType::END_ZONE},
-                {"BACKGROUND_PURPLE_WALL",            TileType::BACKGROUND_PURPLE_WALL},
-                {"TOP_CORNER_WALL_BROKEN_PURPLE",     TileType::TOP_CORNER_WALL_BROKEN_PURPLE},
-                {"TOP_WALL_BROKEN_PURPLE",            TileType::TOP_WALL_BROKEN_PURPLE},
-                {"BORDER_WALL_BROKEN_PURPLE",         TileType::BORDER_WALL_BROKEN_PURPLE},
-                {"BOTTOM_CORNER_WALL_BROKEN_PURPLE",  TileType::BOTTOM_CORNER_WALL_BROKEN_PURPLE},
-                {"BOTTOM_WALL_BROKEN_PURPLE",         TileType::BOTTOM_WALL_BROKEN_PURPLE},
-                {"COLUMN_WALL_BROKEN_PURPLE",         TileType::COLUMN_WALL_BROKEN_PURPLE},
-                {"CENTRAL_WALL_SMALL_BROKEN_PURPLE",  TileType::CENTRAL_WALL_SMALL_BROKEN_PURPLE},
-                {"CENTRAL_WALL_MEDIUM_BROKEN_PURPLE", TileType::CENTRAL_WALL_MEDIUM_BROKEN_PURPLE},
-                {"CENTRAL_WALL_LARGE_BROKEN_PURPLE",  TileType::CENTRAL_WALL_LARGE_BROKEN_PURPLE},
-        };
+        static inline const std::unordered_map<std::string, size_t> TILE_TYPE_LOOKUP_TABLE;
 
         EntityManager& m_entityManager;
         TextureManager& m_textureManager;

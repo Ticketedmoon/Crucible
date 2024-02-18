@@ -24,7 +24,7 @@ typedef std::tuple<
         std::vector<Component::CAnimation>
 > EntityComponentVectorTuple;
 
-static size_t MAX_NUM_ENTITIES = 1000;
+static size_t MAX_NUM_ENTITIES = 100000;
 
 // forward declare
 class Entity;

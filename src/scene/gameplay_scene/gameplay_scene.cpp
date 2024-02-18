@@ -11,9 +11,8 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     createTilesForLevel(level);
 
     m_entitySpawner.createPlayer();
-
-    m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_A_NAME, LevelManager::GUARD_PATHING_LAYER_A);
-    m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_B_NAME, LevelManager::GUARD_PATHING_LAYER_B);
+    m_entitySpawner.createGuard(LevelManager::COLLISION_LAYER_PLAYER_A, LevelManager::GUARD_PATHING_LAYER_A);
+    //m_entitySpawner.createGuard(LevelManager::COLLISION_LAYER_PLAYER_B, LevelManager::GUARD_PATHING_LAYER_B);
 }
 
 void GameplayScene::update()
@@ -81,18 +80,11 @@ void GameplayScene::createTilesForLevel(Level& level)
             {
                 int textureIndex = col + (row * level.width);
                 Tile t = layer.data.at(textureIndex);
-                if (t.type == TileType::TRANSPARENT)
-                {
-                    continue;
-                }
 
                 t.position.x *= Crucible::TILE_SIZE;
                 t.position.y *= Crucible::TILE_SIZE;
 
-                bool isImmovable = t.type != TileType::BACKGROUND_PURPLE_WALL
-                        && t.type != TileType::SPAWN_ZONE
-                        && t.type != TileType::END_ZONE;
-                m_entitySpawner.createTile(t, false, isImmovable);
+                m_entitySpawner.createTile(t, false, false);
             }
         }
     }

@@ -36,7 +36,7 @@ void LightCollisionSystem::resolveLightCollisions(const Entity& entity)
         {
             auto& cTile = playerEntity.getComponent<Component::CTile>();
             std::vector<Object> playerObjects{
-                    {Crucible::EntityType::PLAYER, cTile.tile.type, cTile.tile.vertices}
+                    {Crucible::EntityType::PLAYER, cTile.tile.tileIdx, cTile.tile.vertices}
             };
 
             checkForLightIntersectWithObject(lightSource, playerObjects, ray, rayIndex);

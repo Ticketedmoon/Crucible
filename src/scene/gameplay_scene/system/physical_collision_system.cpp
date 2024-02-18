@@ -71,12 +71,12 @@ void PhysicalCollisionSystem::checkForOtherCollidableEntities(std::vector<Entity
 void PhysicalCollisionSystem::checkForLevelObjectLayerCollisions(const Entity& entity, Component::CCollider& entityCollider)
 {
     ObjectLayer lightingObjectLayerA
-        = LevelManager::activeLevel.layerNameToObjectLayer.at(LevelManager::LIGHTING_OBJECT_LAYER_A_NAME);
-    ObjectLayer lightingObjectLayerB
-            = LevelManager::activeLevel.layerNameToObjectLayer.at(LevelManager::LIGHTING_OBJECT_LAYER_B_NAME);
+        = LevelManager::activeLevel.layerNameToObjectLayer.at(LevelManager::COLLISION_LAYER_PLAYER_A);
+//    ObjectLayer lightingObjectLayerB
+//            = LevelManager::activeLevel.layerNameToObjectLayer.at(LevelManager::COLLISION_LAYER_PLAYER_B);
 
     resolvePhysicalCollisionsForObjectLayer(entityCollider, entity, lightingObjectLayerA);
-    resolvePhysicalCollisionsForObjectLayer(entityCollider, entity, lightingObjectLayerB);
+    //resolvePhysicalCollisionsForObjectLayer(entityCollider, entity, lightingObjectLayerB);
 }
 
 void PhysicalCollisionSystem::resolvePhysicalCollisionsForObjectLayer(Component::CCollider& entityCollider,
@@ -86,22 +86,6 @@ void PhysicalCollisionSystem::resolvePhysicalCollisionsForObjectLayer(Component:
     {
         // FIXME: Problem here, we need to separate out the different tile sheets to enum values.
         //        It is jarring for the different enum key to share the same values and causes some difficult-to-debug issues.
-        if (object.type == TileType::SPAWN_ZONE)
-        {
-            continue;
-        }
-
-        if (object.type == TileType::END_ZONE)
-        {
-            sf::FloatRect overlap;
-            Component::CTile& entityTile = entity.getComponent<Component::CTile>();
-            if (entity.hasComponent<Component::CControllable>() && isCollidingAABB(entityTile, object.objectVertices, overlap))
-            {
-                m_gameEngine.changeScene(Scene::Type::VICTORY_SCREEN, std::make_shared<VictoryScene>(m_gameEngine));
-            }
-
-            continue;
-        }
 
         const std::shared_ptr<sf::VertexArray>& vArr = object.objectVertices;
         sf::Vertex v = (*vArr)[0];

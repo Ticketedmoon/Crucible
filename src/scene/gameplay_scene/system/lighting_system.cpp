@@ -72,10 +72,10 @@ std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionP
                     [](const auto& intersect) {
                         return intersect.entityType != Crucible::EntityType::PLAYER;
                     });
-            collisionPoints.emplace_back(closestIntersectThatIsNotPlayer);
+            //collisionPoints.emplace_back(closestIntersectThatIsNotPlayer);
 
             // @Temporary
-            exit(0);
+            //exit(0);
         }
         else
         {

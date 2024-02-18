@@ -64,24 +64,26 @@ void AnimationSystem::updateTileTexture(
 
 int AnimationSystem::updateAnimation(Tile& tile, Component::CAnimation& animation)
 {
-    int tileTypeValue = static_cast<int>(tile.type) - 1;
-    if (!animation.animationList.empty() )
+    int tileTypeValue = static_cast<int>(tile.tileIdx) - 1;
+    if (animation.animationTileIdxList.empty())
     {
-        tileTypeValue = static_cast<int>(animation.animationList[animation.currentAnimationFrameIdx]) - 1;
+        return tileTypeValue;
+    }
 
-        double& spriteAnimationTime = animation.animationTicker.timeUntilUpdate;
-        double animationCompletionTime = animation.animationTicker.currentTime;
-        spriteAnimationTime += Crucible::DT;
+    tileTypeValue = static_cast<int>(animation.animationTileIdxList[animation.currentAnimationFrameIdx]) - 1;
 
-        if (spriteAnimationTime >= animationCompletionTime)
+    double& spriteAnimationTime = animation.animationTicker.timeUntilUpdate;
+    double animationCompletionTime = animation.animationTicker.currentTime;
+    spriteAnimationTime += Crucible::DT;
+
+    if (spriteAnimationTime >= animationCompletionTime)
+    {
+        animation.currentAnimationFrameIdx++;
+        if (animation.currentAnimationFrameIdx == animation.animationTileIdxList.size())
         {
-            animation.currentAnimationFrameIdx++;
-            if (animation.currentAnimationFrameIdx == animation.animationList.size())
-            {
-                animation.currentAnimationFrameIdx = 0;
-            }
-            spriteAnimationTime = 0;
+            animation.currentAnimationFrameIdx = 0;
         }
+        spriteAnimationTime = 0;
     }
     return tileTypeValue;
 }

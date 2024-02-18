@@ -10,21 +10,10 @@ Level& LevelManager::loadLevel()
     // Level
     activeLevel = loadMapData();
 
-    // Build player sprite sheet
     loadTexture(PLAYER_SPRITE_SHEET_PATH);
-
-    // Build Tile sheet
-    loadTexture(BASIC_TILE_SHEET_PATH);
-    loadTexture(DUNGEON_TILE_SHEET_PATH);
+    loadTexture(CATACOMB_TILESET_PATH);
 
     return activeLevel;
-}
-
-uint32_t LevelManager::getPositionForTile(const Level& level, uint32_t x, uint32_t y)
-{
-    uint32_t row = level.width * y;
-    uint32_t positionForTile = row + x;
-    return positionForTile;
 }
 
 Level LevelManager::loadMapData()
@@ -55,24 +44,38 @@ Level LevelManager::loadMapData()
             layer.name = data[LEVEL_FILE_LAYERS_KEY][layerIdx]["name"];
             layer.type = layerType;
 
-            for (size_t i = 0; i < data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY].size(); i++)
+            size_t totalObjectsForLayer = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY].size();
+            for (size_t i = 0; i < totalObjectsForLayer; i++)
             {
-                sf::FloatRect r;
-                r.left = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["x"];
-                r.top = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["y"];
-                r.width = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["width"];
-                r.height = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["height"];
+                const char *pointKey = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i].contains("polygon")
+                        ? "polygon"
+                        : "polyline";
 
-                std::shared_ptr<sf::VertexArray> verts = std::make_shared<sf::VertexArray>();
-                verts->append({{r.left, r.top}});
-                verts->append({{r.left + r.width, r.top}});
-                verts->append({{r.left + r.width, r.top + r.height}});
-                verts->append({{r.left, r.top + r.height}});
-                // TODO @investigate: currently this vert is required, but it may not be necessary
-                verts->append({{r.left, r.top}});
+                float parentX = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["x"];
+                float parentY = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["y"];
+                for (size_t j = 0; j < data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i][pointKey].size(); j++)
+                {
+                    sf::FloatRect r;
+                    float polygonPointX = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i][pointKey][j]["x"];
+                    float polygonPointY = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i][pointKey][j]["y"];
 
-                TileType tileType = lookupTileTypeForObject(layerIdx, i, data);
-                Object levelObject{Crucible::EntityType::TILE, tileType, verts};
+                    r.left = parentX + polygonPointX;
+                    r.top = parentY + polygonPointY;
+                    r.width = 0;
+                    r.height = 0;
+
+                    std::shared_ptr<sf::VertexArray> verts = std::make_shared<sf::VertexArray>();
+                    verts->append({{r.left, r.top}});
+                    verts->append({{r.left + r.width, r.top}});
+                    verts->append({{r.left + r.width, r.top + r.height}});
+                    verts->append({{r.left, r.top + r.height}});
+                    // TODO @investigate: currently this vert is required, but it may not be necessary
+                    verts->append({{r.left, r.top}});
+
+                    size_t tileTypeIdx = lookupTileTypeForObject(layerIdx, j, data);
+                    Object levelObject{Crucible::EntityType::TILE, tileTypeIdx, verts};
+                    level.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
+                }
 
                 if (data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i].contains("properties"))
                 {
@@ -81,17 +84,15 @@ Level LevelManager::loadMapData()
                     const std::string& type = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["properties"][0]["type"];
                     const std::string& value = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["properties"][0]["value"];
 
-                    if (levelObject.customProperties.contains(name))
+                    if (layer.customProperties.contains(name))
                     {
-                        levelObject.customProperties.at(name).emplace_back(name, type, value);
+                        layer.customProperties.at(name).emplace_back(name, type, value);
                     }
                     else
                     {
-                        levelObject.customProperties[name] = {{name, type, value}};
+                        layer.customProperties[name] = {{name, type, value}};
                     }
                 }
-
-                level.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
             }
         }
     }
@@ -99,24 +100,23 @@ Level LevelManager::loadMapData()
     return level;
 }
 
-TileType LevelManager::lookupTileTypeForObject(size_t layerIdx, size_t i, nlohmann::json& data) const
+size_t LevelManager::lookupTileTypeForObject(size_t layerIdx, size_t i, nlohmann::json& data) const
 {
-    TileType tileType{TileType::NONE};
-    if (data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i].contains("properties"))
+    if (!data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i].contains("properties"))
     {
-        std::vector<std::unordered_map<std::string, std::string>> properties =
-                data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["properties"];
+        return -1;
+    }
 
-        for (std::unordered_map<std::string, std::string> p: properties)
+    std::vector<std::unordered_map<std::string, std::string>> properties =
+            data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["properties"];
+
+    for (std::unordered_map<std::string, std::string> p: properties)
+    {
+        if (p["name"] == "type")
         {
-            if (p["name"] == "type")
-            {
-                tileType = TILE_TYPE_LOOKUP_TABLE.at(p["value"]);
-                break;
-            }
+            return TILE_TYPE_LOOKUP_TABLE.at(p["value"]);
         }
     }
-    return tileType;
 }
 
 std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nlohmann::json& data, const size_t layerIdx)
@@ -124,8 +124,9 @@ std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nl
     std::vector<Tile> tiles;
     std::vector<long> tileValues = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_DATA_KEY].get<std::vector<long>>();
 
-    unsigned long firstGidDungeonTileset = data[LEVEL_FILE_TILESETS_KEY][0]["firstgid"].get<long>();
-    unsigned long firstGidBasicTileset = data[LEVEL_FILE_TILESETS_KEY][1]["firstgid"].get<long>();
+    unsigned long mainTilesetFirstGid = data[LEVEL_FILE_TILESETS_KEY][0]["firstgid"].get<long>();
+    unsigned long decorativeTilesetFirstGid = data[LEVEL_FILE_TILESETS_KEY][1]["firstgid"].get<long>();
+    unsigned long torchTilesetFirstGid = data[LEVEL_FILE_TILESETS_KEY][2]["firstgid"].get<long>();
 
     for (unsigned int y = 0; y < level.height; y++)
     {
@@ -150,17 +151,25 @@ std::vector<Tile> LevelManager::createTilesForWorld(const Level& level, const nl
                     : flippedVertically ? TileRotation::FLIPPED_VERTICALLY
                     : TileRotation::NONE;
 
-            unsigned long localTileId = globalTileId >= firstGidBasicTileset
-                    ? (globalTileId - firstGidBasicTileset) + 1
-                    : (globalTileId - firstGidDungeonTileset) + 1;
+            unsigned long localTileId = globalTileId >= torchTilesetFirstGid
+                    ? (globalTileId - torchTilesetFirstGid) + 1
+                    : globalTileId >= decorativeTilesetFirstGid
+                        ? (globalTileId - decorativeTilesetFirstGid) + 1
+                        : (globalTileId - mainTilesetFirstGid) + 1;
 
-            auto tileType = static_cast<TileType>(localTileId);
             sf::Vector2u pos{x, y};
-            Tile tile(pos, tileType, rotation, {});
+            Tile tile(pos, localTileId, rotation, {});
             tiles.emplace_back(tile);
         }
     }
     return tiles;
+}
+
+uint32_t LevelManager::getPositionForTile(const Level& level, uint32_t x, uint32_t y)
+{
+    uint32_t row = level.width * y;
+    uint32_t positionForTile = row + x;
+    return positionForTile;
 }
 
 void LevelManager::loadTexture(const std::string& tileSheetFilePath)

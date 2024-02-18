@@ -22,7 +22,7 @@ void EntitySpawner::createPlayer()
 
     Tile playerTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
-            TileType::PLAYER_WALK_DOWN_A,
+            0,
             TileRotation::NONE,
             vertices);
 
@@ -40,13 +40,20 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     ObjectLayer pathingObjectLayer = LevelManager::activeLevel.layerNameToObjectLayer.at(pathingObjectLayerName);
 
     std::vector<Waypoint> path;
-    for (auto& guardPath : pathingObjectLayer.lightingObjectData)
+    for (size_t i = 0; i < pathingObjectLayer.lightingObjectData.size(); i++)
     {
+        Object& guardPath = pathingObjectLayer.lightingObjectData[i];
         sf::VertexArray& objectVertData = *guardPath.objectVertices;
         sf::Vertex v{objectVertData[0]};
 
-        uint32_t waitPeriodMs = guardPath.customProperties.contains("wait_period")
-                ? std::stoi(guardPath.customProperties.at("wait_period").at(0).value)
+        bool polygonPointAtIndexHasWaitPeriod =
+            pathingObjectLayer.customProperties.contains("point_idx") &&
+            std::stoi(pathingObjectLayer.customProperties.at("point_idx").at(0).value) == i
+                && pathingObjectLayer.customProperties.contains("wait_period") &&
+                std::stoi(pathingObjectLayer.customProperties.at("wait_period").at(0).value);
+
+        uint32_t waitPeriodMs = pathingObjectLayer.customProperties.contains("wait_period")
+                ? polygonPointAtIndexHasWaitPeriod
                 : 0;
         path.emplace_back(Waypoint({v.position.x, v.position.y}, waitPeriodMs));
     }
@@ -67,11 +74,11 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
 
     Tile guardTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
-            TileType::CENTRAL_WALL_LARGE_BROKEN_PURPLE,
+            0,
             TileRotation::NONE,
             vertices);
 
-    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::DUNGEON_TILE_SHEET_PATH);
+    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::CATACOMB_TILESET_PATH);
 
     std::vector<Crucible::Ray> rays = createRays(transform, lightingObjectLayerName);
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
@@ -79,7 +86,7 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects, lightingObjectLayerName);
     e.addComponent<Component::CTile>(guardTile, texture);
     e.addComponent<Component::CCollider>();
-    e.addComponent<Component::CAnimation>(LevelManager::DUNGEON_TILE_SHEET_PATH);
+    e.addComponent<Component::CAnimation>(LevelManager::CATACOMB_TILESET_PATH);
 
 }
 
@@ -100,27 +107,13 @@ void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
     vertices.append(sf::Vertex({position.x, position.y}));
     vertices.append(sf::Vertex({position.x + tileDimensions.x, position.y}));
     vertices.append(sf::Vertex({position.x + tileDimensions.x, position.y + tileDimensions.y}));
-    vertices.append(sf::Vertex({position.x, position.y + Crucible::TILE_SIZE}));
+    vertices.append(sf::Vertex({position.x, position.y + tileDimensions.y}));
 
-//    if (t.type == TileType::ARROW_BLOCK)
-//    {
-//        LevelManager::activeLevel.layerNameToObjectLayer[0].tileObjectVertices.emplace_back(vertices);
-//    }
-
-    std::shared_ptr<sf::Texture> texture;
+    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::CATACOMB_TILESET_PATH);
     t.vertices = std::make_shared<sf::VertexArray>(vertices);
 
-    if (t.type == TileType::SPAWN_ZONE || t.type == TileType::END_ZONE)
-    {
-        texture = m_textureManager.getTexture(LevelManager::BASIC_TILE_SHEET_PATH);
-        e.addComponent<Component::CAnimation>(LevelManager::BASIC_TILE_SHEET_PATH);
-    }
-    else
-    {
-        texture = m_textureManager.getTexture(LevelManager::DUNGEON_TILE_SHEET_PATH);
-        e.addComponent<Component::CAnimation>(LevelManager::DUNGEON_TILE_SHEET_PATH);
-    }
     e.addComponent<Component::CTile>(t, texture);
+    e.addComponent<Component::CAnimation>(LevelManager::CATACOMB_TILESET_PATH);
 }
 
 std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& playerTransform, const std::string& layerName)
