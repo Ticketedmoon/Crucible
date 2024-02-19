@@ -34,7 +34,7 @@ struct Object
 
 struct TileLayer : Layer
 {
-    sf::VertexArray data;
+    std::unordered_map<std::string, sf::VertexArray> tilesetPathToLevelData;
 };
 
 struct ObjectLayer : Layer

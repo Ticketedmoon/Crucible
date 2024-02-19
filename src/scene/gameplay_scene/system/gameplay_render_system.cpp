@@ -30,9 +30,10 @@ void GameplayRenderSystem::drawEntities()
 
         for (TileLayer layer : LevelManager::activeLevel.tileLayers)
         {
-            sf::Texture* pTexture = m_textureManager.getTexture(LevelManager::CATACOMB_TILESET_PATH).get();
-            sf::RenderStates renderStates{pTexture};
-            m_renderTarget.draw(layer.data, renderStates);
+            for (const auto& entry : layer.tilesetPathToLevelData)
+            {
+                m_renderTarget.draw(entry.second, sf::RenderStates(m_textureManager.getTexture(entry.first).get()));
+            }
         }
 
 //        if (e.hasComponent<Component::CTile>())

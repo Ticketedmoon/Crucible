@@ -3,13 +3,10 @@
 LevelManager::LevelManager(EntityManager& entityManager, TextureManager& textureManager)
     : m_entityManager(entityManager), m_textureManager(textureManager)
 {
-    loadLevel();
-}
-
-void LevelManager::loadLevel()
-{
     loadTexture(PLAYER_SPRITE_SHEET_PATH);
-    loadTexture(CATACOMB_TILESET_PATH);
+    loadTexture(CATACOMB_MAIN_TILESET_PATH);
+    loadTexture(CATACOMB_DECORATIVE_TILESET_PATH);
+    loadTexture(CATACOMB_TORCH_TILESET_PATH);
 
     // Level
     activeLevel = loadMapData();
@@ -33,7 +30,7 @@ Level LevelManager::loadMapData()
             TileLayer layer;
             layer.name = data[LEVEL_FILE_LAYERS_KEY][layerIdx]["name"];
             layer.type = layerType;
-            layer.data = createTilesForWorld(level, data, layerIdx);
+            layer.tilesetPathToLevelData = createTilesForWorld(level, data, layerIdx);
             level.tileLayers.emplace_back(layer);
         }
 
@@ -118,9 +115,16 @@ size_t LevelManager::lookupTileTypeForObject(size_t layerIdx, size_t i, nlohmann
     }
 }
 
-sf::VertexArray LevelManager::createTilesForWorld(const Level& level, const nlohmann::json& data, const size_t layerIdx)
+std::unordered_map<std::string, sf::VertexArray> LevelManager::createTilesForWorld(
+        const Level& level,
+        const nlohmann::json& data,
+        const size_t layerIdx)
 {
-    sf::VertexArray vertexArrayForLayer(sf::Quads);
+    std::unordered_map<std::string, sf::VertexArray> tilesetPathToVertexArrayForLayer{
+            {CATACOMB_MAIN_TILESET_PATH, sf::VertexArray(sf::Quads)},
+            {CATACOMB_DECORATIVE_TILESET_PATH, sf::VertexArray(sf::Quads)},
+            {CATACOMB_TORCH_TILESET_PATH, sf::VertexArray(sf::Quads)}
+    };
     std::vector<long> tileValues = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_DATA_KEY].get<std::vector<long>>();
 
     // TODO make dynamic
@@ -152,13 +156,8 @@ sf::VertexArray LevelManager::createTilesForWorld(const Level& level, const nloh
             unsigned long localTileId = globalTileId >= torchTilesetFirstGid
                     ? globalTileId - torchTilesetFirstGid
                     : globalTileId >= decorativeTilesetFirstGid
-                            ? globalTileId - decorativeTilesetFirstGid + 1
+                            ? globalTileId - decorativeTilesetFirstGid
                             : globalTileId - mainTilesetFirstGid;
-
-            if (localTileId == 0)
-            {
-                continue;
-            }
 
             sf::Vector2f pos{
                 static_cast<float>(x * Crucible::TILE_SIZE),
@@ -170,7 +169,13 @@ sf::VertexArray LevelManager::createTilesForWorld(const Level& level, const nloh
             sf::Vertex vertexC = sf::Vertex({pos.x + tileDimensions.x, pos.y + tileDimensions.y});
             sf::Vertex vertexD = sf::Vertex({pos.x, pos.y + tileDimensions.y});
 
-            std::shared_ptr<sf::Texture>& tileSheetTexture = m_textureManager.getTexture(CATACOMB_TILESET_PATH);
+            const std::string& texturePath = globalTileId >= torchTilesetFirstGid
+                    ? CATACOMB_TORCH_TILESET_PATH
+                    : globalTileId >= decorativeTilesetFirstGid
+                            ? CATACOMB_DECORATIVE_TILESET_PATH
+                            : CATACOMB_MAIN_TILESET_PATH;
+
+            std::shared_ptr<sf::Texture>& tileSheetTexture = m_textureManager.getTexture(texturePath);
             float tu = (localTileId % (tileSheetTexture->getSize().x / tileDimensions.x));
             float tv = (localTileId / (tileSheetTexture->getSize().x /tileDimensions.y));
 
@@ -198,14 +203,14 @@ sf::VertexArray LevelManager::createTilesForWorld(const Level& level, const nloh
                 vertexD.texCoords = {tuPositionStart, tvPositionEnd};
             }
 
-            vertexArrayForLayer.append(vertexA);
-            vertexArrayForLayer.append(vertexB);
-            vertexArrayForLayer.append(vertexC);
-            vertexArrayForLayer.append(vertexD);
+            tilesetPathToVertexArrayForLayer.at(texturePath).append(vertexA);
+            tilesetPathToVertexArrayForLayer.at(texturePath).append(vertexB);
+            tilesetPathToVertexArrayForLayer.at(texturePath).append(vertexC);
+            tilesetPathToVertexArrayForLayer.at(texturePath).append(vertexD);
         }
     }
 
-    return vertexArrayForLayer;
+    return tilesetPathToVertexArrayForLayer;
 }
 
 uint32_t LevelManager::getPositionForTile(const Level& level, uint32_t x, uint32_t y)
