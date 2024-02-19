@@ -1,4 +1,5 @@
 #include "render_system.h"
+#include "view_manager.h"
 
 GameplayRenderSystem::GameplayRenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager,
         TextureManager& textureManager)
@@ -9,9 +10,20 @@ GameplayRenderSystem::GameplayRenderSystem(sf::RenderTarget& renderTarget, Entit
 
 void GameplayRenderSystem::execute()
 {
+    centreViewOnPlayer();
     drawMap();
     drawEntities();
     drawGuiData();
+}
+
+void GameplayRenderSystem::centreViewOnPlayer()
+{
+    std::vector<Entity>& players = m_entityManager.getEntitiesByEntityType(Crucible::EntityType::PLAYER);
+    if (!players.empty())
+    {
+        m_renderTarget.setView(m_renderTarget.getDefaultView());
+        ViewManager::centerViewOnEntity(m_renderTarget, players.at(0));
+    }
 }
 
 void GameplayRenderSystem::drawMap()
@@ -27,7 +39,6 @@ void GameplayRenderSystem::drawMap()
 
 void GameplayRenderSystem::drawEntities()
 {
-
     std::vector<Entity> entities = m_entityManager.getEntities();
 
     const sf::RenderStates lightSrcRenderStates{sf::BlendMultiply};

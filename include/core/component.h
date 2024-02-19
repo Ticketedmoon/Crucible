@@ -29,6 +29,7 @@ namespace Component
 {
     struct CTransform
     {
+        // TODO investigate if this needs to be a shared_ptr
         std::shared_ptr<Crucible::Vec2> position;
         Crucible::Vec2 dimensions;
 

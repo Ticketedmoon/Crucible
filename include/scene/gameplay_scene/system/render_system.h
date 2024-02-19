@@ -25,6 +25,7 @@ class GameplayRenderSystem : public System
         void execute() override;
 
     private:
+        void centreViewOnPlayer();
         void drawMap();
         void drawEntities();
         void drawGuiData();

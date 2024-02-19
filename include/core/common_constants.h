@@ -25,6 +25,8 @@ namespace Crucible
             {2 * Crucible::TILE_SIZE, 8 * Crucible::TILE_SIZE}
     };
 
+    static const inline uint8_t TOTAL_ENTITY_TYPES = 4;
+
     enum class EntityType
     {
         PLAYER,

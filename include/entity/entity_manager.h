@@ -3,7 +3,6 @@
 #ifndef CRUCIBLE_ENTITY_MANAGER_H
 #define CRUCIBLE_ENTITY_MANAGER_H
 
-
 #include <cstddef>
 #include <vector>
 #include <unordered_map>
@@ -11,9 +10,13 @@
 #include <cassert>
 #include "entity.h"
 
+const uint8_t TOTAL_ENTITY_TYPES = 100;
+
 class EntityManager
 {
     public:
+        EntityManager();
+
         void update();
         Entity addEntity(Crucible::EntityType type);
         std::vector<Entity> getEntities();
@@ -28,22 +31,6 @@ class EntityManager
                     });
             return std::vector(filteredEntities.begin(), filteredEntities.end());
         };
-
-        // TODO is this needed?
-        template<typename T>
-        std::vector<T> getActiveComponentGroupForEntities()
-        {
-            std::vector<T> activeComponents;
-            std::vector<T> componentGroup = EntityMemoryPool::instance().getComponents<T>();
-            for (T component : componentGroup)
-            {
-                if (component.has)
-                {
-                    activeComponents.emplace_back(component);
-                }
-            }
-            return activeComponents;
-        }
 
     private:
         std::vector<Entity> m_entities;
