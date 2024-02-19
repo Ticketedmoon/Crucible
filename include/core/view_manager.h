@@ -18,7 +18,8 @@ class ViewManager
         static sf::View centerViewOnEntity(sf::RenderTarget& renderTarget, const Entity& entity);
         static std::unordered_map<std::string, sf::VertexArray> getTileVerticesInView(
                 const sf::RenderTarget& target,
-                const TileLayer& tileLayer);
+                const TileLayer& tileLayer,
+                const std::vector<TileSet>& tileSets);
 
     private:
         ViewManager();
@@ -27,7 +28,7 @@ class ViewManager
 
     private:
         static const uint32_t TOTAL_TILES_VISIBLE_X = std::ceil(Crucible::WINDOW_WIDTH / Crucible::TILE_SIZE / 1);
-        static const uint32_t TOTAL_TILES_VISIBLE_Y = std::ceil(Crucible::WINDOW_HEIGHT / Crucible::TILE_SIZE / 1);
+        static const uint32_t TOTAL_TILES_VISIBLE_Y = std::ceil(Crucible::WINDOW_HEIGHT / Crucible::TILE_SIZE / 4);
 };
 
 #endif //CRUCIBLE_VIEW_MANAGER_H

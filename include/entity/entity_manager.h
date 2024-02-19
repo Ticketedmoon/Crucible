@@ -10,7 +10,7 @@
 #include <cassert>
 #include "entity.h"
 
-const uint8_t TOTAL_ENTITY_TYPES = 100;
+static const uint8_t TOTAL_ENTITY_TYPES = 100;
 
 class EntityManager
 {

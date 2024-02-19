@@ -42,6 +42,17 @@ struct ObjectLayer : Layer
     std::unordered_map<std::string, std::vector<CustomProperty>> customProperties;
 };
 
+struct TileSet
+{
+    const size_t firstgid;
+    const std::string name;
+    const std::string path;
+    const size_t tileCount;
+    const size_t tileWidth;
+    const size_t tileHeight;
+    const size_t columns;
+};
+
 class Level
 {
     public:
@@ -49,7 +60,7 @@ class Level
         uint8_t height;
         std::vector<TileLayer> tileLayers;
         std::unordered_map<std::string, ObjectLayer> layerNameToObjectLayer;
-        std::vector<std::string> orderedTileSetPathList;
+        std::vector<TileSet> tileSets;
 };
 
 

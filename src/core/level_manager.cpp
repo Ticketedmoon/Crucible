@@ -17,9 +17,9 @@ LevelManager::LevelManager(EntityManager& entityManager, TextureManager& texture
 void LevelManager::loadTexturesForLevel()
 {
     loadTexture(PLAYER_SPRITE_SHEET_PATH);
-    for (const std::string& tilesetPath : activeLevel.orderedTileSetPathList)
+    for (const TileSet& tileSet : activeLevel.tileSets)
     {
-        loadTexture(tilesetPath);
+        loadTexture(tileSet.path);
     }
 }
 
@@ -27,8 +27,16 @@ void LevelManager::loadTileSets(nlohmann::json data)
 {
     for (size_t tilesetIdx = 0; tilesetIdx < data[LEVEL_FILE_TILESETS_KEY].size(); tilesetIdx++)
     {
-        std::string tilesetPath = TILESET_ROOT_PATH + data[LEVEL_FILE_TILESETS_KEY][tilesetIdx]["image"].get<std::string>();
-        activeLevel.orderedTileSetPathList.emplace_back(tilesetPath);
+        TileSet tileset{
+                data[LEVEL_FILE_TILESETS_KEY][tilesetIdx]["firstgid"].get<size_t>(),
+                data[LEVEL_FILE_TILESETS_KEY][tilesetIdx]["name"].get<std::string>(),
+                TILESET_ROOT_PATH + data[LEVEL_FILE_TILESETS_KEY][tilesetIdx]["image"].get<std::string>(),
+                data[LEVEL_FILE_TILESETS_KEY][tilesetIdx]["tilecount"].get<size_t>(),
+                data[LEVEL_FILE_TILESETS_KEY][tilesetIdx]["tilewidth"].get<size_t>(),
+                data[LEVEL_FILE_TILESETS_KEY][tilesetIdx]["tileheight"].get<size_t>(),
+                data[LEVEL_FILE_TILESETS_KEY][tilesetIdx]["columns"].get<size_t>()
+        };
+        activeLevel.tileSets.emplace_back(tileset);
     }
 }
 
@@ -125,11 +133,10 @@ std::unordered_map<std::string, sf::VertexArray> LevelManager::createTilesForWor
 {
     std::unordered_map<std::string, unsigned long> tilesetPathToFirstGids;
     std::unordered_map<std::string, sf::VertexArray> tilesetPathToVertexArrayForLayer;
-    for (size_t i = 0; i < activeLevel.orderedTileSetPathList.size(); i++)
+    for (const TileSet& tileSet : activeLevel.tileSets)
     {
-        const std::string& tilesetPath = activeLevel.orderedTileSetPathList.at(i);
-        tilesetPathToVertexArrayForLayer.insert({tilesetPath, sf::VertexArray(sf::Quads)});
-        tilesetPathToFirstGids.insert({tilesetPath, data[LEVEL_FILE_TILESETS_KEY][i]["firstgid"].get<long>()});
+        tilesetPathToVertexArrayForLayer.insert({tileSet.path, sf::VertexArray(sf::Quads)});
+        tilesetPathToFirstGids.insert({tileSet.path, tileSet.firstgid});
     }
 
     sf::Vector2u tileDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
@@ -160,7 +167,7 @@ std::unordered_map<std::string, sf::VertexArray> LevelManager::createTilesForWor
                     Crucible::ROTATED_HEXAGONAL_120_FLAG);
 
             std::pair<std::string, unsigned long> tilePathToLocalTileIdPair
-                = findLocalTilesetId(activeLevel.orderedTileSetPathList, tilesetPathToFirstGids, globalTileId);
+                = findLocalTilesetId(activeLevel.tileSets, tilesetPathToFirstGids, globalTileId);
 
             sf::Vector2f pos{
                 static_cast<float>(x * Crucible::TILE_SIZE),
@@ -172,48 +179,9 @@ std::unordered_map<std::string, sf::VertexArray> LevelManager::createTilesForWor
             sf::Vertex vertexC = sf::Vertex({pos.x + tileDimensions.x, pos.y + tileDimensions.y});
             sf::Vertex vertexD = sf::Vertex({pos.x, pos.y + tileDimensions.y});
 
-            std::shared_ptr<sf::Texture>& tileSheetTexture = m_textureManager.getTexture(tilePathToLocalTileIdPair.first);
-            float tu = (tilePathToLocalTileIdPair.second % (tileSheetTexture->getSize().x / tileDimensions.x));
-            float tv = (tilePathToLocalTileIdPair.second / (tileSheetTexture->getSize().x /tileDimensions.y));
-
-            float tuPositionStart = tu * tileDimensions.x;
-            float tuPositionEnd = (tu + 1) * tileDimensions.x;
-            float tvPositionStart = tv * tileDimensions.y;
-            float tvPositionEnd = (tv + 1) * tileDimensions.y;
-
-            if (rotatedLeft)
-            {
-                vertexA.texCoords = {tuPositionEnd, tvPositionStart};
-                vertexB.texCoords = {tuPositionEnd, tvPositionEnd};
-                vertexC.texCoords = {tuPositionStart, tvPositionEnd};
-                vertexD.texCoords = {tuPositionStart, tvPositionStart};
-            }
-            else if (rotatedRight)
-            {
-
-            }
-            else if (rotatedTop)
-            {
-
-            }
-            else if (flippedHorizontally)
-            {
-                vertexA.texCoords = {tuPositionEnd, tvPositionStart};
-                vertexB.texCoords = {tuPositionStart, tvPositionStart};
-                vertexC.texCoords = {tuPositionStart, tvPositionEnd};
-                vertexD.texCoords = {tuPositionEnd, tvPositionEnd};
-            }
-            else if (flippedVertically)
-            {
-
-            }
-            else
-            {
-                vertexA.texCoords = {tuPositionStart, tvPositionStart};
-                vertexB.texCoords = {tuPositionEnd, tvPositionStart};
-                vertexC.texCoords = {tuPositionEnd, tvPositionEnd};
-                vertexD.texCoords = {tuPositionStart, tvPositionEnd};
-            }
+            setTextureCoordinatesForQuad(tileDimensions, flippedHorizontally, flippedVertically, rotatedLeft,
+                    rotatedRight, rotatedTop,
+                    tilePathToLocalTileIdPair, vertexA, vertexB, vertexC, vertexD);
 
             tilesetPathToVertexArrayForLayer.at(tilePathToLocalTileIdPair.first).append(vertexA);
             tilesetPathToVertexArrayForLayer.at(tilePathToLocalTileIdPair.first).append(vertexB);
@@ -224,13 +192,64 @@ std::unordered_map<std::string, sf::VertexArray> LevelManager::createTilesForWor
 
     return tilesetPathToVertexArrayForLayer;
 }
-
-std::pair<std::string, unsigned long> LevelManager::findLocalTilesetId(const std::vector<std::string>& orderedTileSets,
-        std::unordered_map<std::string, unsigned long>& tilesetPathToFirstGids, unsigned long globalTileId)
+void LevelManager::setTextureCoordinatesForQuad(const sf::Vector2u& tileDimensions, bool flippedHorizontally,
+        bool flippedVertically, bool rotatedLeft, bool rotatedRight, bool rotatedTop,
+        const std::pair<std::string, unsigned long>& tilePathToLocalTileIdPair, sf::Vertex& vertexA,
+        sf::Vertex& vertexB, sf::Vertex& vertexC, sf::Vertex& vertexD)
 {
-    for (size_t i = orderedTileSets.size(); i > 0; i--)
+    std::shared_ptr<sf::Texture>& tileSheetTexture = m_textureManager.getTexture(tilePathToLocalTileIdPair.first);
+    float tu = (tilePathToLocalTileIdPair.second % (tileSheetTexture->getSize().x / tileDimensions.x));
+    float tv = (tilePathToLocalTileIdPair.second / (tileSheetTexture->getSize().x /tileDimensions.y));
+
+    float tuPositionStart = tu * tileDimensions.x;
+    float tuPositionEnd = (tu + 1) * tileDimensions.x;
+    float tvPositionStart = tv * tileDimensions.y;
+    float tvPositionEnd = (tv + 1) * tileDimensions.y;
+
+    if (rotatedLeft)
     {
-        const std::string& tileSetPath = orderedTileSets.at(i-1);
+        vertexA.texCoords = {tuPositionEnd, tvPositionStart};
+        vertexB.texCoords = {tuPositionEnd, tvPositionEnd};
+        vertexC.texCoords = {tuPositionStart, tvPositionEnd};
+        vertexD.texCoords = {tuPositionStart, tvPositionStart};
+    }
+    else if (rotatedRight)
+    {
+
+    }
+    else if (rotatedTop)
+    {
+
+    }
+    else if (flippedHorizontally)
+    {
+        vertexA.texCoords = {tuPositionEnd, tvPositionStart};
+        vertexB.texCoords = {tuPositionStart, tvPositionStart};
+        vertexC.texCoords = {tuPositionStart, tvPositionEnd};
+        vertexD.texCoords = {tuPositionEnd, tvPositionEnd};
+    }
+    else if (flippedVertically)
+    {
+
+    }
+    else
+    {
+        vertexA.texCoords = {tuPositionStart, tvPositionStart};
+        vertexB.texCoords = {tuPositionEnd, tvPositionStart};
+        vertexC.texCoords = {tuPositionEnd, tvPositionEnd};
+        vertexD.texCoords = {tuPositionStart, tvPositionEnd};
+    }
+}
+
+std::pair<std::string, unsigned long> LevelManager::findLocalTilesetId(
+        const std::vector<TileSet>& tileSets,
+        std::unordered_map<std::string,
+        unsigned long>& tilesetPathToFirstGids,
+        unsigned long globalTileId)
+{
+    for (size_t i = tileSets.size(); i > 0; i--)
+    {
+        const std::string& tileSetPath = tileSets.at(i-1).path;
         long layerGid = tilesetPathToFirstGids.at(tileSetPath);
         if (globalTileId >= layerGid - 1)
         {

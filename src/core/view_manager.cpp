@@ -29,12 +29,18 @@ float ViewManager::getViewCentreForCoordinate(const float playerCoordinatePositi
            : windowDimensionValue - (windowDimensionValue / 3);
 }
 
-std::unordered_map<std::string, sf::VertexArray> ViewManager::getTileVerticesInView(const sf::RenderTarget& target, const TileLayer& tileLayer)
+std::unordered_map<std::string, sf::VertexArray> ViewManager::getTileVerticesInView(
+        const sf::RenderTarget& target,
+        const TileLayer& tileLayer,
+        const std::vector<TileSet>& tileSets)
 {
     std::unordered_map<std::string, sf::VertexArray> tileVerticesInViewPerTileset;
-    for (const auto& entry : tileLayer.tilesetPathToLevelData)
+    
+    for (const TileSet& tileSet : tileSets)
     {
-        tileVerticesInViewPerTileset.insert({entry.first, sf::VertexArray(sf::Quads, 0)});
+        sf::VertexArray vArr = sf::VertexArray(sf::Quads);
+        //vArr.resize(4 * tileSet.tileCount * tileSet.columns);
+        tileVerticesInViewPerTileset.insert({tileSet.path, vArr});
     }
 
     sf::Vector2f viewCentre = target.getView().getCenter();
@@ -44,9 +50,9 @@ std::unordered_map<std::string, sf::VertexArray> ViewManager::getTileVerticesInV
     float minOffsetY = viewCentre.y - (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_Y);
     float maxOffsetY = viewCentre.y + (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_Y);
 
-    for (const auto& entry: tileLayer.tilesetPathToLevelData)
+    for (const TileSet& tileSet : tileSets)
     {
-        const sf::VertexArray& tileSetVertexArray = entry.second;
+        const sf::VertexArray& tileSetVertexArray = tileLayer.tilesetPathToLevelData.at(tileSet.path);
         for (size_t i = 0; i < tileSetVertexArray.getVertexCount(); i++)
         {
             sf::Vertex vertex = tileSetVertexArray.operator[](i);
@@ -56,7 +62,7 @@ std::unordered_map<std::string, sf::VertexArray> ViewManager::getTileVerticesInV
 
             if (vertexInViewOnX && vertexInViewOnY)
             {
-                tileVerticesInViewPerTileset.at(entry.first).append(vertex);
+                tileVerticesInViewPerTileset.at(tileSet.path).append(vertex);
             }
         }
     }

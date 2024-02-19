@@ -33,11 +33,12 @@ void GameplayRenderSystem::drawMap()
 {
     for (const TileLayer& layer : LevelManager::activeLevel.tileLayers)
     {
-        for (const auto& entry : ViewManager::getTileVerticesInView(m_renderTarget, layer))
+        const std::unordered_map<std::string, sf::VertexArray>& verticesInViewPerTileset
+            = ViewManager::getTileVerticesInView(m_renderTarget, layer, LevelManager::activeLevel.tileSets);
+        for (const TileSet& tileSet: LevelManager::activeLevel.tileSets)
         {
-            size_t originalVertexCount = layer.tilesetPathToLevelData.at(entry.first).getVertexCount();
-            size_t newVertexCount = entry.second.getVertexCount();
-            m_renderTarget.draw(entry.second, sf::RenderStates(m_textureManager.getTexture(entry.first).get()));
+            const sf::RenderStates& renderStates = sf::RenderStates(m_textureManager.getTexture(tileSet.path).get());
+            m_renderTarget.draw(verticesInViewPerTileset.at(tileSet.path), renderStates);
         }
     }
 }

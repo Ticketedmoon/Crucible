@@ -76,7 +76,7 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
             TileRotation::NONE,
             vertices);
 
-    std::basic_string<char>& mainTilesetPath = LevelManager::activeLevel.orderedTileSetPathList[0];
+    const std::string& mainTilesetPath = LevelManager::activeLevel.tileSets[0].path;
     std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(mainTilesetPath);
 
     std::vector<Crucible::Ray> rays = createRays(transform, lightingObjectLayerName);

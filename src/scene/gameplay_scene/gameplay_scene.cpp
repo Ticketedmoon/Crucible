@@ -8,7 +8,7 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     registerSystems();
 
     m_entitySpawner.createPlayer();
-    m_entitySpawner.createGuard(LevelManager::COLLISION_LAYER_PLAYER_A, LevelManager::GUARD_PATHING_LAYER_A);
+    //m_entitySpawner.createGuard(LevelManager::COLLISION_LAYER_PLAYER_A, LevelManager::GUARD_PATHING_LAYER_A);
     //m_entitySpawner.createGuard(LevelManager::COLLISION_LAYER_PLAYER_B, LevelManager::GUARD_PATHING_LAYER_B);
 }
 

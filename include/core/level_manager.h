@@ -24,6 +24,7 @@ class LevelManager
         static inline const std::string PLAYER_SPRITE_SHEET_PATH = "resources/assets/texture/player_crucible_16x32_6pr.png";
         static inline const std::string TILESET_ROOT_PATH = "resources/maps/catacomb/";
 
+        // Can this be acquired programmatically like the tilesets?
         static inline const std::string MAP_DATA_PATH = "resources/maps/catacomb/catacombs.json";
 
         static inline const std::string COLLISION_LAYER_PLAYER_A = "collision_layer_player_a";
@@ -49,19 +50,22 @@ class LevelManager
         static uint32_t getPositionForTile(uint32_t x, uint32_t y);
 
         static std::pair<std::string, unsigned long> findLocalTilesetId(
-                const std::vector<std::string>& orderedTileSets,
+                const std::vector<TileSet>& orderedTileSets,
                 std::unordered_map<std::string,
                 unsigned long>& tilesetPathToFirstGids,
                 unsigned long globalTileId);
 
+        void setTextureCoordinatesForQuad(const sf::Vector2u& tileDimensions, bool flippedHorizontally,
+                bool flippedVertically,
+                bool rotatedLeft, bool rotatedRight, bool rotatedTop,
+                const std::pair<std::string, unsigned long>& tilePathToLocalTileIdPair, sf::Vertex& vertexA,
+                sf::Vertex& vertexB, sf::Vertex& vertexC, sf::Vertex& vertexD);
+
     private:
         const std::string LEVEL_FILE_LAYERS_KEY = "layers";
         const std::string LEVEL_FILE_TILESETS_KEY = "tilesets";
-        const std::string LEVEL_FILE_TILES_KEY = "tiles";
         const std::string LEVEL_FILE_OBJECTS_KEY = "objects";
         const std::string LEVEL_FILE_DATA_KEY = "data";
-
-        static inline const std::unordered_map<std::string, size_t> TILE_TYPE_LOOKUP_TABLE;
 
         EntityManager& m_entityManager;
         TextureManager& m_textureManager;
