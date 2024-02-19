@@ -14,7 +14,6 @@ void TextureManager::addTexture(const std::string& filePath) {
         std::string msg = "Unable to open texture '" + filePath + "'\n";
         throw std::runtime_error(msg);
     }
-    texture->setSmooth(true);
 
     textureMap_.emplace(filePath, texture);
     std::cout << "Texture with path: [" << filePath << "] has been added, size: [" << texture->getSize().x << ", "
