@@ -9,7 +9,7 @@ void EntitySpawner::createPlayer()
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::PLAYER);
 
-    Crucible::Vec2 playerDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
+    Crucible::Vec2 playerDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE * 2};
     std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(Crucible::PLAYER_SPAWN_LOCATIONS[0]);
 
     auto& playerTransform = e.addComponent<Component::CTransform>(position, playerDimensions);
@@ -22,7 +22,6 @@ void EntitySpawner::createPlayer()
 
     Tile playerTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
-            0,
             TileRotation::NONE,
             vertices);
 
@@ -74,7 +73,6 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
 
     Tile guardTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
-            0,
             TileRotation::NONE,
             vertices);
 
@@ -88,32 +86,6 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     e.addComponent<Component::CCollider>();
     e.addComponent<Component::CAnimation>(LevelManager::CATACOMB_MAIN_TILESET_PATH);
 
-}
-
-void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
-{
-    auto e = m_entityManager.addEntity(Crucible::EntityType::TILE);
-    Crucible::Vec2 position{static_cast<float>(t.position.x), static_cast<float>(t.position.y)};
-
-    Crucible::Vec2 tileDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
-
-    e.addComponent<Component::CTransform>(std::make_shared<Crucible::Vec2>(position), tileDimensions);
-    if (isCollidable)
-    {
-        e.addComponent<Component::CCollider>(immovable);
-    }
-
-    sf::VertexArray vertices(sf::Quads);
-    vertices.append(sf::Vertex({position.x, position.y}));
-    vertices.append(sf::Vertex({position.x + tileDimensions.x, position.y}));
-    vertices.append(sf::Vertex({position.x + tileDimensions.x, position.y + tileDimensions.y}));
-    vertices.append(sf::Vertex({position.x, position.y + tileDimensions.y}));
-
-    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::CATACOMB_MAIN_TILESET_PATH);
-    t.vertices = std::make_shared<sf::VertexArray>(vertices);
-
-    e.addComponent<Component::CTile>(t, texture);
-    e.addComponent<Component::CAnimation>(LevelManager::CATACOMB_MAIN_TILESET_PATH);
 }
 
 std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& playerTransform, const std::string& layerName)

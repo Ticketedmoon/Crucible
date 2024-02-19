@@ -92,7 +92,7 @@ namespace Component
     {
         std::string animationSpriteSheetPath;
 
-        std::vector<size_t> animationTileIdxList{};
+        std::vector<PlayerAnimation> animationList{};
 
         uint8_t currentAnimationFrameIdx;
 

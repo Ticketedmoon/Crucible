@@ -29,7 +29,7 @@ namespace Crucible
     {
         PLAYER,
         GUARD,
-        TILE,
+        LEVEL_OBJECT,
         NONE
     };
 

@@ -28,7 +28,6 @@ struct Layer
 struct Object
 {
     Crucible::EntityType entityType;
-    size_t tileIdx;
     std::shared_ptr<sf::VertexArray> objectVertices;
 };
 

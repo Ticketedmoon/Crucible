@@ -25,10 +25,6 @@ class EntitySpawner
         void createGuard(
                 const std::string& lightingObjectLayerName,
                 const std::string& pathingObjectLayerName);
-        void createTile(
-                Tile& t,
-                bool isCollidable,
-                bool immovable);
 
     private:
         static std::vector<Crucible::Ray> createRays(

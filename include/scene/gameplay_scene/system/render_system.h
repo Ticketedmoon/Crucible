@@ -25,9 +25,10 @@ class GameplayRenderSystem : public System
         void execute() override;
 
     private:
+        void drawMap();
         void drawEntities();
-
         void drawGuiData();
+
         void configureTextRendering();
         void drawText(sf::Text& text, const sf::Color& fillColour, uint8_t characterSize, sf::Vector2f position);
 

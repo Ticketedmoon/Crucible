@@ -68,8 +68,7 @@ Level LevelManager::loadMapData()
                     // TODO @investigate: currently this vert is required, but it may not be necessary
                     verts->append({{r.left, r.top}});
 
-                    size_t tileTypeIdx = lookupTileTypeForObject(layerIdx, j, data);
-                    Object levelObject{Crucible::EntityType::TILE, tileTypeIdx, verts};
+                    Object levelObject{Crucible::EntityType::LEVEL_OBJECT, verts};
                     level.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
                 }
 

@@ -9,12 +9,25 @@ GameplayRenderSystem::GameplayRenderSystem(sf::RenderTarget& renderTarget, Entit
 
 void GameplayRenderSystem::execute()
 {
+    drawMap();
     drawEntities();
     drawGuiData();
 }
 
+void GameplayRenderSystem::drawMap()
+{
+    for (const TileLayer& layer : LevelManager::activeLevel.tileLayers)
+    {
+        for (const auto& entry : layer.tilesetPathToLevelData)
+        {
+            m_renderTarget.draw(entry.second, sf::RenderStates(m_textureManager.getTexture(entry.first).get()));
+        }
+    }
+}
+
 void GameplayRenderSystem::drawEntities()
 {
+
     std::vector<Entity> entities = m_entityManager.getEntities();
 
     const sf::RenderStates lightSrcRenderStates{sf::BlendMultiply};
@@ -28,20 +41,12 @@ void GameplayRenderSystem::drawEntities()
             m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::TriangleFan, lightSrcRenderStates);
         }
 
-        for (TileLayer layer : LevelManager::activeLevel.tileLayers)
+        if (e.hasComponent<Component::CTile>())
         {
-            for (const auto& entry : layer.tilesetPathToLevelData)
-            {
-                m_renderTarget.draw(entry.second, sf::RenderStates(m_textureManager.getTexture(entry.first).get()));
-            }
+            auto& cTile = e.getComponent<Component::CTile>();
+            sf::RenderStates renderStates{cTile.texture.get()};
+            m_renderTarget.draw(*cTile.tile.vertices, renderStates);
         }
-
-//        if (e.hasComponent<Component::CTile>())
-//        {
-//            auto& cTile = e.getComponent<Component::CTile>();
-//            sf::RenderStates renderStates{cTile.texture.get()};
-//            m_renderTarget.draw(*cTile.tile.vertices, renderStates);
-//        }
     }
 }
 
