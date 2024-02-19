@@ -28,3 +28,38 @@ float ViewManager::getViewCentreForCoordinate(const float playerCoordinatePositi
            ? playerCoordinatePosition
            : windowDimensionValue - (windowDimensionValue / 3);
 }
+
+std::unordered_map<std::string, sf::VertexArray> ViewManager::getTileVerticesInView(const sf::RenderTarget& target, const TileLayer& tileLayer)
+{
+    std::unordered_map<std::string, sf::VertexArray> tileVerticesInViewPerTileset;
+    for (const auto& entry : tileLayer.tilesetPathToLevelData)
+    {
+        tileVerticesInViewPerTileset.insert({entry.first, sf::VertexArray(sf::Quads, 0)});
+    }
+
+    sf::Vector2f viewCentre = target.getView().getCenter();
+
+    float minOffsetX = viewCentre.x - (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_X);
+    float maxOffsetX = viewCentre.x + (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_X);
+    float minOffsetY = viewCentre.y - (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_Y);
+    float maxOffsetY = viewCentre.y + (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_Y);
+
+    for (const auto& entry: tileLayer.tilesetPathToLevelData)
+    {
+        const sf::VertexArray& tileSetVertexArray = entry.second;
+        for (size_t i = 0; i < tileSetVertexArray.getVertexCount(); i++)
+        {
+            sf::Vertex vertex = tileSetVertexArray.operator[](i);
+            bool vertexInViewOnX = vertex.position.x >= minOffsetX && vertex.position.x < maxOffsetX;
+            bool vertexInViewOnY = (vertex.position.y == 0 || vertex.position.y >= minOffsetY) &&
+                    vertex.position.y < maxOffsetY;
+
+            if (vertexInViewOnX && vertexInViewOnY)
+            {
+                tileVerticesInViewPerTileset.at(entry.first).append(vertex);
+            }
+        }
+    }
+
+    return tileVerticesInViewPerTileset;
+}

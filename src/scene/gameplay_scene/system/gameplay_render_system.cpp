@@ -21,7 +21,10 @@ void GameplayRenderSystem::centreViewOnPlayer()
     std::vector<Entity>& players = m_entityManager.getEntitiesByEntityType(Crucible::EntityType::PLAYER);
     if (!players.empty())
     {
+        // Reset the view
         m_renderTarget.setView(m_renderTarget.getDefaultView());
+
+        // Set to Player Centre
         ViewManager::centerViewOnEntity(m_renderTarget, players.at(0));
     }
 }
@@ -30,8 +33,10 @@ void GameplayRenderSystem::drawMap()
 {
     for (const TileLayer& layer : LevelManager::activeLevel.tileLayers)
     {
-        for (const auto& entry : layer.tilesetPathToLevelData)
+        for (const auto& entry : ViewManager::getTileVerticesInView(m_renderTarget, layer))
         {
+            size_t originalVertexCount = layer.tilesetPathToLevelData.at(entry.first).getVertexCount();
+            size_t newVertexCount = entry.second.getVertexCount();
             m_renderTarget.draw(entry.second, sf::RenderStates(m_textureManager.getTexture(entry.first).get()));
         }
     }

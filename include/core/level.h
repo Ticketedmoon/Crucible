@@ -49,6 +49,7 @@ class Level
         uint8_t height;
         std::vector<TileLayer> tileLayers;
         std::unordered_map<std::string, ObjectLayer> layerNameToObjectLayer;
+        std::vector<std::string> orderedTileSetPathList;
 };
 
 

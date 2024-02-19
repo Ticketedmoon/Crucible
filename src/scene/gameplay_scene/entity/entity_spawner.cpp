@@ -76,7 +76,8 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
             TileRotation::NONE,
             vertices);
 
-    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::CATACOMB_MAIN_TILESET_PATH);
+    std::basic_string<char>& mainTilesetPath = LevelManager::activeLevel.orderedTileSetPathList[0];
+    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(mainTilesetPath);
 
     std::vector<Crucible::Ray> rays = createRays(transform, lightingObjectLayerName);
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
@@ -84,7 +85,7 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects, lightingObjectLayerName);
     e.addComponent<Component::CTile>(guardTile, texture);
     e.addComponent<Component::CCollider>();
-    e.addComponent<Component::CAnimation>(LevelManager::CATACOMB_MAIN_TILESET_PATH);
+    e.addComponent<Component::CAnimation>(mainTilesetPath);
 
 }
 
