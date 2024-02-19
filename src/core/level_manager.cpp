@@ -147,6 +147,11 @@ std::unordered_map<std::string, sf::VertexArray> LevelManager::createTilesForWor
             bool flippedDiagonally = (globalTileId & Crucible::FLIPPED_DIAGONALLY_FLAG);
             bool rotatedHex120 = (globalTileId & Crucible::ROTATED_HEXAGONAL_120_FLAG);
 
+            bool rotatedLeft = (globalTileId & Crucible::FLIPPED_LEFT_FLAG);
+            bool rotatedRight = (globalTileId & Crucible::FLIPPED_RIGHT_FLAG);
+            bool rotatedTop = (globalTileId & Crucible::FLIPPED_TOP_FLAG);
+            // Left rotation is diagonal + vertical
+
             // Clear all four flags
             globalTileId &= ~(Crucible::FLIPPED_HORIZONTALLY_FLAG |
                     Crucible::FLIPPED_VERTICALLY_FLAG |
@@ -184,12 +189,27 @@ std::unordered_map<std::string, sf::VertexArray> LevelManager::createTilesForWor
             float tvPositionStart = tv * tileDimensions.y;
             float tvPositionEnd = (tv + 1) * tileDimensions.y;
 
-            if (flippedHorizontally)
+            if (rotatedLeft)
             {
-                vertexA.texCoords = sf::Vector2f(tuPositionEnd, tvPositionStart);
-                vertexB.texCoords = sf::Vector2f(tuPositionStart, tvPositionStart);
-                vertexC.texCoords = sf::Vector2f(tuPositionStart, tvPositionEnd);
-                vertexD.texCoords = sf::Vector2f(tuPositionEnd, tvPositionEnd);
+                vertexA.texCoords = {tuPositionEnd, tvPositionStart};
+                vertexB.texCoords = {tuPositionEnd, tvPositionEnd};
+                vertexC.texCoords = {tuPositionStart, tvPositionEnd};
+                vertexD.texCoords = {tuPositionStart, tvPositionStart};
+            }
+            else if (rotatedRight)
+            {
+
+            }
+            else if (rotatedTop)
+            {
+
+            }
+            else if (flippedHorizontally)
+            {
+                vertexA.texCoords = {tuPositionEnd, tvPositionStart};
+                vertexB.texCoords = {tuPositionStart, tvPositionStart};
+                vertexC.texCoords = {tuPositionStart, tvPositionEnd};
+                vertexD.texCoords = {tuPositionEnd, tvPositionEnd};
             }
             else if (flippedVertically)
             {

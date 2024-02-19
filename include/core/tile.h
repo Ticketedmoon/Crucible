@@ -22,10 +22,15 @@ enum class TileRotation
 namespace Crucible
 {
     // Bits on the far end of the 32-bit global tile ID are used for tile flags
+
     const unsigned FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
     const unsigned FLIPPED_VERTICALLY_FLAG = 0x40000000;
     const unsigned FLIPPED_DIAGONALLY_FLAG = 0x20000000;
     const unsigned ROTATED_HEXAGONAL_120_FLAG = 0x10000000;
+
+    const unsigned FLIPPED_LEFT_FLAG = Crucible::FLIPPED_DIAGONALLY_FLAG + Crucible::FLIPPED_VERTICALLY_FLAG;
+    const unsigned FLIPPED_RIGHT_FLAG = Crucible::FLIPPED_HORIZONTALLY_FLAG + Crucible::FLIPPED_DIAGONALLY_FLAG;
+    const unsigned FLIPPED_TOP_FLAG = Crucible::FLIPPED_HORIZONTALLY_FLAG + Crucible::FLIPPED_VERTICALLY_FLAG;
 }
 
 class Tile
