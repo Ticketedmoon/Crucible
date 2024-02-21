@@ -43,29 +43,50 @@ std::unordered_map<std::string, sf::VertexArray> ViewManager::getTileVerticesInV
         tileVerticesInViewPerTileset.insert({tileSet.path, vArr});
     }
 
-    sf::Vector2f viewCentre = target.getView().getCenter();
-
-    float minOffsetX = viewCentre.x - (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_X);
-    float maxOffsetX = viewCentre.x + (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_X);
-    float minOffsetY = viewCentre.y - (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_Y);
-    float maxOffsetY = viewCentre.y + (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_Y);
-
     for (const TileSet& tileSet : tileSets)
     {
         const sf::VertexArray& tileSetVertexArray = tileLayer.tilesetPathToLevelData.at(tileSet.path);
-        for (size_t i = 0; i < tileSetVertexArray.getVertexCount(); i++)
+        for (size_t i = 0; i < tileSetVertexArray.getVertexCount(); i+=4)
         {
-            sf::Vertex vertex = tileSetVertexArray.operator[](i);
-            bool vertexInViewOnX = vertex.position.x >= minOffsetX && vertex.position.x < maxOffsetX;
-            bool vertexInViewOnY = (vertex.position.y == 0 || vertex.position.y >= minOffsetY) &&
-                    vertex.position.y < maxOffsetY;
+            sf::Vertex vertexA = tileSetVertexArray.operator[](i);
+            sf::Vertex vertexB = tileSetVertexArray.operator[](i+1);
+            sf::Vertex vertexC = tileSetVertexArray.operator[](i+2);
+            sf::Vertex vertexD = tileSetVertexArray.operator[](i+3);
 
-            if (vertexInViewOnX && vertexInViewOnY)
+            bool isVertexAVisible = isVertexOfQuadVisible(target, vertexA);
+            bool isVertexBVisible = isVertexOfQuadVisible(target, vertexB);
+            bool isVertexCVisible = isVertexOfQuadVisible(target, vertexC);
+            bool isVertexDVisible = isVertexOfQuadVisible(target, vertexD);
+
+            // If any of the vertices of the tile are visible in the view threshold, then just include the whole tile.
+            if (isVertexAVisible || isVertexBVisible || isVertexCVisible || isVertexDVisible)
             {
-                tileVerticesInViewPerTileset.at(tileSet.path).append(vertex);
+                tileVerticesInViewPerTileset.at(tileSet.path).append(vertexA);
+                tileVerticesInViewPerTileset.at(tileSet.path).append(vertexB);
+                tileVerticesInViewPerTileset.at(tileSet.path).append(vertexC);
+                tileVerticesInViewPerTileset.at(tileSet.path).append(vertexD);
             }
         }
     }
 
     return tileVerticesInViewPerTileset;
+}
+
+bool ViewManager::isVertexOfQuadVisible(const sf::RenderTarget& target, const sf::Vertex& vertex)
+{
+    sf::Vector2f viewCentre = target.getView().getCenter();
+
+    float minOffsetX = viewCentre.x - (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_X);
+    minOffsetX = minOffsetX < 0 ? 0.0f : minOffsetX;
+    float minOffsetY = viewCentre.y - (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_Y);
+    minOffsetY = minOffsetY < 0 ? 0.0f : minOffsetY;
+
+    float maxOffsetX = viewCentre.x + (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_X);
+    float maxOffsetY = viewCentre.y + (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_Y);
+
+    //bool vertexInViewOnX = vertex.position.x >= 0 && vertex.position.x < 1000; //vertex.position.x >= minOffsetX && vertex.position.x <= maxOffsetX;
+    bool vertexInViewOnX = vertex.position.x >= minOffsetX && vertex.position.x <= maxOffsetX;
+    bool vertexInViewOnY = vertex.position.y >= minOffsetY && vertex.position.y <= maxOffsetY;
+
+    return vertexInViewOnX && vertexInViewOnY;
 }

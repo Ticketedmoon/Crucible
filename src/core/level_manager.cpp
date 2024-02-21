@@ -180,8 +180,7 @@ std::unordered_map<std::string, sf::VertexArray> LevelManager::createTilesForWor
             sf::Vertex vertexD = sf::Vertex({pos.x, pos.y + tileDimensions.y});
 
             setTextureCoordinatesForQuad(tileDimensions, flippedHorizontally, flippedVertically, rotatedLeft,
-                    rotatedRight, rotatedTop,
-                    tilePathToLocalTileIdPair, vertexA, vertexB, vertexC, vertexD);
+                    rotatedRight, rotatedTop, tilePathToLocalTileIdPair, vertexA, vertexB, vertexC, vertexD);
 
             tilesetPathToVertexArrayForLayer.at(tilePathToLocalTileIdPair.first).append(vertexA);
             tilesetPathToVertexArrayForLayer.at(tilePathToLocalTileIdPair.first).append(vertexB);
