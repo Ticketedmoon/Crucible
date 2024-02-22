@@ -29,6 +29,7 @@ class GameplayRenderSystem : public System
         void drawMap();
         void drawEntities();
         void drawGuiData();
+        void drawTiles(const std::unordered_map<std::string, sf::VertexArray>& tileData);
 
         void configureTextRendering();
         void drawText(sf::Text& text, const sf::Color& fillColour, uint8_t characterSize, sf::Vector2f position);

@@ -25,11 +25,7 @@ class ViewManager
         ViewManager();
         static float getViewCentreForCoordinate(float playerCoordinatePosition, float levelDimension,
                                                 float windowDimensionValue, float playerDimensionValue);
-        static bool isVertexOfQuadVisible(const sf::RenderTarget& target, const sf::Vertex& vertex);
-
-    private:
-        static const uint32_t TOTAL_TILES_VISIBLE_X = std::ceil(Crucible::WINDOW_WIDTH / Crucible::TILE_SIZE / 6);
-        static const uint32_t TOTAL_TILES_VISIBLE_Y = std::ceil(Crucible::WINDOW_HEIGHT / Crucible::TILE_SIZE / 6);
+        static bool isVertexOfQuadVisible(sf::Vector2f vertexPosition, sf::FloatRect screenRect);
 };
 
 #endif //CRUCIBLE_VIEW_MANAGER_H

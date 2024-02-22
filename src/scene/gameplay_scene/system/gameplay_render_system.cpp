@@ -31,15 +31,27 @@ void GameplayRenderSystem::centreViewOnPlayer()
 
 void GameplayRenderSystem::drawMap()
 {
-    for (const TileLayer& layer : LevelManager::activeLevel.tileLayers)
+    for (const TileLayer& layer: LevelManager::activeLevel.tileLayers)
     {
-        const std::unordered_map<std::string, sf::VertexArray>& verticesInViewPerTileset
-            = ViewManager::getTileVerticesInView(m_renderTarget, layer, LevelManager::activeLevel.tileSets);
-        for (const TileSet& tileSet: LevelManager::activeLevel.tileSets)
+        if (Crucible::SHOULD_CULL_TILES)
         {
-            const sf::RenderStates& renderStates = sf::RenderStates(m_textureManager.getTexture(tileSet.path).get());
-            m_renderTarget.draw(verticesInViewPerTileset.at(tileSet.path), renderStates);
+            const std::unordered_map<std::string, sf::VertexArray>& tileVerticesInView
+                    = ViewManager::getTileVerticesInView(m_renderTarget, layer, LevelManager::activeLevel.tileSets);
+            drawTiles(tileVerticesInView);
         }
+        else
+        {
+            drawTiles(layer.tilesetPathToLevelData);
+        }
+    }
+}
+
+void GameplayRenderSystem::drawTiles(const std::unordered_map<std::string, sf::VertexArray>& tileData)
+{
+    for (const TileSet& tileSet: LevelManager::activeLevel.tileSets)
+    {
+        const sf::RenderStates& renderStates = sf::RenderStates(m_textureManager.getTexture(tileSet.path).get());
+        m_renderTarget.draw(tileData.at(tileSet.path), renderStates);
     }
 }
 

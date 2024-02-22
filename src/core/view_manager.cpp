@@ -35,28 +35,29 @@ std::unordered_map<std::string, sf::VertexArray> ViewManager::getTileVerticesInV
         const std::vector<TileSet>& tileSets)
 {
     std::unordered_map<std::string, sf::VertexArray> tileVerticesInViewPerTileset;
-    
+
     for (const TileSet& tileSet : tileSets)
     {
-        sf::VertexArray vArr = sf::VertexArray(sf::Quads);
-        //vArr.resize(4 * tileSet.tileCount * tileSet.columns);
-        tileVerticesInViewPerTileset.insert({tileSet.path, vArr});
+        tileVerticesInViewPerTileset.insert({tileSet.path, sf::VertexArray(sf::Quads)});
     }
+
+    sf::View cam = target.getView();
+    sf::FloatRect screenRect(cam.getCenter() - (cam.getSize() / 2.f), cam.getSize());
 
     for (const TileSet& tileSet : tileSets)
     {
         const sf::VertexArray& tileSetVertexArray = tileLayer.tilesetPathToLevelData.at(tileSet.path);
         for (size_t i = 0; i < tileSetVertexArray.getVertexCount(); i+=4)
         {
-            sf::Vertex vertexA = tileSetVertexArray.operator[](i);
-            sf::Vertex vertexB = tileSetVertexArray.operator[](i+1);
-            sf::Vertex vertexC = tileSetVertexArray.operator[](i+2);
-            sf::Vertex vertexD = tileSetVertexArray.operator[](i+3);
+            const sf::Vertex vertexA = tileSetVertexArray.operator[](i);
+            const sf::Vertex vertexB = tileSetVertexArray.operator[](i+1);
+            const sf::Vertex vertexC = tileSetVertexArray.operator[](i+2);
+            const sf::Vertex vertexD = tileSetVertexArray.operator[](i+3);
 
-            bool isVertexAVisible = isVertexOfQuadVisible(target, vertexA);
-            bool isVertexBVisible = isVertexOfQuadVisible(target, vertexB);
-            bool isVertexCVisible = isVertexOfQuadVisible(target, vertexC);
-            bool isVertexDVisible = isVertexOfQuadVisible(target, vertexD);
+            bool isVertexAVisible = isVertexOfQuadVisible(vertexA.position, screenRect);
+            bool isVertexBVisible = isVertexOfQuadVisible(vertexB.position, screenRect);
+            bool isVertexCVisible = isVertexOfQuadVisible(vertexC.position, screenRect);
+            bool isVertexDVisible = isVertexOfQuadVisible(vertexD.position, screenRect);
 
             // If any of the vertices of the tile are visible in the view threshold, then just include the whole tile.
             if (isVertexAVisible || isVertexBVisible || isVertexCVisible || isVertexDVisible)
@@ -72,21 +73,9 @@ std::unordered_map<std::string, sf::VertexArray> ViewManager::getTileVerticesInV
     return tileVerticesInViewPerTileset;
 }
 
-bool ViewManager::isVertexOfQuadVisible(const sf::RenderTarget& target, const sf::Vertex& vertex)
+bool ViewManager::isVertexOfQuadVisible(const sf::Vector2f vertexPosition, sf::FloatRect screenRect)
 {
-    sf::Vector2f viewCentre = target.getView().getCenter();
-
-    float minOffsetX = viewCentre.x - (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_X);
-    minOffsetX = minOffsetX < 0 ? 0.0f : minOffsetX;
-    float minOffsetY = viewCentre.y - (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_Y);
-    minOffsetY = minOffsetY < 0 ? 0.0f : minOffsetY;
-
-    float maxOffsetX = viewCentre.x + (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_X);
-    float maxOffsetY = viewCentre.y + (Crucible::TILE_SIZE * TOTAL_TILES_VISIBLE_Y);
-
-    //bool vertexInViewOnX = vertex.position.x >= 0 && vertex.position.x < 1000; //vertex.position.x >= minOffsetX && vertex.position.x <= maxOffsetX;
-    bool vertexInViewOnX = vertex.position.x >= minOffsetX && vertex.position.x <= maxOffsetX;
-    bool vertexInViewOnY = vertex.position.y >= minOffsetY && vertex.position.y <= maxOffsetY;
-
+    bool vertexInViewOnX = vertexPosition.x >= screenRect.left && vertexPosition.x <= screenRect.left + screenRect.width;
+    bool vertexInViewOnY = vertexPosition.y >= screenRect.top && vertexPosition.y <= screenRect.top + screenRect.height;
     return vertexInViewOnX && vertexInViewOnY;
 }
