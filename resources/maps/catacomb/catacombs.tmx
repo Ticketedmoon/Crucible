@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="git" orientation="orthogonal" renderorder="right-down" width="80" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="15" nextobjectid="5">
+<map version="1.10" tiledversion="git" orientation="orthogonal" renderorder="right-down" width="80" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="16" nextobjectid="25">
  <editorsettings>
   <export target="catacombs.json" format="json"/>
  </editorsettings>
@@ -220,10 +220,26 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="11" name="collision_layer_player_a" visible="0" locked="1">
-  <object id="2" name="collision_polygon" x="586.667" y="93.3333">
-   <polygon points="0,0 -107.333,0.666667 -107.333,-68 -563.333,-68 -564.667,352.667 -228.667,352.667 -229.333,657.333 29.3333,658.667 28.6667,379.333 -0.666667,379.333 -1.33333,283.333 -191.333,283.333 -192,146 0,145.333"/>
-  </object>
+ <objectgroup id="15" name="collision_layer_player_a">
+  <object id="5" x="12.6667" y="22.6667" width="6" height="426.667"/>
+  <object id="6" x="19.3333" y="451.333" width="330" height="5.33333"/>
+  <object id="7" x="344.667" y="461.333" width="10.6667" height="291.333"/>
+  <object id="8" x="355.333" y="755.333" width="585.333" height="5.33333"/>
+  <object id="9" x="597.333" y="463.333" width="125.333" height="9.33333"/>
+  <object id="10" x="587.333" y="378" width="6" height="91.3333"/>
+  <object id="11" x="405.333" y="369.333" width="181.333" height="7.33333"/>
+  <object id="12" x="616" y="488" width="8.66667" height="251.333"/>
+  <object id="13" x="16" y="15.3333" width="462.667" height="7.33333"/>
+  <object id="14" x="481.333" y="14" width="102.667" height="58.6667"/>
+  <object id="15" x="586.667" y="15.3333" width="8" height="226"/>
+  <object id="16" x="396.667" y="242" width="6" height="130.667"/>
+  <object id="18" x="405.333" y="240" width="194.667" height="6.66667"/>
+  <object id="19" x="490.667" y="587.333" width="106" height="104.667"/>
+  <object id="20" x="226" y="272" width="60.6667" height="63.3333"/>
+  <object id="21" x="174" y="92.6667" width="194.667" height="88"/>
+  <object id="22" x="178" y="53.3333" width="190.667" height="42"/>
+  <object id="23" x="490.667" y="694" width="39.3333" height="30.6667"/>
+  <object id="24" x="558" y="694" width="38.6667" height="28.6667"/>
  </objectgroup>
  <objectgroup id="12" name="guard_pathing_layer_player_a" visible="0" locked="1">
   <object id="4" x="337" y="219">

@@ -82,16 +82,13 @@ void PhysicalCollisionSystem::checkForLevelObjectLayerCollisions(const Entity& e
 void PhysicalCollisionSystem::resolvePhysicalCollisionsForObjectLayer(Component::CCollider& entityCollider,
         const Entity& entity, ObjectLayer& lightingObjectLayer)
 {
+    Component::CTile entityTile = entity.getComponent<Component::CTile>();
+    Component::CTransform entityTransform = entity.getComponent<Component::CTransform>();
     for (const Object& object: lightingObjectLayer.lightingObjectData)
     {
-        // FIXME: Problem here, we need to separate out the different tile sheets to enum values.
-        //        It is jarring for the different enum key to share the same values and causes some difficult-to-debug issues.
-
         const std::shared_ptr<sf::VertexArray>& vArr = object.objectVertices;
         sf::Vertex v = (*vArr)[0];
 
-        Component::CTile entityTile = entity.getComponent<Component::CTile>();
-        Component::CTransform entityTransform = entity.getComponent<Component::CTransform>();
         resolvePhysicalCollisions(
                 entityTile,
                 entityTransform,

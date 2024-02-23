@@ -40,7 +40,7 @@ class LevelManager
         void loadTexture(const std::string& tileSheetFilePath);
         void loadTexturesForLevel();
 
-        void addPolygonObjectsToLayer(const nlohmann::json& data, size_t layerIdx, const ObjectLayer& layer, size_t i);
+        void addRectObjectsToLayer(const nlohmann::json& data, size_t layerIdx, const ObjectLayer& layer);
         void addCustomPropertiesToLayer(const nlohmann::json& data, size_t layerIdx, ObjectLayer& layer, size_t i) const;
 
         std::unordered_map<std::string, sf::VertexArray> createTilesForWorld(

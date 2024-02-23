@@ -23,7 +23,7 @@ namespace Crucible
     static const inline float DEFAULT_SFX_VOLUME = 50.0f;
 
     static const inline std::vector<Crucible::Vec2> PLAYER_SPAWN_LOCATIONS{
-            {2 * Crucible::TILE_SIZE, 3 * Crucible::TILE_SIZE},
+            {10 * Crucible::TILE_SIZE, 10 * Crucible::TILE_SIZE},
             {2 * Crucible::TILE_SIZE, 8 * Crucible::TILE_SIZE}
     };
 

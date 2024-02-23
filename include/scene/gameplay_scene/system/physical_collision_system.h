@@ -23,8 +23,10 @@ class PhysicalCollisionSystem : public System
         void execute() override;
 
     private:
-        bool isCollidingAABB(const Component::CTile& entityTile,
-                const std::shared_ptr<sf::VertexArray>& otherRectVertices, sf::FloatRect& overlap);
+        bool isCollidingAABB(
+                const Component::CTile& entityTile,
+                const std::shared_ptr<sf::VertexArray>& otherRectVertices,
+                sf::FloatRect& overlap);
 
         void resolveCollision(Component::CTile& entityTile, Component::CTransform& entityTransform,
                 const Crucible::Vec2& otherEntityPositionVec, const sf::FloatRect& overlap);

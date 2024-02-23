@@ -62,33 +62,25 @@ void LevelManager::loadMapData(nlohmann::json data)
             layer.name = data[LEVEL_FILE_LAYERS_KEY][layerIdx]["name"];
             layer.type = layerType;
 
+            addRectObjectsToLayer(data, layerIdx, layer);
+
             size_t totalObjectsForLayer = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY].size();
             for (size_t i = 0; i < totalObjectsForLayer; i++)
             {
-                addPolygonObjectsToLayer(data, layerIdx, layer, i);
                 addCustomPropertiesToLayer(data, layerIdx, layer, i);
             }
         }
     }
 }
-void LevelManager::addPolygonObjectsToLayer(const nlohmann::json& data, size_t layerIdx, const ObjectLayer& layer, size_t i)
+void LevelManager::addRectObjectsToLayer(const nlohmann::json& data, size_t layerIdx, const ObjectLayer& layer)
 {
-    const char *pointKey = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i].contains("polygon")
-            ? "polygon"
-            : "polyline";
-
-    float parentX = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["x"];
-    float parentY = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["y"];
-    for (size_t j = 0; j < data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i][pointKey].size(); j++)
+    for (const auto& object : data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY])
     {
         sf::FloatRect r;
-        float polygonPointX = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i][pointKey][j]["x"];
-        float polygonPointY = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i][pointKey][j]["y"];
-
-        r.left = parentX + polygonPointX;
-        r.top = parentY + polygonPointY;
-        r.width = 0;
-        r.height = 0;
+        r.left = object["x"];
+        r.top = object["y"];
+        r.width = object["width"];
+        r.height = object["height"];
 
         std::shared_ptr<sf::VertexArray> verts = std::make_shared<sf::VertexArray>();
         verts->append({{r.left, r.top}});
