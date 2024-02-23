@@ -29,8 +29,9 @@ class LevelManager
 
         static inline const std::string COLLISION_LAYER_PLAYER_A = "collision_layer_player_a";
         static inline const std::string COLLISION_LAYER_PLAYER_B = "collision_layer_player_b";
-        static inline const std::string GUARD_PATHING_LAYER_A = "guard_pathing_layer_player_a";
-        static inline const std::string GUARD_PATHING_LAYER_B = "guard_pathing_layer_player_b";
+        static inline const std::string GUARD_LIGHTING_LAYER_A = "guard_lighting_layer_a";
+        static inline const std::string GUARD_PATHING_LAYER_A = "guard_pathing_layer_a";
+        static inline const std::string GUARD_PATHING_LAYER_B = "guard_pathing_layer_b";
 
         static inline Level activeLevel;
 
@@ -40,8 +41,8 @@ class LevelManager
         void loadTexture(const std::string& tileSheetFilePath);
         void loadTexturesForLevel();
 
-        void addRectObjectsToLayer(const nlohmann::json& data, size_t layerIdx, const ObjectLayer& layer);
-        void addCustomPropertiesToLayer(const nlohmann::json& data, size_t layerIdx, ObjectLayer& layer, size_t i) const;
+        void addObjectsToLayer(const nlohmann::json& data, size_t layerIdx, ObjectLayer& layer);
+        void addCustomPropertiesToLayer(ObjectLayer& layer, nlohmann::basic_json<>& object);
 
         std::unordered_map<std::string, sf::VertexArray> createTilesForWorld(
                 const nlohmann::json& data,

@@ -24,16 +24,13 @@ void RayAppenderSystem::execute()
         for (Object& object : lightingLayerForLightSrc.lightingObjectData)
         {
             sf::VertexArray objectVertices = *object.objectVertices;
-            const size_t totalShapeVertices = objectVertices.getVertexCount();
-            const size_t totalAdditionalRaysPerEntity = totalShapeVertices * totalRaysPerVertex;
 
-            for (size_t vertIndex = 0; vertIndex < totalAdditionalRaysPerEntity; vertIndex += totalRaysPerVertex)
+            for (size_t vertIndex = 0; vertIndex < objectVertices.getVertexCount(); vertIndex += totalRaysPerVertex)
             {
                 const sf::Vertex& v = objectVertices[vertIndex / totalRaysPerVertex];
 
                 // Update ray vector to point left and right of endV with large RAY_SCALE.
-                const size_t additionalRayIndex = TOTAL_CORE_RAYS + vertIndex +
-                        (totalAdditionalRaysPerEntity * otherShapeIndex);
+                const size_t additionalRayIndex = TOTAL_CORE_RAYS + vertIndex + (totalRaysPerVertex * otherShapeIndex);
 
                 const Crucible::Vec2& rayEndPositionLeftOfVertex = Crucible::Vec2(v.position.x - RAY_DELTA,
                         v.position.y);
@@ -43,8 +40,7 @@ void RayAppenderSystem::execute()
                 // Scale rays
                 Crucible::Vec2 playerPosition{entityTransform.position->x, entityTransform.position->y};
                 Crucible::Vec2 endVa = ((rayEndPositionLeftOfVertex - playerPosition) * RAY_SCALE) + playerPosition;
-                Crucible::Vec2 endVb = ((rayEndPositionRightOfVertex - playerPosition) * RAY_SCALE) +
-                        playerPosition;
+                Crucible::Vec2 endVb = ((rayEndPositionRightOfVertex - playerPosition) * RAY_SCALE) + playerPosition;
 
                 const float angleARads = std::atan2(endVa.y, endVa.x) + RADIANS_OFFSET;
                 const float angleBRads = std::atan2(endVb.y, endVb.x) - RADIANS_OFFSET;
@@ -53,8 +49,7 @@ void RayAppenderSystem::execute()
                 Crucible::Vec2 endVResultB(endVb.x + std::cos(angleBRads), endVb.y + std::sin(angleBRads));
 
                 entityLightSource.rays[additionalRayIndex] = Crucible::Ray(entityTransform.position, endVResultA);
-                entityLightSource.rays[additionalRayIndex + 1] = Crucible::Ray(entityTransform.position,
-                        endVResultB);
+                entityLightSource.rays[additionalRayIndex + 1] = Crucible::Ray(entityTransform.position, endVResultB);
             }
 
             otherShapeIndex++;

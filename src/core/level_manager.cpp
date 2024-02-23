@@ -61,52 +61,65 @@ void LevelManager::loadMapData(nlohmann::json data)
             ObjectLayer layer;
             layer.name = data[LEVEL_FILE_LAYERS_KEY][layerIdx]["name"];
             layer.type = layerType;
-
-            addRectObjectsToLayer(data, layerIdx, layer);
-
-            size_t totalObjectsForLayer = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY].size();
-            for (size_t i = 0; i < totalObjectsForLayer; i++)
-            {
-                addCustomPropertiesToLayer(data, layerIdx, layer, i);
-            }
+            addObjectsToLayer(data, layerIdx, layer);
         }
     }
 }
-void LevelManager::addRectObjectsToLayer(const nlohmann::json& data, size_t layerIdx, const ObjectLayer& layer)
+
+void LevelManager::addObjectsToLayer(const nlohmann::json& data, size_t layerIdx, ObjectLayer& layer)
 {
-    for (const auto& object : data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY])
+    for (nlohmann::basic_json object : data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY])
     {
-        sf::FloatRect r;
-        r.left = object["x"];
-        r.top = object["y"];
-        r.width = object["width"];
-        r.height = object["height"];
+        const ObjectType objectType = object.contains("polygon")
+                ? ObjectType::POLYGON
+                : object.contains("polyline")
+                        ? ObjectType::POLYLINE
+                        : ObjectType::RECT;
+        float parentX = object["x"];
+        float parentY = object["y"];
 
         std::shared_ptr<sf::VertexArray> verts = std::make_shared<sf::VertexArray>();
-        verts->append({{r.left, r.top}});
-        verts->append({{r.left + r.width, r.top}});
-        verts->append({{r.left + r.width, r.top + r.height}});
-        verts->append({{r.left, r.top + r.height}});
-        // TODO @investigate: currently this vert is required, but it may not be necessary
-        verts->append({{r.left, r.top}});
+        if (objectType == ObjectType::RECT)
+        {
+            sf::FloatRect r;
+            r.left = object["x"];
+            r.top = object["y"];
+            r.width = object["width"];
+            r.height = object["height"];
+
+            verts->append({{r.left, r.top}});
+            verts->append({{r.left + r.width, r.top}});
+            verts->append({{r.left + r.width, r.top + r.height}});
+            verts->append({{r.left, r.top + r.height}});
+            // TODO @investigate: currently this vert is required, but it may not be necessary
+            verts->append({{r.left, r.top}});
+        }
+        else if (objectType == ObjectType::POLYLINE || objectType == ObjectType::POLYGON)
+        {
+            const std::string verticesKey = objectType == ObjectType::POLYLINE ? "polyline" : "polygon";
+            for (size_t j = 0; j < object[verticesKey].size(); j++)
+            {
+                float polygonPointX = object[verticesKey][j]["x"];
+                float polygonPointY = object[verticesKey][j]["y"];
+                verts->append({{parentX + polygonPointX, parentY + polygonPointY}});
+            }
+        }
 
         Object levelObject{Crucible::EntityType::LEVEL_OBJECT, verts};
         activeLevel.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
+
+        addCustomPropertiesToLayer(layer, object);
     }
 }
 
-void LevelManager::addCustomPropertiesToLayer(
-        const nlohmann::json& data,
-        size_t layerIdx,
-        ObjectLayer& layer,
-        size_t i) const
+void LevelManager::addCustomPropertiesToLayer(ObjectLayer& layer, nlohmann::basic_json<>& object)
 {
-    if (data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i].contains("properties"))
+    if (object.contains("properties"))
     {
         // TODO this points to 0th index - make scalable in future
-        const std::string& name = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["properties"][0]["name"];
-        const std::string& type = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["properties"][0]["type"];
-        const std::string& value = data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY][i]["properties"][0]["value"];
+        const std::string& name = object["properties"][0]["name"];
+        const std::string& type = object["properties"][0]["type"];
+        const std::string& value = object["properties"][0]["value"];
 
         if (layer.customProperties.contains(name))
         {

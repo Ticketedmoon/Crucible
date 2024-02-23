@@ -12,6 +12,13 @@
 #include "vec2.h"
 #include "common_constants.h"
 
+enum class ObjectType
+{
+        POLYGON,
+        POLYLINE,
+        RECT
+};
+
 struct CustomProperty
 {
     std::string name;

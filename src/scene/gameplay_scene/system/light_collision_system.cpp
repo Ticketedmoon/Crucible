@@ -29,7 +29,8 @@ void LightCollisionSystem::resolveLightCollisions(const Entity& entity)
     {
         Crucible::Ray& ray = lightSource.rays[rayIndex];
 
-        ObjectLayer& layer = LevelManager::activeLevel.layerNameToObjectLayer.at(lightSource.lightingObjectLayerName);
+        std::string& lightLayerName = lightSource.lightingObjectLayerName;
+        ObjectLayer& layer = LevelManager::activeLevel.layerNameToObjectLayer.at(lightLayerName);
         checkForLightIntersectWithObject(lightSource, layer.lightingObjectData, ray, rayIndex);
 
         for (Entity& playerEntity : players)

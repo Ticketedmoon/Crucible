@@ -36,32 +36,34 @@ void EntitySpawner::createPlayer()
 void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, const std::string& pathingObjectLayerName)
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::GUARD);
-    ObjectLayer pathingObjectLayer = LevelManager::activeLevel.layerNameToObjectLayer.at(pathingObjectLayerName);
+    std::unordered_map<std::string, ObjectLayer>& pathingObjectLayerNameToObjectLayer
+        = LevelManager::activeLevel.layerNameToObjectLayer;
+    ObjectLayer pathingObjectLayer = pathingObjectLayerNameToObjectLayer.at(pathingObjectLayerName);
 
     std::vector<Waypoint> path;
     for (size_t i = 0; i < pathingObjectLayer.lightingObjectData.size(); i++)
     {
-        Object& guardPath = pathingObjectLayer.lightingObjectData[i];
-        sf::VertexArray& objectVertData = *guardPath.objectVertices;
-        sf::Vertex v{objectVertData[0]};
-
         bool polygonPointAtIndexHasWaitPeriod =
-            pathingObjectLayer.customProperties.contains("point_idx") &&
-            std::stoi(pathingObjectLayer.customProperties.at("point_idx").at(0).value) == i
-                && pathingObjectLayer.customProperties.contains("wait_period") &&
-                std::stoi(pathingObjectLayer.customProperties.at("wait_period").at(0).value);
+                pathingObjectLayer.customProperties.contains("point_idx") &&
+                        std::stoi(pathingObjectLayer.customProperties.at("point_idx").at(0).value) == i
+                                && pathingObjectLayer.customProperties.contains("wait_period") &&
+                        std::stoi(pathingObjectLayer.customProperties.at("wait_period").at(0).value);
 
-        uint32_t waitPeriodMs = pathingObjectLayer.customProperties.contains("wait_period")
-                ? polygonPointAtIndexHasWaitPeriod
-                : 0;
-        path.emplace_back(Waypoint({v.position.x, v.position.y}, waitPeriodMs));
+        const sf::VertexArray pathingVertices = *pathingObjectLayer.lightingObjectData[i].objectVertices;
+        for (size_t j = 0; j < pathingVertices.getVertexCount(); j++)
+        {
+            uint32_t waitPeriodMs = pathingObjectLayer.customProperties.contains("wait_period")
+                    ? polygonPointAtIndexHasWaitPeriod
+                    : 0;
+            path.emplace_back(Waypoint({pathingVertices[j].position.x, pathingVertices[j].position.y}, waitPeriodMs));
+        }
     }
 
     e.addComponent<Component::CPathFollower>(path, pathingObjectLayerName);
 
     std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(path.at(0).position);
 
-    Crucible::Vec2 guardDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
+    Crucible::Vec2 guardDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE * 2};
 
     auto& transform = e.addComponent<Component::CTransform>(position, guardDimensions);
 
@@ -69,7 +71,7 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     vertices->append(sf::Vertex({transform.position->x, transform.position->y}));
     vertices->append(sf::Vertex({transform.position->x + guardDimensions.x, transform.position->y}));
     vertices->append(sf::Vertex({transform.position->x + guardDimensions.x, transform.position->y + guardDimensions.y}));
-    vertices->append(sf::Vertex({transform.position->x, transform.position->y + Crucible::TILE_SIZE}));
+    vertices->append(sf::Vertex({transform.position->x, transform.position->y + guardDimensions.y}));
 
     Tile guardTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
@@ -82,10 +84,14 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     std::vector<Crucible::Ray> rays = createRays(transform, lightingObjectLayerName);
     std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
             std::vector<std::vector<Crucible::LightRayIntersect>>(rays.size(), std::vector<Crucible::LightRayIntersect>());
+
     e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects, lightingObjectLayerName);
-    e.addComponent<Component::CTile>(guardTile, texture);
     e.addComponent<Component::CCollider>();
-    e.addComponent<Component::CAnimation>(mainTilesetPath);
+
+    // FIXME this is temporary, use different texture
+    std::shared_ptr<sf::Texture>& p_texture = m_textureManager.getTexture(LevelManager::PLAYER_SPRITE_SHEET_PATH);
+    e.addComponent<Component::CTile>(guardTile, p_texture);
+    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH);
 
 }
 
@@ -110,7 +116,9 @@ std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& play
         }
     }
 
+    std::cout << "Configured: [" << rays.size() << "] core light rays" << '\n';
+    std::cout << "Configured: [" << additionalRays.size() << "] additional light rays" << '\n';
     rays.insert(rays.end(), additionalRays.begin(), additionalRays.end());
-    std::cout << "Configured: [" << rays.size() << "] light rays" << '\n';
+    std::cout << "Configured: total [" << rays.size() << "] light rays" << '\n';
     return rays;
 }
