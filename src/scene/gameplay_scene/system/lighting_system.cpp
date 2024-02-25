@@ -7,15 +7,9 @@ LightingSystem::LightingSystem(EntityManager& entityManager) : m_entityManager(e
 
 void LightingSystem::execute()
 {
-    std::vector<Entity> entities = m_entityManager.getEntities();
+    std::vector<Entity> entities = m_entityManager.getEntitiesByEntityType(Crucible::EntityType::GUARD);
     for (const Entity entity : entities)
     {
-        if (!entity.hasComponent<Component::CLightSource>() || !entity.hasComponent<Component::CTransform>() ||
-                !entity.hasComponent<Component::CTile>())
-        {
-            continue;
-        }
-
         auto& entityLightSource = entity.getComponent<Component::CLightSource>();
         auto& entityTransform = entity.getComponent<Component::CTransform>();
 
@@ -73,22 +67,24 @@ std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionP
 
         sortLightIntersectionsByDistanceToEntity(entityTransform, intersectList);
 
+        Crucible::LightRayIntersect intersect = intersectList[0];
+
         if (intersectList[0].entityType == Crucible::EntityType::PLAYER)
         {
             // Add intersect that is not player
-            auto closestIntersectThatIsNotPlayer= *std::ranges::find_if(intersectList,
+            intersect = *std::ranges::find_if(intersectList,
                     [](const auto& intersect) {
                         return intersect.entityType != Crucible::EntityType::PLAYER;
                     });
-            //collisionPoints.emplace_back(closestIntersectThatIsNotPlayer);
 
             // @Temporary
-            //exit(0);
+            if (Crucible::SHOULD_EXIT_APP_WHEN_CAUGHT_BY_GUARD)
+            {
+                exit(0);
+            }
         }
-        else
-        {
-            collisionPoints.emplace_back(intersectList[0]);
-        }
+
+        collisionPoints.emplace_back(intersect);
 
         intersectList.clear();
     }

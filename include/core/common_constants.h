@@ -20,6 +20,8 @@ namespace Crucible
     static inline constexpr uint8_t TILE_SIZE = 16;
     static const bool USE_VERTICAL_SYNC = true;
     static const bool SHOULD_CULL_TILES = false;
+    // @Temporary
+    static const bool SHOULD_EXIT_APP_WHEN_CAUGHT_BY_GUARD = false;
 
     static const inline float DEFAULT_SFX_VOLUME = 50.0f;
 

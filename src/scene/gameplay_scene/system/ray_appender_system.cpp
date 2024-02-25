@@ -20,7 +20,7 @@ void RayAppenderSystem::execute()
 
         size_t additionalRayGroupStartIdx = 0;
 
-        for (const auto& object : lightingLayerForLightSrc.lightingObjectData)
+        for (const auto& object : lightingLayerForLightSrc.objectData)
         {
             sf::VertexArray objectVertices = *object.objectVertices;
             const size_t TOTAL_ADDITIONAL_RAYS_FOR_OBJECT = (objectVertices.getVertexCount()-1) * TOTAL_ADDITIONAL_RAYS_PER_VERT;

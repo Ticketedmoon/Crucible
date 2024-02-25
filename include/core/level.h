@@ -34,6 +34,7 @@ struct Layer
 
 struct Object
 {
+    std::string objectName;
     Crucible::EntityType entityType;
     std::shared_ptr<sf::VertexArray> objectVertices;
 };
@@ -45,7 +46,7 @@ struct TileLayer : Layer
 
 struct ObjectLayer : Layer
 {
-    std::vector<Object> lightingObjectData;
+    std::vector<Object> objectData;
     std::unordered_map<std::string, std::vector<CustomProperty>> customProperties;
 };
 

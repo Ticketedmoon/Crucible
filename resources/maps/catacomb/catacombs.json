@@ -245,7 +245,6 @@
         {
          "draworder":"topdown",
          "id":15,
-         "locked":true,
          "name":"collision_layer_player_a",
          "objects":[
                 {
@@ -355,8 +354,8 @@
                  "type":"",
                  "visible":true,
                  "width":102.667,
-                 "x":481.333,
-                 "y":14
+                 "x":479.333,
+                 "y":16
                 }, 
                 {
                  "height":226,
@@ -467,16 +466,34 @@
                  "width":13,
                  "x":402,
                  "y":379
+                }, 
+                {
+                 "height":32,
+                 "id":42,
+                 "name":"end zone",
+                 "properties":[
+                        {
+                         "name":"is_end_zone",
+                         "type":"string",
+                         "value":"true"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":33.3333333333334,
+                 "x":510.666666666667,
+                 "y":48
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }, 
         {
          "draworder":"topdown",
          "id":16,
+         "locked":true,
          "name":"guard_lighting_layer_a",
          "objects":[
                 {
@@ -596,7 +613,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }, 
@@ -684,7 +701,7 @@
          "y":0
         }],
  "nextlayerid":18,
- "nextobjectid":41,
+ "nextobjectid":43,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"git",

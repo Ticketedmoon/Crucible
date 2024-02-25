@@ -23,9 +23,9 @@ class PhysicalCollisionSystem : public System
         void execute() override;
 
     private:
-        bool isCollidingAABB(
+        static bool isCollidingAABB(
                 const Component::CTile& entityTile,
-                const std::shared_ptr<sf::VertexArray>& otherRectVertices,
+                const sf::FloatRect& otherObjectBounds,
                 sf::FloatRect& overlap);
 
         void resolveCollision(Component::CTile& entityTile, Component::CTransform& entityTransform,
@@ -34,7 +34,7 @@ class PhysicalCollisionSystem : public System
         void resolvePhysicalCollisionsForObjectLayer(
                 Component::CCollider& entityCollider,
                 const Entity& entity,
-                ObjectLayer& lightingObjectLayer);
+                ObjectLayer& objectLayer);
 
         void resolvePhysicalCollisions(Component::CTile& entityTile,
                 Component::CTransform& entityTransform,

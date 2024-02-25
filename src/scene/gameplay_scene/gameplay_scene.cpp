@@ -2,7 +2,7 @@
 
 GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     m_entitySpawner(m_entityManager, m_textureManager),
-    m_levelManager(m_entityManager, m_textureManager)
+    m_levelManager(m_textureManager)
 {
     registerActions();
     registerSystems();

@@ -18,7 +18,7 @@
 class LevelManager
 {
     public:
-        explicit LevelManager(EntityManager& entityManager, TextureManager& textureManager);
+        explicit LevelManager(TextureManager& textureManager);
 
     public:
         static inline const std::string PLAYER_SPRITE_SHEET_PATH = "resources/assets/texture/player_crucible_16x32_6pr.png";
@@ -41,8 +41,8 @@ class LevelManager
         void loadTexture(const std::string& tileSheetFilePath);
         void loadTexturesForLevel();
 
-        void addObjectsToLayer(const nlohmann::json& data, size_t layerIdx, ObjectLayer& layer);
-        void addCustomPropertiesToLayer(ObjectLayer& layer, nlohmann::basic_json<>& object);
+        void addObjectsToLayer(const nlohmann::json& data, size_t layerIdx, ObjectLayer& objectLayer);
+        static void addCustomPropertiesToLayer(ObjectLayer& objectLayer, nlohmann::basic_json<>& json);
 
         std::unordered_map<std::string, sf::VertexArray> createTilesForWorld(
                 const nlohmann::json& data,
@@ -68,7 +68,6 @@ class LevelManager
         const std::string LEVEL_FILE_OBJECTS_KEY = "objects";
         const std::string LEVEL_FILE_DATA_KEY = "data";
 
-        EntityManager& m_entityManager;
         TextureManager& m_textureManager;
 };
 

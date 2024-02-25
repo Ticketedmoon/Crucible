@@ -41,12 +41,12 @@ void LightCollisionSystem::resolveLightCollisionsForRayGroup(
 
         std::string& lightLayerName = lightSource.lightingObjectLayerName;
         ObjectLayer& layer = LevelManager::activeLevel.layerNameToObjectLayer.at(lightLayerName);
-        checkForLightIntersectWithObject(lightSource, layer.lightingObjectData, ray, rayIndex, rayType);
+        checkForLightIntersectWithObject(lightSource, layer.objectData, ray, rayIndex, rayType);
 
         for (Entity& playerEntity : players)
         {
             auto& cTile = playerEntity.getComponent<Component::CTile>();
-            std::vector<Object> playerObjects{{Crucible::EntityType::PLAYER, cTile.tile.vertices}};
+            std::vector<Object> playerObjects{{"player", Crucible::EntityType::PLAYER, cTile.tile.vertices}};
             checkForLightIntersectWithObject(lightSource, playerObjects, ray, rayIndex, rayType);
         }
     }

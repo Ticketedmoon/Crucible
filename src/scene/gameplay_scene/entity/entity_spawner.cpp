@@ -41,7 +41,7 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     ObjectLayer pathingObjectLayer = pathingObjectLayerNameToObjectLayer.at(pathingObjectLayerName);
 
     std::vector<Waypoint> path;
-    for (size_t i = 0; i < pathingObjectLayer.lightingObjectData.size(); i++)
+    for (size_t i = 0; i < pathingObjectLayer.objectData.size(); i++)
     {
         bool polygonPointAtIndexHasWaitPeriod =
                 pathingObjectLayer.customProperties.contains("point_idx") &&
@@ -49,7 +49,7 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
                                 && pathingObjectLayer.customProperties.contains("wait_period") &&
                         std::stoi(pathingObjectLayer.customProperties.at("wait_period").at(0).value);
 
-        const sf::VertexArray pathingVertices = *pathingObjectLayer.lightingObjectData[i].objectVertices;
+        const sf::VertexArray pathingVertices = *pathingObjectLayer.objectData[i].objectVertices;
         for (size_t j = 0; j < pathingVertices.getVertexCount(); j++)
         {
             uint32_t waitPeriodMs = pathingObjectLayer.customProperties.contains("wait_period")
@@ -100,7 +100,7 @@ Component::CLightSource EntitySpawner::createLightSource(Component::CTransform& 
 
     ObjectLayer& objectLayer = LevelManager::activeLevel.layerNameToObjectLayer.at(layerName);
 
-    for (const Object& tileObject : objectLayer.lightingObjectData)
+    for (const Object& tileObject : objectLayer.objectData)
     {
         std::shared_ptr<sf::VertexArray> tileObjectVertices = tileObject.objectVertices;
         for (size_t i = 0; i < tileObjectVertices->getVertexCount(); i++)

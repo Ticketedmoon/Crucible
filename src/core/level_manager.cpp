@@ -1,7 +1,6 @@
 #include "level_manager.h"
 
-LevelManager::LevelManager(EntityManager& entityManager, TextureManager& textureManager)
-    : m_entityManager(entityManager), m_textureManager(textureManager)
+LevelManager::LevelManager(TextureManager& textureManager) : m_textureManager(textureManager)
 {
     std::ifstream f(MAP_DATA_PATH);
     nlohmann::json data = nlohmann::json::parse(f);
@@ -58,33 +57,36 @@ void LevelManager::loadMapData(nlohmann::json data)
 
         if (layerType == "objectgroup")
         {
-            ObjectLayer layer;
-            layer.name = data[LEVEL_FILE_LAYERS_KEY][layerIdx]["name"];
-            layer.type = layerType;
-            addObjectsToLayer(data, layerIdx, layer);
+            const std::string layerName = data[LEVEL_FILE_LAYERS_KEY][layerIdx]["name"];
+            ObjectLayer& objectLayer = activeLevel.layerNameToObjectLayer[layerName];
+            objectLayer.name = layerName;
+            objectLayer.type = layerType;
+            addObjectsToLayer(data, layerIdx, objectLayer);
         }
     }
 }
 
-void LevelManager::addObjectsToLayer(const nlohmann::json& data, size_t layerIdx, ObjectLayer& layer)
+void LevelManager::addObjectsToLayer(const nlohmann::json& data, size_t layerIdx, ObjectLayer& objectLayer)
 {
-    for (nlohmann::basic_json object : data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY])
+    for (nlohmann::basic_json json : data[LEVEL_FILE_LAYERS_KEY][layerIdx][LEVEL_FILE_OBJECTS_KEY])
     {
-        const ObjectType objectType = object.contains("polygon")
+        const ObjectType objectType = json.contains("polygon")
                 ? ObjectType::POLYGON
-                : object.contains("polyline")
+                : json.contains("polyline")
                         ? ObjectType::POLYLINE
                         : ObjectType::RECT;
-        float parentX = object["x"];
-        float parentY = object["y"];
+        float parentX = json["x"];
+        float parentY = json["y"];
+
+        std::string objectName = json["name"];
 
         if (objectType == ObjectType::RECT)
         {
             sf::FloatRect r;
-            r.left = object["x"];
-            r.top = object["y"];
-            r.width = object["width"];
-            r.height = object["height"];
+            r.left = json["x"];
+            r.top = json["y"];
+            r.width = json["width"];
+            r.height = json["height"];
 
             std::shared_ptr<sf::VertexArray> verts = std::make_shared<sf::VertexArray>(sf::Quads, 5);
             (*verts)[0] = {{r.left, r.top}};
@@ -93,50 +95,50 @@ void LevelManager::addObjectsToLayer(const nlohmann::json& data, size_t layerIdx
             (*verts)[3] = {{r.left, r.top + r.height}};
             (*verts)[4] = {{r.left, r.top}};
 
-            Object levelObject{Crucible::EntityType::LEVEL_OBJECT, verts};
-            activeLevel.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
+            Object levelObject{objectName, Crucible::EntityType::LEVEL_OBJECT, verts};
+            activeLevel.layerNameToObjectLayer[objectLayer.name].objectData.emplace_back(levelObject);
         }
         else if (objectType == ObjectType::POLYGON || objectType == ObjectType::POLYLINE)
         {
             const std::string verticesKey = objectType == ObjectType::POLYGON ? "polygon" : "polyline";
-            const size_t totalVerticesForObject = object[verticesKey].size();
+            const size_t totalVerticesForObject = json[verticesKey].size();
 
             sf::VertexArray objectVertices(sf::Lines, totalVerticesForObject + 1);
 
             for (size_t i = 0; i < totalVerticesForObject; i++)
             {
-                float polygonPointX = object[verticesKey][i]["x"];
-                float polygonPointY = object[verticesKey][i]["y"];
+                float polygonPointX = json[verticesKey][i]["x"];
+                float polygonPointY = json[verticesKey][i]["y"];
                 objectVertices[i] = {{parentX + polygonPointX, parentY + polygonPointY}};
             }
 
-            // Add first vertex again to complete object
+            // Add first vertex again to complete json
             objectVertices[objectVertices.getVertexCount()-1] = objectVertices[0];
 
-            Object levelObject{Crucible::EntityType::LEVEL_OBJECT, std::make_shared<sf::VertexArray>(objectVertices)};
-            activeLevel.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
+            Object levelObject{objectName, Crucible::EntityType::LEVEL_OBJECT, std::make_shared<sf::VertexArray>(objectVertices)};
+            activeLevel.layerNameToObjectLayer[objectLayer.name].objectData.emplace_back(levelObject);
         }
 
-        addCustomPropertiesToLayer(layer, object);
+        addCustomPropertiesToLayer(objectLayer, json);
     }
 }
 
-void LevelManager::addCustomPropertiesToLayer(ObjectLayer& layer, nlohmann::basic_json<>& object)
+void LevelManager::addCustomPropertiesToLayer(ObjectLayer& objectLayer, nlohmann::basic_json<>& json)
 {
-    if (object.contains("properties"))
+    if (json.contains("properties"))
     {
         // TODO this points to 0th index - make scalable in future
-        const std::string& name = object["properties"][0]["name"];
-        const std::string& type = object["properties"][0]["type"];
-        const std::string& value = object["properties"][0]["value"];
+        const std::string& name = json["properties"][0]["name"];
+        const std::string& type = json["properties"][0]["type"];
+        const std::string& value = json["properties"][0]["value"];
 
-        if (layer.customProperties.contains(name))
+        if (objectLayer.customProperties.contains(name))
         {
-            layer.customProperties.at(name).emplace_back(name, type, value);
+            objectLayer.customProperties.at(name).emplace_back(name, type, value);
         }
         else
         {
-            layer.customProperties[name] = {{name, type, value}};
+            objectLayer.customProperties[name] = {{name, type, value}};
         }
     }
 }
