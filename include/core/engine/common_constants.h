@@ -11,7 +11,7 @@
 namespace Crucible
 {
     static constexpr std::string_view WINDOW_TITLE = "crucible";
-    static constexpr float DT = 0.01;
+    static constexpr float DT = 0.02;
     static const uint32_t APP_FRAME_RATE = 60;
 
     static const uint32_t WINDOW_WIDTH = 1280; // 80 tiles
