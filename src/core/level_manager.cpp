@@ -78,7 +78,6 @@ void LevelManager::addObjectsToLayer(const nlohmann::json& data, size_t layerIdx
         float parentX = object["x"];
         float parentY = object["y"];
 
-        std::shared_ptr<sf::VertexArray> verts = std::make_shared<sf::VertexArray>();
         if (objectType == ObjectType::RECT)
         {
             sf::FloatRect r;
@@ -87,26 +86,36 @@ void LevelManager::addObjectsToLayer(const nlohmann::json& data, size_t layerIdx
             r.width = object["width"];
             r.height = object["height"];
 
-            verts->append({{r.left, r.top}});
-            verts->append({{r.left + r.width, r.top}});
-            verts->append({{r.left + r.width, r.top + r.height}});
-            verts->append({{r.left, r.top + r.height}});
-            // TODO @investigate: currently this vert is required, but it may not be necessary
-            verts->append({{r.left, r.top}});
-        }
-        else if (objectType == ObjectType::POLYLINE || objectType == ObjectType::POLYGON)
-        {
-            const std::string verticesKey = objectType == ObjectType::POLYLINE ? "polyline" : "polygon";
-            for (size_t j = 0; j < object[verticesKey].size(); j++)
-            {
-                float polygonPointX = object[verticesKey][j]["x"];
-                float polygonPointY = object[verticesKey][j]["y"];
-                verts->append({{parentX + polygonPointX, parentY + polygonPointY}});
-            }
-        }
+            std::shared_ptr<sf::VertexArray> verts = std::make_shared<sf::VertexArray>(sf::Quads, 5);
+            (*verts)[0] = {{r.left, r.top}};
+            (*verts)[1] = {{r.left + r.width, r.top}};
+            (*verts)[2] = {{r.left + r.width, r.top + r.height}};
+            (*verts)[3] = {{r.left, r.top + r.height}};
+            (*verts)[4] = {{r.left, r.top}};
 
-        Object levelObject{Crucible::EntityType::LEVEL_OBJECT, verts};
-        activeLevel.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
+            Object levelObject{Crucible::EntityType::LEVEL_OBJECT, verts};
+            activeLevel.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
+        }
+        else if (objectType == ObjectType::POLYGON || objectType == ObjectType::POLYLINE)
+        {
+            const std::string verticesKey = objectType == ObjectType::POLYGON ? "polygon" : "polyline";
+            const size_t totalVerticesForObject = object[verticesKey].size();
+
+            sf::VertexArray objectVertices(sf::Lines, totalVerticesForObject + 1);
+
+            for (size_t i = 0; i < totalVerticesForObject; i++)
+            {
+                float polygonPointX = object[verticesKey][i]["x"];
+                float polygonPointY = object[verticesKey][i]["y"];
+                objectVertices[i] = {{parentX + polygonPointX, parentY + polygonPointY}};
+            }
+
+            // Add first vertex again to complete object
+            objectVertices[objectVertices.getVertexCount()-1] = objectVertices[0];
+
+            Object levelObject{Crucible::EntityType::LEVEL_OBJECT, std::make_shared<sf::VertexArray>(objectVertices)};
+            activeLevel.layerNameToObjectLayer[layer.name].lightingObjectData.emplace_back(levelObject);
+        }
 
         addCustomPropertiesToLayer(layer, object);
     }

@@ -77,12 +77,9 @@ namespace Component
 
     struct CLightSource
     {
-        // Every 2 elements is a line, so to access the nth line, the index positions are: (v[i * 2], v[(i * 2) * 1])
-        std::vector<Crucible::Ray> rays;
+        std::unordered_map<Crucible::RayType, Crucible::LightRayGroup> lightRayGroups;
 
         sf::VertexArray lightVertices;
-
-        std::vector<std::vector<Crucible::LightRayIntersect>> lightRayIntersects;
 
         std::string lightingObjectLayerName;
 

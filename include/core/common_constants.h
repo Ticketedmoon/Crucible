@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <string_view>
 #include "vec2.h"
+#include "ray.h"
 
 namespace Crucible
 {
@@ -37,11 +38,23 @@ namespace Crucible
         NONE
     };
 
+    enum class RayType
+    {
+            CORE,
+            ADDITIONAL
+    };
+
     struct LightRayIntersect
     {
         bool hasIntersection{};
         EntityType entityType{};
         Vec2 collisionPoint;
+    };
+
+    struct LightRayGroup
+    {
+        std::vector<Crucible::Ray> rays;
+        std::vector<std::vector<Crucible::LightRayIntersect>> rayIntersects;
     };
 }
 

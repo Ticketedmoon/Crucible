@@ -27,7 +27,7 @@ class EntitySpawner
                 const std::string& pathingObjectLayerName);
 
     private:
-        static std::vector<Crucible::Ray> createRays(
+        static Component::CLightSource createLightSource(
                 Component::CTransform& playerTransform,
                 const std::string& layerName);
 

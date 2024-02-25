@@ -21,13 +21,18 @@ void LightingSystem::execute()
 
         entityLightSource.lightVertices.clear();
 
-        std::vector<Crucible::LightRayIntersect> intersections = findAllRayIntersectionPoints(entityLightSource,
-                entityTransform);
+        // Combination of CORE rays and ADDITIONAL rays
+        std::vector<Crucible::LightRayIntersect> rayIntersections = findAllRayIntersectionPoints(
+                Crucible::RayType::CORE, entityLightSource, entityTransform);
 
-        sortIntersectionsByAngleAscending(entityTransform, intersections);
+        // Add additional Rays
+        std::vector<Crucible::LightRayIntersect> additionalRayIntersections = findAllRayIntersectionPoints(
+                Crucible::RayType::ADDITIONAL, entityLightSource, entityTransform);
+        rayIntersections.insert(rayIntersections.end(), additionalRayIntersections.begin(), additionalRayIntersections.end());
 
+        sortIntersectionsByAngleAscending(entityTransform, rayIntersections);
         // Add to light rendering vertex array
-        addVerticesForLightCollisions(entityLightSource, entityTransform, intersections);
+        addVerticesForLightCollisions(entityLightSource, entityTransform, rayIntersections);
     }
 }
 
@@ -51,13 +56,16 @@ void LightingSystem::sortIntersectionsByAngleAscending(
 }
 
 std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionPoints(
+        Crucible::RayType rayType,
         Component::CLightSource& entityLightSource,
         const Component::CTransform& entityTransform)
 {
     std::vector<Crucible::LightRayIntersect> collisionPoints;
-    for (size_t lineIndex = 0; lineIndex <  entityLightSource.rays.size(); lineIndex++)
+
+    Crucible::LightRayGroup& rayGroup = entityLightSource.lightRayGroups[rayType];
+    for (size_t rayIndex = 0; rayIndex <  rayGroup.rays.size(); rayIndex++)
     {
-        std::vector<Crucible::LightRayIntersect>& intersectList = entityLightSource.lightRayIntersects[lineIndex];
+        std::vector<Crucible::LightRayIntersect>& intersectList = rayGroup.rayIntersects[rayIndex];
         if (intersectList.empty())
         {
             continue;

@@ -81,11 +81,9 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     const std::string& mainTilesetPath = LevelManager::activeLevel.tileSets[0].path;
     std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(mainTilesetPath);
 
-    std::vector<Crucible::Ray> rays = createRays(transform, lightingObjectLayerName);
-    std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
-            std::vector<std::vector<Crucible::LightRayIntersect>>(rays.size(), std::vector<Crucible::LightRayIntersect>());
+    Component::CLightSource cLightSource = createLightSource(transform, lightingObjectLayerName);
 
-    e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects, lightingObjectLayerName);
+    e.addComponent<Component::CLightSource>(cLightSource);
     e.addComponent<Component::CCollider>();
 
     // FIXME this is temporary, use different texture
@@ -95,9 +93,9 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
 
 }
 
-std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& playerTransform, const std::string& layerName)
+Component::CLightSource EntitySpawner::createLightSource(Component::CTransform& playerTransform, const std::string& layerName)
 {
-    std::vector<Crucible::Ray> rays = std::vector<Crucible::Ray>();
+    std::vector<Crucible::Ray> coreRays = std::vector<Crucible::Ray>();
     std::vector<Crucible::Ray> additionalRays = std::vector<Crucible::Ray>();
 
     ObjectLayer& objectLayer = LevelManager::activeLevel.layerNameToObjectLayer.at(layerName);
@@ -109,16 +107,20 @@ std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& play
         {
             const sf::Vertex& v = (*tileObjectVertices)[i];
             // Add core ray
-            rays.emplace_back(playerTransform.position, Crucible::Vec2(v.position.x, v.position.y));
+            coreRays.emplace_back(playerTransform.position, Crucible::Vec2(v.position.x, v.position.y));
             // Add additional rays to left and right of core ray (This happens in RayAppenderSystem)
             additionalRays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
             additionalRays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
         }
     }
 
-    std::cout << "Configured: [" << rays.size() << "] core light rays" << '\n';
+    std::cout << "Configured: [" << coreRays.size() << "] core light rays" << '\n';
     std::cout << "Configured: [" << additionalRays.size() << "] additional light rays" << '\n';
-    rays.insert(rays.end(), additionalRays.begin(), additionalRays.end());
-    std::cout << "Configured: total [" << rays.size() << "] light rays" << '\n';
-    return rays;
+    std::cout << "Configured: total [" << coreRays.size() + additionalRays.size() << "] light rays" << '\n';
+
+    std::unordered_map<Crucible::RayType, Crucible::LightRayGroup> lightRayGroups{
+        {Crucible::RayType::CORE, {coreRays, std::vector<std::vector<Crucible::LightRayIntersect>>(coreRays.size(), std::vector<Crucible::LightRayIntersect>())}},
+        {Crucible::RayType::ADDITIONAL, {additionalRays, std::vector<std::vector<Crucible::LightRayIntersect>>(additionalRays.size(), std::vector<Crucible::LightRayIntersect>())}}
+    };
+    return {lightRayGroups, sf::VertexArray(), layerName};
 }

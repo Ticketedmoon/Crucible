@@ -14,9 +14,9 @@
 
 enum class ObjectType
 {
-        POLYGON,
-        POLYLINE,
-        RECT
+        POLYGON = 0,
+        POLYLINE = 1,
+        RECT = 2
 };
 
 struct CustomProperty

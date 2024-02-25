@@ -17,7 +17,9 @@ class LightingSystem : public System
         void execute() override;
 
     private:
-        std::vector<Crucible::LightRayIntersect> findAllRayIntersectionPoints(Component::CLightSource& entityLightSource,
+        std::vector<Crucible::LightRayIntersect> findAllRayIntersectionPoints(
+                Crucible::RayType rayType,
+                Component::CLightSource& entityLightSource,
                 const Component::CTransform& entityTransform);
         void addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
                 const Component::CTransform& entityTransform, const std::vector<Crucible::LightRayIntersect>& intersections) ;
