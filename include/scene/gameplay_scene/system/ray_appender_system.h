@@ -20,6 +20,14 @@ class RayAppenderSystem  : public System
         void execute() override;
 
     private:
+        static void updateAdditionalRayEndPosition(
+                Component::CTransform& entityTransform,
+                Crucible::LightRayGroup& rayGroup,
+                size_t additionalRayGroupStartIdx,
+                size_t rayIndex,
+                const sf::Vertex& rayEndVert);
+
+    private:
         EntityManager& m_entityManager;
 
     private:
@@ -27,7 +35,6 @@ class RayAppenderSystem  : public System
         static const size_t RAY_SCALE = 100;
         static constexpr float RADIANS_OFFSET = 0.3174533f;
         static constexpr size_t TOTAL_ADDITIONAL_RAYS_PER_VERT = 2;
-
 };
 
 
