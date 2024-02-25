@@ -116,7 +116,7 @@ Component::CLightSource EntitySpawner::createLightSource(Component::CTransform& 
 
     std::cout << "Configured: [" << coreRays.size() << "] core light rays" << '\n';
     std::cout << "Configured: [" << additionalRays.size() << "] additional light rays" << '\n';
-    std::cout << "Configured: total [" << coreRays.size() + additionalRays.size() << "] light rays" << '\n';
+    std::cout << "Configured: [" << coreRays.size() + additionalRays.size() << "] total light rays" << '\n';
 
     std::unordered_map<Crucible::RayType, Crucible::LightRayGroup> lightRayGroups{
         {Crucible::RayType::CORE, {coreRays, std::vector<std::vector<Crucible::LightRayIntersect>>(coreRays.size(), std::vector<Crucible::LightRayIntersect>())}},

@@ -25,9 +25,9 @@ void RayAppenderSystem::execute()
             sf::VertexArray objectVertices = *object.objectVertices;
             const size_t TOTAL_ADDITIONAL_RAYS_FOR_OBJECT = (objectVertices.getVertexCount()-1) * TOTAL_ADDITIONAL_RAYS_PER_VERT;
 
-            for (size_t objectIndex = 0; objectIndex <= TOTAL_ADDITIONAL_RAYS_FOR_OBJECT; objectIndex += TOTAL_ADDITIONAL_RAYS_PER_VERT)
+            for (size_t rayIndex = 0; rayIndex <= TOTAL_ADDITIONAL_RAYS_FOR_OBJECT; rayIndex += TOTAL_ADDITIONAL_RAYS_PER_VERT)
             {
-                const sf::Vertex& rayEndVert = objectVertices[objectIndex + 1];
+                const sf::Vertex& rayEndVert = objectVertices[rayIndex / TOTAL_ADDITIONAL_RAYS_PER_VERT];
                 const Crucible::Vec2& rayEndPositionLeftOfVertex = Crucible::Vec2(rayEndVert.position.x - RAY_DELTA,
                         rayEndVert.position.y);
                 const Crucible::Vec2& rayEndPositionRightOfVertex = Crucible::Vec2(rayEndVert.position.x + RAY_DELTA,
@@ -44,7 +44,7 @@ void RayAppenderSystem::execute()
                 Crucible::Vec2 endVResultA(endVa.x + std::cos(angleARads), endVa.y + std::sin(angleARads));
                 Crucible::Vec2 endVResultB(endVb.x + std::cos(angleBRads), endVb.y + std::sin(angleBRads));
 
-                const size_t additionalRayIndex = objectIndex + additionalRayGroupStartIdx;
+                const size_t additionalRayIndex = rayIndex + additionalRayGroupStartIdx;
                 rayGroup.rays[additionalRayIndex] = Crucible::Ray(entityTransform.position, endVResultA);
                 rayGroup.rays[additionalRayIndex + 1] = Crucible::Ray(entityTransform.position, endVResultB);
             }
