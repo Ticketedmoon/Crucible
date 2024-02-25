@@ -23,6 +23,7 @@ namespace Crucible
     // @Temporary
     static const bool SHOULD_EXIT_APP_WHEN_CAUGHT_BY_GUARD = false;
 
+    static const inline float PLAYER_ZOOM_FACTOR = 0.5f;
     static const inline float DEFAULT_SFX_VOLUME = 50.0f;
 
     static const inline std::vector<Crucible::Vec2> PLAYER_SPAWN_LOCATIONS{

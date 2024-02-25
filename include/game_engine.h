@@ -10,10 +10,10 @@
 #include <memory>
 #include <iostream>
 
-#include "common_constants.h"
+#include "core/engine/common_constants.h"
 #include "scene.h"
 #include "gameplay_scene.h"
-#include "level_manager.h"
+#include "core/manager/level_manager.h"
 
 class GameEngine
 {

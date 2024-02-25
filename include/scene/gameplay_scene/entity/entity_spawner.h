@@ -6,10 +6,10 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <iostream>
 
-#include "level_manager.h"
+#include "core/manager/level_manager.h"
 #include "system.h"
 #include "entity_manager.h"
-#include "common_constants.h"
+#include "core/engine/common_constants.h"
 #include "vertex.h"
 #include "ray.h"
 #include "tile.h"

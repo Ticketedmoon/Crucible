@@ -2,7 +2,7 @@
 
 ViewManager::ViewManager() = default;
 
-sf::View ViewManager::centerViewOnEntity(sf::RenderTarget& renderTarget, const Entity& entity)
+sf::View ViewManager::centerViewOnEntity(sf::RenderTarget& renderTarget, const Entity& entity, float zoomFactor)
 {
     // keep view centred/centered on entity
     Component::CTransform transformForEntity = entity.getComponent<Component::CTransform>();
@@ -10,7 +10,7 @@ sf::View ViewManager::centerViewOnEntity(sf::RenderTarget& renderTarget, const E
     float centreY = getViewCentreForCoordinate(transformForEntity.position->y, LevelManager::activeLevel.height, Crucible::WINDOW_HEIGHT, transformForEntity.dimensions.y);
 
     sf::View newView = renderTarget.getView();
-    newView.zoom(VIEW_ZOOM_FACTOR);
+    newView.zoom(zoomFactor);
     newView.setCenter(centreX, centreY);
 
     renderTarget.setView(newView);

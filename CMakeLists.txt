@@ -32,7 +32,13 @@ endif ()
 # configure_file(config.h.in config.h)
 
 file(GLOB ROOT_GAME_SOURCES "src/*.cpp")
+
 file(GLOB CORE_GAME_SOURCES "src/core/*.cpp")
+file(GLOB CORE_ENGINE_GAME_SOURCES "src/core/engine/*.cpp")
+file(GLOB CORE_LEVEL_GAME_SOURCES "src/core/level/*.cpp")
+file(GLOB CORE_MANAGER_GAME_SOURCES "src/core/manager/*.cpp")
+file(GLOB CORE_VIEW_GAME_SOURCES "src/core/view/*.cpp")
+
 file(GLOB SCENE_SOURCES "src/scene/*.cpp")
 file(GLOB ENTITY_SOURCES "src/entity/*.cpp")
 file(GLOB SYSTEM_SOURCES "src/system/*.cpp")
@@ -50,15 +56,22 @@ file(COPY resources DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 # Detect and add SFML
 find_package(SFML 2.5.1 COMPONENTS system window graphics network audio REQUIRED)
 
-add_executable(${PROJECT_NAME}
-        ${ROOT_GAME_SOURCES} ${CORE_GAME_SOURCES} ${SCENE_SOURCES} ${ENTITY_SOURCES} ${SYSTEM_SOURCES}
-        ${VICTORY_SCENE_ROOT_COMPONENT_SOURCES} ${VICTORY_SCENE_SYSTEM_SOURCES}
-        ${GAMEPLAY_SCENE_ROOT_COMPONENT_SOURCES} ${GAMEPLAY_SCENE_COMPONENT_SOURCES} ${GAMEPLAY_SCENE_ENTITY_SOURCES} ${GAMEPLAY_SCENE_SYSTEM_SOURCES})
+add_executable(${PROJECT_NAME} ${ROOT_GAME_SOURCES}
+        ${SCENE_SOURCES} ${ENTITY_SOURCES} ${SYSTEM_SOURCES}
+        # Core
+        ${CORE_GAME_SOURCES} ${CORE_ENGINE_GAME_SOURCES} ${CORE_LEVEL_GAME_SOURCES}
+        ${CORE_MANAGER_GAME_SOURCES} ${CORE_VIEW_GAME_SOURCES}
+        # Gameplay
+        ${GAMEPLAY_SCENE_ROOT_COMPONENT_SOURCES} ${GAMEPLAY_SCENE_COMPONENT_SOURCES} ${GAMEPLAY_SCENE_ENTITY_SOURCES} ${GAMEPLAY_SCENE_SYSTEM_SOURCES}
+        # Victory
+        ${VICTORY_SCENE_ROOT_COMPONENT_SOURCES} ${VICTORY_SCENE_SYSTEM_SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_BINARY_DIR}")
-target_include_directories(${PROJECT_NAME} PRIVATE include include/component include/core include/entity include/system
-        include/scene include/scene/gameplay_scene include/scene/gameplay_scene/component
-        include/scene/gameplay_scene/system  include/scene/victory_scene include/scene/victory_scene/system)
+target_include_directories(${PROJECT_NAME} PRIVATE include
+        include/component include/entity include/system include/scene
+        include/core include/core/engine, include/core/level, include/core/manager, include/core/view
+        include/scene/gameplay_scene include/scene/gameplay_scene/component include/scene/gameplay_scene/system
+        include/scene/victory_scene include/scene/victory_scene/system)
 target_include_directories(${PROJECT_NAME} PRIVATE lib/header)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC sfml-system sfml-window sfml-graphics sfml-network sfml-audio)

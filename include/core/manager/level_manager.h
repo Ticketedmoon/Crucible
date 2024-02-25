@@ -10,9 +10,9 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "tile.h"
-#include "level.h"
+#include "core/level/level.h"
 #include "texture_manager.h"
-#include "common_constants.h"
+#include "core/engine/common_constants.h"
 #include "entity_manager.h"
 
 class LevelManager

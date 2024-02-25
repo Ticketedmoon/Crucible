@@ -1,5 +1,5 @@
 #include "render_system.h"
-#include "view_manager.h"
+#include "core/view/view_manager.h"
 
 GameplayRenderSystem::GameplayRenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager,
         TextureManager& textureManager)
@@ -25,7 +25,7 @@ void GameplayRenderSystem::centreViewOnPlayer()
         m_renderTarget.setView(m_renderTarget.getDefaultView());
 
         // Set to Player Centre
-        ViewManager::centerViewOnEntity(m_renderTarget, players.at(0));
+        ViewManager::centerViewOnEntity(m_renderTarget, players.at(0), Crucible::PLAYER_ZOOM_FACTOR);
     }
 }
 

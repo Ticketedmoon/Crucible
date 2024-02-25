@@ -11,8 +11,8 @@
 
 #include "system.h"
 #include "entity_manager.h"
-#include "common_constants.h"
-#include "level_manager.h"
+#include "core/engine/common_constants.h"
+#include "core/manager/level_manager.h"
 #include "game_engine.h"
 
 class PhysicalCollisionSystem : public System

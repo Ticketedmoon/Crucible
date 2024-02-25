@@ -6,16 +6,15 @@
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/View.hpp>
 
-#include "common_constants.h"
-#include "level_manager.h"
-#include "entity.h"
+#include "core/engine/common_constants.h"
+#include "core/manager/level_manager.h"
 
-static const float VIEW_ZOOM_FACTOR = 0.5;
+#include "entity.h"
 
 class ViewManager
 {
     public:
-        static sf::View centerViewOnEntity(sf::RenderTarget& renderTarget, const Entity& entity);
+        static sf::View centerViewOnEntity(sf::RenderTarget& renderTarget, const Entity& entity, float zoomFactor);
         static std::unordered_map<std::string, sf::VertexArray> getTileVerticesInView(
                 const sf::RenderTarget& target,
                 const TileLayer& tileLayer,

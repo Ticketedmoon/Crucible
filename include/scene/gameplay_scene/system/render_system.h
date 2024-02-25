@@ -14,7 +14,7 @@
 #include "system.h"
 #include "entity/entity_manager.h"
 #include "scene/gameplay_scene/system/render_system.h"
-#include "level_manager.h"
+#include "core/manager/level_manager.h"
 
 class GameplayRenderSystem : public System
 {

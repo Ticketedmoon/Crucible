@@ -3,8 +3,8 @@
 #ifndef CRUCIBLE_ENTITY_MEMORY_POOL_H
 #define CRUCIBLE_ENTITY_MEMORY_POOL_H
 
-#include "component.h"
-#include "common_constants.h"
+#include "core/engine/component.h"
+#include "core/engine/common_constants.h"
 
 #include <tuple>
 #include <vector>

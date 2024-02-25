@@ -21,7 +21,7 @@
 
 #include "entity_manager.h"
 #include "system_manager.h"
-#include "texture_manager.h"
+#include "core/manager/texture_manager.h"
 
 class GameplayScene : public Scene
 {

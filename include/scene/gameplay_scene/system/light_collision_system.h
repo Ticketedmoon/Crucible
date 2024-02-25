@@ -9,10 +9,10 @@
 #include <iostream>
 #include <SFML/System/Vector3.hpp>
 
-#include "level_manager.h"
+#include "core/manager/level_manager.h"
 #include "system.h"
 #include "entity_manager.h"
-#include "common_constants.h"
+#include "core/engine/common_constants.h"
 
 class LightCollisionSystem : public System
 {
