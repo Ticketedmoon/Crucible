@@ -37,8 +37,6 @@ class GameplayScene : public Scene
         void registerActions();
 
     private:
-        static const inline sf::Color LEVEL_BACKGROUND_COLOR = sf::Color{0, 32, 32};
-
         EntityManager m_entityManager;
         EntitySpawner m_entitySpawner;
         TextureManager m_textureManager;

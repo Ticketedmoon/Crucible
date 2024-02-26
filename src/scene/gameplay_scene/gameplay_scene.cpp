@@ -20,7 +20,7 @@ void GameplayScene::update()
 
 void GameplayScene::render()
 {
-    gameEngine.m_renderTexture.clear(LEVEL_BACKGROUND_COLOR);
+    gameEngine.m_renderTexture.clear();
     m_systemManager.render();
     gameEngine.m_renderTexture.display();
     gameEngine.m_renderSprite.setTexture(gameEngine.m_renderTexture.getTexture());
