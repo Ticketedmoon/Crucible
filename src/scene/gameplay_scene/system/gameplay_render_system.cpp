@@ -93,6 +93,7 @@ void GameplayRenderSystem::drawOverlays()
     }
 
     auto& transform = players.at(0).getComponent<Component::CTransform>();
+
     m_playerLightOverlay.setPosition(
             transform.position->x + transform.dimensions.x/2 - PLAYER_LIGHT_OVERLAY_RADIUS,
             transform.position->y + transform.dimensions.y/2 - PLAYER_LIGHT_OVERLAY_RADIUS);
@@ -107,9 +108,9 @@ void GameplayRenderSystem::drawGuiData()
 void GameplayRenderSystem::configureOverlays()
 {
     m_darkOverlay.setPosition(sf::Vector2f(0, 0));
-    m_darkOverlay.setFillColor(sf::Color(255, 255, 255, 64));
+    m_darkOverlay.setFillColor(sf::Color(255, 255, 255, 96));
     m_darkOverlay.setSize(sf::Vector2f(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
 
-    m_playerLightOverlay.setFillColor(sf::Color(0, 0, 0, 96));
+    m_playerLightOverlay.setFillColor(sf::Color(0, 0, 0, 128));
     m_playerLightOverlay.setRadius(PLAYER_LIGHT_OVERLAY_RADIUS);
 }
