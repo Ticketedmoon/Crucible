@@ -110,6 +110,6 @@ void GameplayRenderSystem::configureOverlays()
     m_darkOverlay.setFillColor(sf::Color(255, 255, 255, 64));
     m_darkOverlay.setSize(sf::Vector2f(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
 
-    m_playerLightOverlay.setFillColor(sf::Color(0, 0, 0, 64));
+    m_playerLightOverlay.setFillColor(sf::Color(0, 0, 0, 96));
     m_playerLightOverlay.setRadius(PLAYER_LIGHT_OVERLAY_RADIUS);
 }
