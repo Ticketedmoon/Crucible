@@ -56,5 +56,39 @@ Haven't had much time to work on this project over the last month, but except fo
 
 ---
 
+### Entry #4 [Feb 1st, 2024]:
+
+- Added tiling to the world with single tileset.
+- Add spawn point (blue tile)
+- Add end zone (green tiles)
+- Maintain performant visibility system without ray casting to each tile vertex.
+- Arrow blocks can be pushed
+- Add visibility system blend (sf::Multiply) for the background tiles to still remain visible
+while lit.
+
+##### Add tiling to the world
+![Mon 26 Feb 2024 18:48:17 GMT](https://github.com/Ticketedmoon/Crucible/assets/21260839/04337ee5-fac8-45ae-a5ce-9e93b9a5a457)
+
+##### Collision and Block-Pushing behaviour functional
+![Mon 26 Feb 2024 18:48:34 GMT](https://github.com/Ticketedmoon/Crucible/assets/21260839/20c7931a-69b6-4c14-ab79-083503d3db5e)
+
+
+---
+
+### Entry #5 [Feb 14th, 2024]:
+
+- Added a new tileset to game world (purple-dungeon-brick)
+- Add spawn tiles
+- Add end tiles
+- Add patrolling guards (No guard texture, just a patrolling brick texture)
+- Merged with existing tileset from Entry #4 (See the spawn zone and end zone)
+- Add lower level for player-2 for Couch Co-op. (An idea I think I want to toy with is
+if one of the two player's is caught, the other player can additionally complete the
+opposing section of the map to beat the stage.)
+
+![Mon 26 Feb 2024 18:39:16 GMT](https://github.com/Ticketedmoon/Crucible/assets/21260839/64d03c22-69a0-43eb-8021-642c3ab65823)
+
+---
+
 ### Credit
 - https://ncase.me/sight-and-light/
