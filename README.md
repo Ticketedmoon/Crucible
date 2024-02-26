@@ -54,6 +54,26 @@ Here are the changes summarised during this period:
 Haven't had much time to work on this project over the last month, but except for one notable fix:
 - Fixed a bug where the light rays would flicker when pushing entities in the game world.
 
+### Entry #5 [Feb 26th, 2024]:
+- Catacomb asset texturing to world applied
+- Enable multiple tile layers in world file to stack correctly.
+- Enable multiple tile sets across multiple tile layers to render as expected.
+- Guard pathing updated to patrol around catacombs.
+- Update player spawn location(s)
+- Update lighting approach to use polygons rather than rects. 
+This greatly improves performance from the reduction in vertices. 
+- Update collision logic to be based on polygons and polylines rather than at the tile level.
+- Add end zone to the stage that the player must reach to complete the stage.
+- Add overlays to darken map and a lighter ellipse to give more visibility around player. This
+is done through blending ([multiply] and [add] respectively).
+
+##### First Stage Spawn Area
+![Mon 26 Feb 2024 18:16:51 GMT](https://github.com/Ticketedmoon/Crucible/assets/21260839/4b636cd1-5003-4e73-8271-0ed7708ef53a)
+
+##### Lighting showcased
+![Mon 26 Feb 2024 18:17:34 GMT](https://github.com/Ticketedmoon/Crucible/assets/21260839/ed475168-2579-4647-b8f1-b63830321d07)
+
+
 ---
 
 ### Credit
