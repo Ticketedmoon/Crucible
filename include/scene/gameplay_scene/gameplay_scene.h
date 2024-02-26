@@ -21,7 +21,7 @@
 
 #include "entity_manager.h"
 #include "system_manager.h"
-#include "texture_manager.h"
+#include "core/manager/texture_manager.h"
 
 class GameplayScene : public Scene
 {
@@ -36,11 +36,7 @@ class GameplayScene : public Scene
         void registerSystems();
         void registerActions();
 
-        void createTilesForLevel(Level& level);
-
     private:
-        static const inline sf::Color LEVEL_BACKGROUND_COLOR = sf::Color{0, 32, 32};
-
         EntityManager m_entityManager;
         EntitySpawner m_entitySpawner;
         TextureManager m_textureManager;

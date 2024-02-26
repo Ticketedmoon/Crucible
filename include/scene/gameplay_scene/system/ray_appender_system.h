@@ -5,7 +5,7 @@
 
 #include "system.h"
 #include "entity_manager.h"
-#include "level_manager.h"
+#include "core/manager/level_manager.h"
 
 /**
  * [System Description]
@@ -20,15 +20,21 @@ class RayAppenderSystem  : public System
         void execute() override;
 
     private:
+        static void updateAdditionalRayEndPosition(
+                Component::CTransform& entityTransform,
+                Crucible::LightRayGroup& rayGroup,
+                size_t additionalRayGroupStartIdx,
+                size_t rayIndex,
+                const sf::Vertex& rayEndVert);
+
+    private:
         EntityManager& m_entityManager;
 
     private:
-        static const int TOTAL_CORE_RAYS = 20;
         static const size_t RAY_DELTA = 1;
         static const size_t RAY_SCALE = 100;
         static constexpr float RADIANS_OFFSET = 0.3174533f;
-        const size_t totalRaysPerVertex = 2;
-
+        static constexpr size_t TOTAL_ADDITIONAL_RAYS_PER_VERT = 2;
 };
 
 

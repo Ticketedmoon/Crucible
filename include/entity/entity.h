@@ -10,7 +10,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "component.h"
+#include "core/engine/component.h"
 #include "entity_memory_pool.h"
 
 class Entity

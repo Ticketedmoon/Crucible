@@ -14,26 +14,38 @@
 #include "system.h"
 #include "entity/entity_manager.h"
 #include "scene/gameplay_scene/system/render_system.h"
-#include "level_manager.h"
+#include "core/manager/level_manager.h"
+#include "core/view/view_manager.h"
 
 class GameplayRenderSystem : public System
 {
     public:
-        explicit GameplayRenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager);
+        explicit GameplayRenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager,
+                TextureManager& textureManager);
 
         void execute() override;
 
     private:
-        void drawEntities();
+        void centreViewOnPlayer();
+        void configureOverlays();
 
+        void draw();
+        void drawMap();
+        void drawEntities();
         void drawGuiData();
-        void configureTextRendering();
-        void drawText(sf::Text& text, const sf::Color& fillColour, uint8_t characterSize, sf::Vector2f position);
+        void drawTiles(const std::unordered_map<std::string, sf::VertexArray>& tileData);
+        void drawOverlays();
 
     private:
+        static inline uint16_t PLAYER_LIGHT_OVERLAY_RADIUS = 100;
+        static inline sf::Font m_font;
+
+        sf::RectangleShape m_darkOverlay;
+        sf::CircleShape m_playerLightOverlay;
+
         sf::RenderTarget& m_renderTarget;
         EntityManager& m_entityManager;
-        static inline sf::Font m_font;
+        TextureManager& m_textureManager;
 };
 
 

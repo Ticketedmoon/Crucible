@@ -8,6 +8,8 @@ VictoryRenderSystem::VictoryRenderSystem(sf::RenderTarget& renderTarget, EntityM
 
 void VictoryRenderSystem::execute()
 {
+    m_renderTarget.setView(m_renderTarget.getDefaultView());
+
     const sf::Vector2u& windowSize = m_renderTarget.getSize();
     float viewCentreX = m_renderTarget.getView().getCenter().x;
     const sf::Vector2<float>& position = sf::Vector2f(

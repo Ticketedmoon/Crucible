@@ -10,7 +10,14 @@
 #include <memory>
 #include "tile.h"
 #include "vec2.h"
-#include "common_constants.h"
+#include "core/engine/common_constants.h"
+
+enum class ObjectType
+{
+        POLYGON = 0,
+        POLYLINE = 1,
+        RECT = 2
+};
 
 struct CustomProperty
 {
@@ -27,20 +34,31 @@ struct Layer
 
 struct Object
 {
+    std::string objectName;
     Crucible::EntityType entityType;
-    TileType type;
     std::shared_ptr<sf::VertexArray> objectVertices;
-    std::unordered_map<std::string, std::vector<CustomProperty>> customProperties;
 };
 
 struct TileLayer : Layer
 {
-    std::vector<Tile> data;
+    std::unordered_map<std::string, sf::VertexArray> tilesetPathToLevelData;
 };
 
 struct ObjectLayer : Layer
 {
-    std::vector<Object> lightingObjectData;
+    std::vector<Object> objectData;
+    std::unordered_map<std::string, std::vector<CustomProperty>> customProperties;
+};
+
+struct TileSet
+{
+    const size_t firstgid;
+    const std::string name;
+    const std::string path;
+    const size_t tileCount;
+    const size_t tileWidth;
+    const size_t tileHeight;
+    const size_t columns;
 };
 
 class Level
@@ -50,6 +68,7 @@ class Level
         uint8_t height;
         std::vector<TileLayer> tileLayers;
         std::unordered_map<std::string, ObjectLayer> layerNameToObjectLayer;
+        std::vector<TileSet> tileSets;
 };
 
 

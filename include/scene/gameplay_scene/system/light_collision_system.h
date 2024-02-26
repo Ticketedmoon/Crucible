@@ -9,10 +9,10 @@
 #include <iostream>
 #include <SFML/System/Vector3.hpp>
 
-#include "level_manager.h"
+#include "core/manager/level_manager.h"
 #include "system.h"
 #include "entity_manager.h"
-#include "common_constants.h"
+#include "core/engine/common_constants.h"
 
 class LightCollisionSystem : public System
 {
@@ -28,7 +28,8 @@ class LightCollisionSystem : public System
                 Component::CLightSource& lightSource,
                 const std::vector<Object>& lightObjects,
                 Crucible::Ray& ray,
-                size_t lineIndex);
+                size_t rayIndex,
+                Crucible::RayType rayType);
 
         static float crossProduct(Crucible::Vec2 a, Crucible::Vec2 b);
 
@@ -37,6 +38,21 @@ class LightCollisionSystem : public System
                 Crucible::Vec2 vertexC,
                 Crucible::Vec2 vertexD,
                 Crucible::EntityType entityType);
+
+        void checkForLightIntersectForRay(
+                Component::CLightSource& lightSource,
+                size_t rayIndex,
+                Crucible::RayType rayType,
+                const Object& object,
+                const Crucible::Vec2& rayStartPos,
+                const Crucible::Vec2& rayEndPos,
+                const sf::Vertex& objectStartVert,
+                const sf::Vertex& objectEndVert);
+
+        void resolveLightCollisionsForRayGroup(
+                Component::CLightSource& lightSource,
+                std::vector<Entity>& players,
+                Crucible::RayType rayType);
 
     private:
         EntityManager& m_entityManager;

@@ -6,8 +6,8 @@
 #include <unordered_map>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>
-#include "action.h"
-#include "audio_manager.h"
+#include "core/engine/action.h"
+#include "core/manager/audio_manager.h"
 
 // Forward-declaration
 class GameEngine;

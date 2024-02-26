@@ -2,18 +2,14 @@
 
 GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
     m_entitySpawner(m_entityManager, m_textureManager),
-    m_levelManager(m_entityManager, m_textureManager)
+    m_levelManager(m_textureManager)
 {
     registerActions();
     registerSystems();
 
-    Level& level = m_levelManager.loadLevel();
-    createTilesForLevel(level);
-
     m_entitySpawner.createPlayer();
-
-    m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_A_NAME, LevelManager::GUARD_PATHING_LAYER_A);
-    m_entitySpawner.createGuard(LevelManager::LIGHTING_OBJECT_LAYER_B_NAME, LevelManager::GUARD_PATHING_LAYER_B);
+    m_entitySpawner.createGuard(LevelManager::GUARD_LIGHTING_LAYER_A, LevelManager::GUARD_PATHING_LAYER_A);
+    //m_entitySpawner.createGuard(LevelManager::COLLISION_LAYER_PLAYER_B, LevelManager::GUARD_PATHING_LAYER_B);
 }
 
 void GameplayScene::update()
@@ -24,7 +20,7 @@ void GameplayScene::update()
 
 void GameplayScene::render()
 {
-    gameEngine.m_renderTexture.clear(LEVEL_BACKGROUND_COLOR);
+    gameEngine.m_renderTexture.clear();
     m_systemManager.render();
     gameEngine.m_renderTexture.display();
     gameEngine.m_renderSprite.setTexture(gameEngine.m_renderTexture.getTexture());
@@ -71,33 +67,6 @@ void GameplayScene::performAction(Action& action)
     }
 }
 
-void GameplayScene::createTilesForLevel(Level& level)
-{
-    for (TileLayer layer : level.tileLayers)
-    {
-        for (int row = 0; row < level.height; row++)
-        {
-            for (int col = 0; col < level.width; col++)
-            {
-                int textureIndex = col + (row * level.width);
-                Tile t = layer.data.at(textureIndex);
-                if (t.type == TileType::TRANSPARENT)
-                {
-                    continue;
-                }
-
-                t.position.x *= Crucible::TILE_SIZE;
-                t.position.y *= Crucible::TILE_SIZE;
-
-                bool isImmovable = t.type != TileType::BACKGROUND_PURPLE_WALL
-                        && t.type != TileType::SPAWN_ZONE
-                        && t.type != TileType::END_ZONE;
-                m_entitySpawner.createTile(t, false, isImmovable);
-            }
-        }
-    }
-}
-
 void GameplayScene::registerActions()
 {
     // Escape
@@ -135,5 +104,6 @@ void GameplayScene::registerSystems()
 
     // Render
     m_systemManager.registerSystem(
-            std::make_shared<GameplayRenderSystem>(gameEngine.m_renderTexture, m_entityManager), SystemManager::SystemType::RENDER);
+            std::make_shared<GameplayRenderSystem>(gameEngine.m_renderTexture, m_entityManager, m_textureManager),
+                    SystemManager::SystemType::RENDER);
 }

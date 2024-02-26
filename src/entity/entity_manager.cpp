@@ -1,5 +1,18 @@
 #include "entity/entity_manager.h"
 
+EntityManager::EntityManager()
+{
+    // Initialise entityType->Entity map with empty vectors.
+    for (size_t i = 0; i < TOTAL_ENTITY_TYPES; i++)
+    {
+        auto entityType = static_cast<Crucible::EntityType>(i);
+        if (i < Crucible::TOTAL_ENTITY_TYPES)
+        {
+            m_entitiesByType[entityType] = {};
+        }
+    }
+}
+
 void EntityManager::update()
 {
     for (const auto& entityTypeToEntityPair : m_entitiesToAdd)

@@ -76,16 +76,16 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
     {
         cTransform.position->y += PLAYER_SPEED;
         animation.animationList = {
-                TileType::PLAYER_WALK_DOWN_A, TileType::PLAYER_WALK_DOWN_B, TileType::PLAYER_WALK_DOWN_C,
-                TileType::PLAYER_WALK_DOWN_D, TileType::PLAYER_WALK_DOWN_E, TileType::PLAYER_WALK_DOWN_F,
+                PlayerAnimation::PLAYER_WALK_DOWN_A, PlayerAnimation::PLAYER_WALK_DOWN_B, PlayerAnimation::PLAYER_WALK_DOWN_C,
+                PlayerAnimation::PLAYER_WALK_DOWN_D, PlayerAnimation::PLAYER_WALK_DOWN_E, PlayerAnimation::PLAYER_WALK_DOWN_F,
         };
     }
     if (controllable.isMovingUp)
     {
         cTransform.position->y -= PLAYER_SPEED;
         animation.animationList = {
-                TileType::PLAYER_WALK_UP_A, TileType::PLAYER_WALK_UP_B, TileType::PLAYER_WALK_UP_C,
-                TileType::PLAYER_WALK_UP_D, TileType::PLAYER_WALK_UP_E, TileType::PLAYER_WALK_UP_F,
+                PlayerAnimation::PLAYER_WALK_UP_A, PlayerAnimation::PLAYER_WALK_UP_B, PlayerAnimation::PLAYER_WALK_UP_C,
+                PlayerAnimation::PLAYER_WALK_UP_D, PlayerAnimation::PLAYER_WALK_UP_E, PlayerAnimation::PLAYER_WALK_UP_F,
                 };
     }
     if (controllable.isMovingLeft)
@@ -93,16 +93,16 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
         cTransform.position->x -= PLAYER_SPEED;
         // TODO add other anims
         animation.animationList = {
-                TileType::PLAYER_WALK_LEFT_A, TileType::PLAYER_WALK_LEFT_B, TileType::PLAYER_WALK_LEFT_C,
-                TileType::PLAYER_WALK_LEFT_D, TileType::PLAYER_WALK_LEFT_E, TileType::PLAYER_WALK_LEFT_F
+                PlayerAnimation::PLAYER_WALK_LEFT_A, PlayerAnimation::PLAYER_WALK_LEFT_B, PlayerAnimation::PLAYER_WALK_LEFT_C,
+                PlayerAnimation::PLAYER_WALK_LEFT_D, PlayerAnimation::PLAYER_WALK_LEFT_E, PlayerAnimation::PLAYER_WALK_LEFT_F
         };
     }
     if (controllable.isMovingRight)
     {
         cTransform.position->x += PLAYER_SPEED;
         animation.animationList = {
-                TileType::PLAYER_WALK_RIGHT_A, TileType::PLAYER_WALK_RIGHT_B, TileType::PLAYER_WALK_RIGHT_C,
-                TileType::PLAYER_WALK_RIGHT_D, TileType::PLAYER_WALK_RIGHT_E, TileType::PLAYER_WALK_RIGHT_F,
+                PlayerAnimation::PLAYER_WALK_RIGHT_A, PlayerAnimation::PLAYER_WALK_RIGHT_B, PlayerAnimation::PLAYER_WALK_RIGHT_C,
+                PlayerAnimation::PLAYER_WALK_RIGHT_D, PlayerAnimation::PLAYER_WALK_RIGHT_E, PlayerAnimation::PLAYER_WALK_RIGHT_F,
         };
     }
 }

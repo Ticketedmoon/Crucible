@@ -9,7 +9,7 @@ void EntitySpawner::createPlayer()
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::PLAYER);
 
-    Crucible::Vec2 playerDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
+    Crucible::Vec2 playerDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE * 2};
     std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(Crucible::PLAYER_SPAWN_LOCATIONS[0]);
 
     auto& playerTransform = e.addComponent<Component::CTransform>(position, playerDimensions);
@@ -22,7 +22,6 @@ void EntitySpawner::createPlayer()
 
     Tile playerTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
-            TileType::PLAYER_WALK_DOWN_A,
             TileRotation::NONE,
             vertices);
 
@@ -37,25 +36,32 @@ void EntitySpawner::createPlayer()
 void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, const std::string& pathingObjectLayerName)
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::GUARD);
-    ObjectLayer pathingObjectLayer = LevelManager::activeLevel.layerNameToObjectLayer.at(pathingObjectLayerName);
+    std::unordered_map<std::string, ObjectLayer>& pathingObjectLayerNameToObjectLayer
+        = LevelManager::activeLevel.layerNameToObjectLayer;
+    ObjectLayer pathingObjectLayer = pathingObjectLayerNameToObjectLayer.at(pathingObjectLayerName);
 
     std::vector<Waypoint> path;
-    for (auto& guardPath : pathingObjectLayer.lightingObjectData)
+    for (size_t i = 0; i < pathingObjectLayer.objectData.size(); i++)
     {
-        sf::VertexArray& objectVertData = *guardPath.objectVertices;
-        sf::Vertex v{objectVertData[0]};
-
-        uint32_t waitPeriodMs = guardPath.customProperties.contains("wait_period")
-                ? std::stoi(guardPath.customProperties.at("wait_period").at(0).value)
+        size_t pointIndex = pathingObjectLayer.customProperties.contains("point_idx")
+                ? std::stoi(pathingObjectLayer.customProperties.at("point_idx").at(0).value)
                 : 0;
-        path.emplace_back(Waypoint({v.position.x, v.position.y}, waitPeriodMs));
+
+        const sf::VertexArray pathingVertices = *pathingObjectLayer.objectData[i].objectVertices;
+        for (size_t j = 0; j < pathingVertices.getVertexCount(); j++)
+        {
+            uint32_t waitPeriodMs = pathingObjectLayer.customProperties.contains("wait_period") && pointIndex == j
+                    ? std::stoi(pathingObjectLayer.customProperties.at("wait_period").at(0).value)
+                    : 0;
+            path.emplace_back(Waypoint({pathingVertices[j].position.x, pathingVertices[j].position.y}, waitPeriodMs));
+        }
     }
 
     e.addComponent<Component::CPathFollower>(path, pathingObjectLayerName);
 
     std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(path.at(0).position);
 
-    Crucible::Vec2 guardDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
+    Crucible::Vec2 guardDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE * 2};
 
     auto& transform = e.addComponent<Component::CTransform>(position, guardDimensions);
 
@@ -63,88 +69,56 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     vertices->append(sf::Vertex({transform.position->x, transform.position->y}));
     vertices->append(sf::Vertex({transform.position->x + guardDimensions.x, transform.position->y}));
     vertices->append(sf::Vertex({transform.position->x + guardDimensions.x, transform.position->y + guardDimensions.y}));
-    vertices->append(sf::Vertex({transform.position->x, transform.position->y + Crucible::TILE_SIZE}));
+    vertices->append(sf::Vertex({transform.position->x, transform.position->y + guardDimensions.y}));
 
     Tile guardTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
-            TileType::CENTRAL_WALL_LARGE_BROKEN_PURPLE,
             TileRotation::NONE,
             vertices);
 
-    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::DUNGEON_TILE_SHEET_PATH);
+    const std::string& mainTilesetPath = LevelManager::activeLevel.tileSets[0].path;
+    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(mainTilesetPath);
 
-    std::vector<Crucible::Ray> rays = createRays(transform, lightingObjectLayerName);
-    std::vector<std::vector<Crucible::LightRayIntersect>> defaultLightRayIntersects =
-            std::vector<std::vector<Crucible::LightRayIntersect>>(rays.size(), std::vector<Crucible::LightRayIntersect>());
-    e.addComponent<Component::CLightSource>(rays, sf::VertexArray(), defaultLightRayIntersects, lightingObjectLayerName);
-    e.addComponent<Component::CTile>(guardTile, texture);
+    Component::CLightSource cLightSource = createLightSource(transform, lightingObjectLayerName);
+
+    e.addComponent<Component::CLightSource>(cLightSource);
     e.addComponent<Component::CCollider>();
-    e.addComponent<Component::CAnimation>(LevelManager::DUNGEON_TILE_SHEET_PATH);
+
+    // FIXME this is temporary, use different texture
+    std::shared_ptr<sf::Texture>& p_texture = m_textureManager.getTexture(LevelManager::PLAYER_SPRITE_SHEET_PATH);
+    e.addComponent<Component::CTile>(guardTile, p_texture);
+    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH);
 
 }
 
-void EntitySpawner::createTile(Tile& t, bool isCollidable, bool immovable)
+Component::CLightSource EntitySpawner::createLightSource(Component::CTransform& playerTransform, const std::string& layerName)
 {
-    auto e = m_entityManager.addEntity(Crucible::EntityType::TILE);
-    Crucible::Vec2 position{static_cast<float>(t.position.x), static_cast<float>(t.position.y)};
-
-    Crucible::Vec2 tileDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE};
-
-    e.addComponent<Component::CTransform>(std::make_shared<Crucible::Vec2>(position), tileDimensions);
-    if (isCollidable)
-    {
-        e.addComponent<Component::CCollider>(immovable);
-    }
-
-    sf::VertexArray vertices(sf::Quads);
-    vertices.append(sf::Vertex({position.x, position.y}));
-    vertices.append(sf::Vertex({position.x + tileDimensions.x, position.y}));
-    vertices.append(sf::Vertex({position.x + tileDimensions.x, position.y + tileDimensions.y}));
-    vertices.append(sf::Vertex({position.x, position.y + Crucible::TILE_SIZE}));
-
-//    if (t.type == TileType::ARROW_BLOCK)
-//    {
-//        LevelManager::activeLevel.layerNameToObjectLayer[0].tileObjectVertices.emplace_back(vertices);
-//    }
-
-    std::shared_ptr<sf::Texture> texture;
-    t.vertices = std::make_shared<sf::VertexArray>(vertices);
-
-    if (t.type == TileType::SPAWN_ZONE || t.type == TileType::END_ZONE)
-    {
-        texture = m_textureManager.getTexture(LevelManager::BASIC_TILE_SHEET_PATH);
-        e.addComponent<Component::CAnimation>(LevelManager::BASIC_TILE_SHEET_PATH);
-    }
-    else
-    {
-        texture = m_textureManager.getTexture(LevelManager::DUNGEON_TILE_SHEET_PATH);
-        e.addComponent<Component::CAnimation>(LevelManager::DUNGEON_TILE_SHEET_PATH);
-    }
-    e.addComponent<Component::CTile>(t, texture);
-}
-
-std::vector<Crucible::Ray> EntitySpawner::createRays(Component::CTransform& playerTransform, const std::string& layerName)
-{
-    std::vector<Crucible::Ray> rays = std::vector<Crucible::Ray>();
+    std::vector<Crucible::Ray> coreRays = std::vector<Crucible::Ray>();
     std::vector<Crucible::Ray> additionalRays = std::vector<Crucible::Ray>();
 
     ObjectLayer& objectLayer = LevelManager::activeLevel.layerNameToObjectLayer.at(layerName);
 
-    for (const Object& tileObject : objectLayer.lightingObjectData)
+    for (const Object& tileObject : objectLayer.objectData)
     {
         std::shared_ptr<sf::VertexArray> tileObjectVertices = tileObject.objectVertices;
         for (size_t i = 0; i < tileObjectVertices->getVertexCount(); i++)
         {
             const sf::Vertex& v = (*tileObjectVertices)[i];
             // Add core ray
-            rays.emplace_back(playerTransform.position, Crucible::Vec2(v.position.x, v.position.y));
+            coreRays.emplace_back(playerTransform.position, Crucible::Vec2(v.position.x, v.position.y));
             // Add additional rays to left and right of core ray (This happens in RayAppenderSystem)
             additionalRays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
             additionalRays.emplace_back(playerTransform.position, Crucible::Vec2(0, 0));
         }
     }
 
-    rays.insert(rays.end(), additionalRays.begin(), additionalRays.end());
-    std::cout << "Configured: [" << rays.size() << "] light rays" << '\n';
-    return rays;
+    std::cout << "Configured: [" << coreRays.size() << "] core light rays" << '\n';
+    std::cout << "Configured: [" << additionalRays.size() << "] additional light rays" << '\n';
+    std::cout << "Configured: [" << coreRays.size() + additionalRays.size() << "] total light rays" << '\n';
+
+    std::unordered_map<Crucible::RayType, Crucible::LightRayGroup> lightRayGroups{
+        {Crucible::RayType::CORE, {coreRays, std::vector<std::vector<Crucible::LightRayIntersect>>(coreRays.size(), std::vector<Crucible::LightRayIntersect>())}},
+        {Crucible::RayType::ADDITIONAL, {additionalRays, std::vector<std::vector<Crucible::LightRayIntersect>>(additionalRays.size(), std::vector<Crucible::LightRayIntersect>())}}
+    };
+    return {lightRayGroups, sf::VertexArray(), layerName};
 }

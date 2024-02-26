@@ -11,8 +11,8 @@
 
 #include "system.h"
 #include "entity_manager.h"
-#include "common_constants.h"
-#include "level_manager.h"
+#include "core/engine/common_constants.h"
+#include "core/manager/level_manager.h"
 #include "game_engine.h"
 
 class PhysicalCollisionSystem : public System
@@ -23,8 +23,10 @@ class PhysicalCollisionSystem : public System
         void execute() override;
 
     private:
-        bool isCollidingAABB(const Component::CTile& entityTile,
-                const std::shared_ptr<sf::VertexArray>& otherRectVertices, sf::FloatRect& overlap);
+        static bool isCollidingAABB(
+                const Component::CTile& entityTile,
+                const sf::FloatRect& otherObjectBounds,
+                sf::FloatRect& overlap);
 
         void resolveCollision(Component::CTile& entityTile, Component::CTransform& entityTransform,
                 const Crucible::Vec2& otherEntityPositionVec, const sf::FloatRect& overlap);
@@ -32,7 +34,7 @@ class PhysicalCollisionSystem : public System
         void resolvePhysicalCollisionsForObjectLayer(
                 Component::CCollider& entityCollider,
                 const Entity& entity,
-                ObjectLayer& lightingObjectLayer);
+                ObjectLayer& objectLayer);
 
         void resolvePhysicalCollisions(Component::CTile& entityTile,
                 Component::CTransform& entityTransform,

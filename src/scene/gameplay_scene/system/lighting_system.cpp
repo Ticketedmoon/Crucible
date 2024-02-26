@@ -7,27 +7,26 @@ LightingSystem::LightingSystem(EntityManager& entityManager) : m_entityManager(e
 
 void LightingSystem::execute()
 {
-    std::vector<Entity> entities = m_entityManager.getEntities();
+    std::vector<Entity> entities = m_entityManager.getEntitiesByEntityType(Crucible::EntityType::GUARD);
     for (const Entity entity : entities)
     {
-        if (!entity.hasComponent<Component::CLightSource>() || !entity.hasComponent<Component::CTransform>() ||
-                !entity.hasComponent<Component::CTile>())
-        {
-            continue;
-        }
-
         auto& entityLightSource = entity.getComponent<Component::CLightSource>();
         auto& entityTransform = entity.getComponent<Component::CTransform>();
 
         entityLightSource.lightVertices.clear();
 
-        std::vector<Crucible::LightRayIntersect> intersections = findAllRayIntersectionPoints(entityLightSource,
-                entityTransform);
+        // Combination of CORE rays and ADDITIONAL rays
+        std::vector<Crucible::LightRayIntersect> rayIntersections = findAllRayIntersectionPoints(
+                Crucible::RayType::CORE, entityLightSource, entityTransform);
 
-        sortIntersectionsByAngleAscending(entityTransform, intersections);
+        // Add additional Rays
+        std::vector<Crucible::LightRayIntersect> additionalRayIntersections = findAllRayIntersectionPoints(
+                Crucible::RayType::ADDITIONAL, entityLightSource, entityTransform);
+        rayIntersections.insert(rayIntersections.end(), additionalRayIntersections.begin(), additionalRayIntersections.end());
 
+        sortIntersectionsByAngleAscending(entityTransform, rayIntersections);
         // Add to light rendering vertex array
-        addVerticesForLightCollisions(entityLightSource, entityTransform, intersections);
+        addVerticesForLightCollisions(entityLightSource, entityTransform, rayIntersections);
     }
 }
 
@@ -51,13 +50,16 @@ void LightingSystem::sortIntersectionsByAngleAscending(
 }
 
 std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionPoints(
+        Crucible::RayType rayType,
         Component::CLightSource& entityLightSource,
         const Component::CTransform& entityTransform)
 {
     std::vector<Crucible::LightRayIntersect> collisionPoints;
-    for (size_t lineIndex = 0; lineIndex <  entityLightSource.rays.size(); lineIndex++)
+
+    Crucible::LightRayGroup& rayGroup = entityLightSource.lightRayGroups[rayType];
+    for (size_t rayIndex = 0; rayIndex <  rayGroup.rays.size(); rayIndex++)
     {
-        std::vector<Crucible::LightRayIntersect>& intersectList = entityLightSource.lightRayIntersects[lineIndex];
+        std::vector<Crucible::LightRayIntersect>& intersectList = rayGroup.rayIntersects[rayIndex];
         if (intersectList.empty())
         {
             continue;
@@ -65,22 +67,24 @@ std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionP
 
         sortLightIntersectionsByDistanceToEntity(entityTransform, intersectList);
 
+        Crucible::LightRayIntersect intersect = intersectList[0];
+
         if (intersectList[0].entityType == Crucible::EntityType::PLAYER)
         {
             // Add intersect that is not player
-            auto closestIntersectThatIsNotPlayer= *std::ranges::find_if(intersectList,
+            intersect = *std::ranges::find_if(intersectList,
                     [](const auto& intersect) {
                         return intersect.entityType != Crucible::EntityType::PLAYER;
                     });
-            collisionPoints.emplace_back(closestIntersectThatIsNotPlayer);
 
             // @Temporary
-            exit(0);
+            if (Crucible::SHOULD_EXIT_APP_WHEN_CAUGHT_BY_GUARD)
+            {
+                exit(0);
+            }
         }
-        else
-        {
-            collisionPoints.emplace_back(intersectList[0]);
-        }
+
+        collisionPoints.emplace_back(intersect);
 
         intersectList.clear();
     }

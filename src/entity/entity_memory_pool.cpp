@@ -35,7 +35,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
         controllableComponents.insert(controllableComponents.begin() + i, {{}, false});
         collisionComponents.insert(collisionComponents.begin() + i, {{}});
         tileComponents.insert(tileComponents.begin() + i, {{}, {}, false});
-        lightSourceComponents.insert(lightSourceComponents.begin() + i, {{}, {}, {}, {}, false});
+        lightSourceComponents.insert(lightSourceComponents.begin() + i, {{}, {}, {}, false});
         pathFollowerComponents.insert(pathFollowerComponents.begin() + i, {{}, {}, false});
         animationComponents.insert(animationComponents.begin() + i, {{}, {}, false});
     }

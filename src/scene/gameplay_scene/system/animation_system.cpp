@@ -32,11 +32,11 @@ void AnimationSystem::updateTileTexture(
     sf::VertexArray& tileVertices = *tile.vertices;
     assert(tileVertices.getVertexCount() == 4);
 
-    int tileTypeValue = updateAnimation(tile, animation);
+    int tileTypeValue = updateAnimation(animation);
 
     // TODO the below logic only needs to be called once for static entities, we are doing additional work here unnecessarily.
-    float tu = (tileTypeValue % (tileSheetTexture->getSize().x / static_cast<uint8_t>(transform.dimensions.x)));
-    float tv = tileTypeValue / (tileSheetTexture->getSize().x / static_cast<uint8_t>(transform.dimensions.y));
+    float tu = (tileTypeValue % (tileSheetTexture->getSize().x / static_cast<uint8_t>(Crucible::TILE_SIZE)));
+    float tv = tileTypeValue / (tileSheetTexture->getSize().x / static_cast<uint8_t>(Crucible::TILE_SIZE));
 
     float tuPositionStart = tu * transform.dimensions.x;
     float tuPositionEnd = (tu + 1) * transform.dimensions.x;
@@ -62,26 +62,28 @@ void AnimationSystem::updateTileTexture(
     }
 }
 
-int AnimationSystem::updateAnimation(Tile& tile, Component::CAnimation& animation)
+int AnimationSystem::updateAnimation(Component::CAnimation& animation)
 {
-    int tileTypeValue = static_cast<int>(tile.type) - 1;
-    if (!animation.animationList.empty() )
+    // TODO INVESTIGATE, THIS BLOCK CAN BE REMOVED?
+    if (animation.animationList.empty())
     {
-        tileTypeValue = static_cast<int>(animation.animationList[animation.currentAnimationFrameIdx]) - 1;
+        return 0;
+    }
 
-        double& spriteAnimationTime = animation.animationTicker.timeUntilUpdate;
-        double animationCompletionTime = animation.animationTicker.currentTime;
-        spriteAnimationTime += Crucible::DT;
+    int tileTypeValue = static_cast<int>(animation.animationList[animation.currentAnimationFrameIdx]) - 1;
 
-        if (spriteAnimationTime >= animationCompletionTime)
+    double& spriteAnimationTime = animation.animationTicker.timeUntilUpdate;
+    double animationCompletionTime = animation.animationTicker.currentTime;
+    spriteAnimationTime += Crucible::DT;
+
+    if (spriteAnimationTime >= animationCompletionTime)
+    {
+        animation.currentAnimationFrameIdx++;
+        if (animation.currentAnimationFrameIdx == animation.animationList.size())
         {
-            animation.currentAnimationFrameIdx++;
-            if (animation.currentAnimationFrameIdx == animation.animationList.size())
-            {
-                animation.currentAnimationFrameIdx = 0;
-            }
-            spriteAnimationTime = 0;
+            animation.currentAnimationFrameIdx = 0;
         }
+        spriteAnimationTime = 0;
     }
     return tileTypeValue;
 }
