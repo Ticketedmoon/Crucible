@@ -127,18 +127,20 @@ void LevelManager::addCustomPropertiesToLayer(ObjectLayer& objectLayer, nlohmann
 {
     if (json.contains("properties"))
     {
-        // TODO this points to 0th index - make scalable in future
-        const std::string& name = json["properties"][0]["name"];
-        const std::string& type = json["properties"][0]["type"];
-        const std::string& value = json["properties"][0]["value"];
+        for (size_t i = 0; i < json["properties"].size(); i++)
+        {
+            const std::string& name = json["properties"][i]["name"];
+            const std::string& type = json["properties"][i]["type"];
+            const std::string& value = json["properties"][i]["value"];
 
-        if (objectLayer.customProperties.contains(name))
-        {
-            objectLayer.customProperties.at(name).emplace_back(name, type, value);
-        }
-        else
-        {
-            objectLayer.customProperties[name] = {{name, type, value}};
+            if (objectLayer.customProperties.contains(name))
+            {
+                objectLayer.customProperties.at(name).emplace_back(name, type, value);
+            }
+            else
+            {
+                objectLayer.customProperties[name] = {{name, type, value}};
+            }
         }
     }
 }

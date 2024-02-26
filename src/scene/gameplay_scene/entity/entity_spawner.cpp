@@ -43,17 +43,15 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     std::vector<Waypoint> path;
     for (size_t i = 0; i < pathingObjectLayer.objectData.size(); i++)
     {
-        bool polygonPointAtIndexHasWaitPeriod =
-                pathingObjectLayer.customProperties.contains("point_idx") &&
-                        std::stoi(pathingObjectLayer.customProperties.at("point_idx").at(0).value) == i
-                                && pathingObjectLayer.customProperties.contains("wait_period") &&
-                        std::stoi(pathingObjectLayer.customProperties.at("wait_period").at(0).value);
+        size_t pointIndex = pathingObjectLayer.customProperties.contains("point_idx")
+                ? std::stoi(pathingObjectLayer.customProperties.at("point_idx").at(0).value)
+                : 0;
 
         const sf::VertexArray pathingVertices = *pathingObjectLayer.objectData[i].objectVertices;
         for (size_t j = 0; j < pathingVertices.getVertexCount(); j++)
         {
-            uint32_t waitPeriodMs = pathingObjectLayer.customProperties.contains("wait_period")
-                    ? polygonPointAtIndexHasWaitPeriod
+            uint32_t waitPeriodMs = pathingObjectLayer.customProperties.contains("wait_period") && pointIndex == j
+                    ? std::stoi(pathingObjectLayer.customProperties.at("wait_period").at(0).value)
                     : 0;
             path.emplace_back(Waypoint({pathingVertices[j].position.x, pathingVertices[j].position.y}, waitPeriodMs));
         }

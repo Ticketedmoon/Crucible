@@ -220,7 +220,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="15" name="collision_layer_player_a">
+ <objectgroup id="15" name="collision_layer_player_a" visible="0" locked="1">
   <object id="5" x="12.6667" y="22.6667" width="6" height="426.667"/>
   <object id="6" x="19.3333" y="451.333" width="330" height="5.33333"/>
   <object id="7" x="344.667" y="461.333" width="10.6667" height="291.333"/>
@@ -261,10 +261,10 @@
    <polygon points="0,0 -0.666667,422.667 328,422 328.667,400 385.333,399.333 386,423.333 332,422.667 333.333,727.333 592.667,730.667 591.333,447.333 563.333,447.333 564,377.333 536,377.333 536,356.667 394,356.667 394,374.667 377.333,374.667 378,350.667 371.333,350 372,216 562,216.667 562.667,-7.33333 552.667,-7.33333 552,66 456,68.6667 456,-0.666667"/>
   </object>
  </objectgroup>
- <objectgroup id="12" name="guard_pathing_layer_a" visible="0" locked="1">
+ <objectgroup id="12" name="guard_pathing_layer_a" locked="1">
   <object id="4" x="327.934" y="195.459">
    <properties>
-    <property name="point_idx" value="4"/>
+    <property name="point_idx" value="2"/>
     <property name="wait_period" value="3000"/>
    </properties>
    <polyline points="1.98877,14.1481 0.964586,145.938 -246.934,149.541 -245.969,-167.558 107.069,-168.459 107.099,11.2658"/>
