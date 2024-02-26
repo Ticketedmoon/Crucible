@@ -54,7 +54,7 @@ Here are the changes summarised during this period:
 Haven't had much time to work on this project over the last month, but except for one notable fix:
 - Fixed a bug where the light rays would flicker when pushing entities in the game world.
 
-### Entry #5 [Feb 26th, 2024]:
+### Entry #6 [Feb 26th, 2024]:
 - Catacomb asset texturing to world applied
 - Enable multiple tile layers in world file to stack correctly.
 - Enable multiple tile sets across multiple tile layers to render as expected.
