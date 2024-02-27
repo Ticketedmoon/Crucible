@@ -70,39 +70,26 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
     auto& animation = e.getComponent<Component::CAnimation>();
 
     // TODO @Refactor
-    animation.animationList = {};
+    animation.currentAnimation = PlayerAnimation::PLAYER_IDLE_START;
 
     if (controllable.isMovingDown)
     {
         cTransform.position->y += PLAYER_SPEED;
-        animation.animationList = {
-                PlayerAnimation::PLAYER_WALK_DOWN_A, PlayerAnimation::PLAYER_WALK_DOWN_B, PlayerAnimation::PLAYER_WALK_DOWN_C,
-                PlayerAnimation::PLAYER_WALK_DOWN_D, PlayerAnimation::PLAYER_WALK_DOWN_E, PlayerAnimation::PLAYER_WALK_DOWN_F,
-        };
+        animation.currentAnimation = PlayerAnimation::PLAYER_WALK_DOWN_START;
     }
     if (controllable.isMovingUp)
     {
         cTransform.position->y -= PLAYER_SPEED;
-        animation.animationList = {
-                PlayerAnimation::PLAYER_WALK_UP_A, PlayerAnimation::PLAYER_WALK_UP_B, PlayerAnimation::PLAYER_WALK_UP_C,
-                PlayerAnimation::PLAYER_WALK_UP_D, PlayerAnimation::PLAYER_WALK_UP_E, PlayerAnimation::PLAYER_WALK_UP_F,
-                };
+        animation.currentAnimation = PlayerAnimation::PLAYER_WALK_UP_START;
     }
     if (controllable.isMovingLeft)
     {
         cTransform.position->x -= PLAYER_SPEED;
-        // TODO add other anims
-        animation.animationList = {
-                PlayerAnimation::PLAYER_WALK_LEFT_A, PlayerAnimation::PLAYER_WALK_LEFT_B, PlayerAnimation::PLAYER_WALK_LEFT_C,
-                PlayerAnimation::PLAYER_WALK_LEFT_D, PlayerAnimation::PLAYER_WALK_LEFT_E, PlayerAnimation::PLAYER_WALK_LEFT_F
-        };
+        animation.currentAnimation = PlayerAnimation::PLAYER_WALK_LEFT_START;
     }
     if (controllable.isMovingRight)
     {
         cTransform.position->x += PLAYER_SPEED;
-        animation.animationList = {
-                PlayerAnimation::PLAYER_WALK_RIGHT_A, PlayerAnimation::PLAYER_WALK_RIGHT_B, PlayerAnimation::PLAYER_WALK_RIGHT_C,
-                PlayerAnimation::PLAYER_WALK_RIGHT_D, PlayerAnimation::PLAYER_WALK_RIGHT_E, PlayerAnimation::PLAYER_WALK_RIGHT_F,
-        };
+        animation.currentAnimation = PlayerAnimation::PLAYER_WALK_RIGHT_START;
     }
 }

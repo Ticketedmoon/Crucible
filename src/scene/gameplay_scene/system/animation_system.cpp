@@ -19,6 +19,12 @@ void AnimationSystem::execute()
         auto& entityAnimation = entity.getComponent<Component::CAnimation>();
         auto& entityCTile = entity.getComponent<Component::CTile>();
 
+        if (entityAnimation.animations.empty())
+        {
+            return;
+        }
+
+        updateAnimation(entityAnimation);
         updateTileTexture(entityCTile.tile, entityCTile.texture, entityTransform, entityAnimation);
     }
 }
@@ -32,7 +38,9 @@ void AnimationSystem::updateTileTexture(
     sf::VertexArray& tileVertices = *tile.vertices;
     assert(tileVertices.getVertexCount() == 4);
 
-    int tileTypeValue = updateAnimation(animation);
+    size_t tileTypeValue = static_cast<int>(animation.animations
+            .at(animation.currentAnimation).animationIndexes
+            .at(animation.currentAnimationFrameIdx));
 
     // TODO the below logic only needs to be called once for static entities, we are doing additional work here unnecessarily.
     float tu = (tileTypeValue % (tileSheetTexture->getSize().x / static_cast<uint8_t>(Crucible::TILE_SIZE)));
@@ -43,47 +51,27 @@ void AnimationSystem::updateTileTexture(
     float tvPositionStart = tv * transform.dimensions.y;
     float tvPositionEnd = (tv + 1) * transform.dimensions.y;
 
-    if (tile.rotation == TileRotation::NONE)
-    {
-        tileVertices[0].texCoords = {tuPositionStart, tvPositionStart};
-        tileVertices[1].texCoords = {tuPositionEnd, tvPositionStart};
-        tileVertices[2].texCoords = {tuPositionEnd, tvPositionEnd};
-        tileVertices[3].texCoords = {tuPositionStart, tvPositionEnd};
-        return;
-    }
-
-    if (tile.rotation == TileRotation::FLIPPED_HORIZONTALLY)
-    {
-        tileVertices[0].texCoords = sf::Vector2f(tuPositionEnd, tvPositionStart);
-        tileVertices[1].texCoords = sf::Vector2f(tuPositionStart, tvPositionStart);
-        tileVertices[2].texCoords = sf::Vector2f(tuPositionStart, tvPositionEnd);
-        tileVertices[3].texCoords = sf::Vector2f(tuPositionEnd, tvPositionEnd);
-        return;
-    }
+    tileVertices[0].texCoords = {tuPositionStart, tvPositionStart};
+    tileVertices[1].texCoords = {tuPositionEnd, tvPositionStart};
+    tileVertices[2].texCoords = {tuPositionEnd, tvPositionEnd};
+    tileVertices[3].texCoords = {tuPositionStart, tvPositionEnd};
 }
 
-int AnimationSystem::updateAnimation(Component::CAnimation& animation)
+void AnimationSystem::updateAnimation(Component::CAnimation& animation)
 {
-    // TODO INVESTIGATE, THIS BLOCK CAN BE REMOVED?
-    if (animation.animationList.empty())
-    {
-        return 0;
-    }
-
-    int tileTypeValue = static_cast<int>(animation.animationList[animation.currentAnimationFrameIdx]) - 1;
-
-    double& spriteAnimationTime = animation.animationTicker.timeUntilUpdate;
-    double animationCompletionTime = animation.animationTicker.currentTime;
+    double& spriteAnimationTime = animation.animations.at(animation.currentAnimation).animationTicker.currentTime;
+    double animationCompletionTime = animation.animations.at(animation.currentAnimation).animationTicker.timeUntilUpdate;
     spriteAnimationTime += Crucible::DT;
 
     if (spriteAnimationTime >= animationCompletionTime)
     {
         animation.currentAnimationFrameIdx++;
-        if (animation.currentAnimationFrameIdx == animation.animationList.size())
+
+        uint32_t totalAnimationsForAnimationGroup =  animation.animations.at(animation.currentAnimation).animationIndexes.size();
+        if (animation.currentAnimationFrameIdx == totalAnimationsForAnimationGroup)
         {
             animation.currentAnimationFrameIdx = 0;
         }
         spriteAnimationTime = 0;
     }
-    return tileTypeValue;
 }

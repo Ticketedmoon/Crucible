@@ -22,12 +22,19 @@ void EntitySpawner::createPlayer()
 
     Tile playerTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
-            TileRotation::NONE,
             vertices);
 
     std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::PLAYER_SPRITE_SHEET_PATH);
 
-    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH);
+    std::unordered_map<PlayerAnimation, Component::AnimationGroup> animations{
+            {PlayerAnimation::PLAYER_IDLE_START,        Component::AnimationGroup({24, 25, 26, 27, 28, 29}, {0, 1.0f/2.0f})},
+            {PlayerAnimation::PLAYER_WALK_DOWN_START,   Component::AnimationGroup({0, 1, 2, 3, 4, 5})},
+            {PlayerAnimation::PLAYER_WALK_UP_START,     Component::AnimationGroup({6, 7, 8, 9, 10, 11})},
+            {PlayerAnimation::PLAYER_WALK_RIGHT_START,  Component::AnimationGroup({12, 13, 14, 15, 16, 17})},
+            {PlayerAnimation::PLAYER_WALK_LEFT_START,   Component::AnimationGroup({18, 19, 20, 21, 22, 23})}
+    };
+
+    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH, PlayerAnimation::PLAYER_IDLE_START, 0, animations);
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CCollider>();
     e.addComponent<Component::CTile>(playerTile, texture);
@@ -73,7 +80,6 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
 
     Tile guardTile(
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
-            TileRotation::NONE,
             vertices);
 
     const std::string& mainTilesetPath = LevelManager::activeLevel.tileSets[0].path;
@@ -87,8 +93,16 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     // FIXME this is temporary, use different texture
     std::shared_ptr<sf::Texture>& p_texture = m_textureManager.getTexture(LevelManager::PLAYER_SPRITE_SHEET_PATH);
     e.addComponent<Component::CTile>(guardTile, p_texture);
-    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH);
 
+    std::unordered_map<PlayerAnimation, Component::AnimationGroup> animations{
+            {PlayerAnimation::PLAYER_IDLE_START,        Component::AnimationGroup({24, 25, 26, 27, 28, 29}, {0, 1.0f/3.0f})},
+            {PlayerAnimation::PLAYER_WALK_DOWN_START,   Component::AnimationGroup({0, 1, 2, 3, 4, 5})},
+            {PlayerAnimation::PLAYER_WALK_UP_START,     Component::AnimationGroup({6, 7, 8, 9, 10, 11})},
+            {PlayerAnimation::PLAYER_WALK_RIGHT_START,  Component::AnimationGroup({12, 13, 14, 15, 16, 17})},
+            {PlayerAnimation::PLAYER_WALK_LEFT_START,   Component::AnimationGroup({18, 19, 20, 21, 22, 23})}
+    };;
+
+    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH, PlayerAnimation::PLAYER_IDLE_START, 0, animations);
 }
 
 Component::CLightSource EntitySpawner::createLightSource(Component::CTransform& playerTransform, const std::string& layerName)

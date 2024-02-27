@@ -32,7 +32,7 @@ class AnimationSystem : public System
                 const Component::CTransform& transform,
                 Component::CAnimation& animation);
 
-        static int updateAnimation(Component::CAnimation& animation);
+        static void updateAnimation(Component::CAnimation& animation);
 
     private:
         EntityManager& m_entityManager;

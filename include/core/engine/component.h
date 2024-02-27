@@ -15,8 +15,8 @@
 
 struct GameTimeTicker
 {
+    double currentTime{0.0f};
     double timeUntilUpdate;
-    double currentTime;
 };
 
 struct Waypoint
@@ -86,15 +86,19 @@ namespace Component
         bool has{};
     };
 
+    // TODO MOVE ME
+    struct AnimationGroup {
+        std::vector<uint32_t> animationIndexes;
+        GameTimeTicker animationTicker{0, 1.0f/6.0f};
+    };
+
     struct CAnimation
     {
         std::string animationSpriteSheetPath;
-
-        std::vector<PlayerAnimation> animationList{};
-
-        uint8_t currentAnimationFrameIdx;
-
-        GameTimeTicker animationTicker{0, 1.0f/6.0f};
+        PlayerAnimation currentAnimation;
+        uint32_t currentAnimationFrameIdx;
+        std::unordered_map<PlayerAnimation, AnimationGroup> animations;
+        uint32_t spriteSheetWidth{6};
 
         bool has{};
     };
