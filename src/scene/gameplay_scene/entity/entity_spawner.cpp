@@ -27,7 +27,7 @@ void EntitySpawner::createPlayer()
     std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::PLAYER_SPRITE_SHEET_PATH);
 
     std::unordered_map<PlayerAnimation, Component::AnimationGroup> animations{
-            {PlayerAnimation::PLAYER_IDLE_START,        Component::AnimationGroup({24, 25, 26, 27, 28, 29}, {0, 1.0f/2.0f})},
+            {PlayerAnimation::PLAYER_IDLE_START,        Component::AnimationGroup({24, 25, 26, 27, 28, 29}, {0, 1.0f/1.2f})},
             {PlayerAnimation::PLAYER_WALK_DOWN_START,   Component::AnimationGroup({0, 1, 2, 3, 4, 5})},
             {PlayerAnimation::PLAYER_WALK_UP_START,     Component::AnimationGroup({6, 7, 8, 9, 10, 11})},
             {PlayerAnimation::PLAYER_WALK_RIGHT_START,  Component::AnimationGroup({12, 13, 14, 15, 16, 17})},
