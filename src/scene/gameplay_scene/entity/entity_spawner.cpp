@@ -26,15 +26,19 @@ void EntitySpawner::createPlayer()
 
     std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::PLAYER_SPRITE_SHEET_PATH);
 
-    std::unordered_map<PlayerAnimation, Component::AnimationGroup> animations{
-            {PlayerAnimation::PLAYER_IDLE_START,        Component::AnimationGroup({24, 25, 26, 27, 28, 29}, {0, 1.0f/1.2f})},
-            {PlayerAnimation::PLAYER_WALK_DOWN_START,   Component::AnimationGroup({0, 1, 2, 3, 4, 5})},
-            {PlayerAnimation::PLAYER_WALK_UP_START,     Component::AnimationGroup({6, 7, 8, 9, 10, 11})},
-            {PlayerAnimation::PLAYER_WALK_RIGHT_START,  Component::AnimationGroup({12, 13, 14, 15, 16, 17})},
-            {PlayerAnimation::PLAYER_WALK_LEFT_START,   Component::AnimationGroup({18, 19, 20, 21, 22, 23})}
+    std::unordered_map<EntityAnimation, Component::AnimationGroup> animations{
+            {EntityAnimation::PLAYER_WALK_DOWN,  Component::AnimationGroup({0, 1, 2, 3, 4, 5})},
+            {EntityAnimation::PLAYER_WALK_UP,    Component::AnimationGroup({6, 7, 8, 9, 10, 11})},
+            {EntityAnimation::PLAYER_WALK_RIGHT, Component::AnimationGroup({12, 13, 14, 15, 16, 17})},
+            {EntityAnimation::PLAYER_WALK_LEFT,  Component::AnimationGroup({18, 19, 20, 21, 22, 23})},
+            {EntityAnimation::PLAYER_IDLE_DOWN,  Component::AnimationGroup({24, 25, 26, 27, 28, 29}, {0, 1.0f/0.8f})},
+            {EntityAnimation::PLAYER_IDLE_UP,    Component::AnimationGroup({30, 31, 32, 33, 34, 35}, {0, 1.0f/0.35f})},
+            {EntityAnimation::PLAYER_IDLE_RIGHT, Component::AnimationGroup({36, 37, 38, 39, 40, 41}, {0, 1.0f/0.8f})},
+            {EntityAnimation::PLAYER_IDLE_LEFT,  Component::AnimationGroup({42, 43, 44, 45, 46, 47}, {0, 1.0f/0.8f})},
     };
 
-    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH, PlayerAnimation::PLAYER_IDLE_START, 0, animations);
+    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH, EntityDirection::DOWN,
+            EntityAnimation::PLAYER_IDLE_DOWN, 0, animations);
     e.addComponent<Component::CControllable>();
     e.addComponent<Component::CCollider>();
     e.addComponent<Component::CTile>(playerTile, texture);
@@ -94,15 +98,16 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
     std::shared_ptr<sf::Texture>& p_texture = m_textureManager.getTexture(LevelManager::PLAYER_SPRITE_SHEET_PATH);
     e.addComponent<Component::CTile>(guardTile, p_texture);
 
-    std::unordered_map<PlayerAnimation, Component::AnimationGroup> animations{
-            {PlayerAnimation::PLAYER_IDLE_START,        Component::AnimationGroup({24, 25, 26, 27, 28, 29}, {0, 1.0f/3.0f})},
-            {PlayerAnimation::PLAYER_WALK_DOWN_START,   Component::AnimationGroup({0, 1, 2, 3, 4, 5})},
-            {PlayerAnimation::PLAYER_WALK_UP_START,     Component::AnimationGroup({6, 7, 8, 9, 10, 11})},
-            {PlayerAnimation::PLAYER_WALK_RIGHT_START,  Component::AnimationGroup({12, 13, 14, 15, 16, 17})},
-            {PlayerAnimation::PLAYER_WALK_LEFT_START,   Component::AnimationGroup({18, 19, 20, 21, 22, 23})}
+    std::unordered_map<EntityAnimation, Component::AnimationGroup> animations{
+            {EntityAnimation::PLAYER_IDLE_DOWN,  Component::AnimationGroup({24, 25, 26, 27, 28, 29}, {0, 1.0f/3.0f})},
+            {EntityAnimation::PLAYER_WALK_DOWN,  Component::AnimationGroup({0, 1, 2, 3, 4, 5})},
+            {EntityAnimation::PLAYER_WALK_UP,    Component::AnimationGroup({6, 7, 8, 9, 10, 11})},
+            {EntityAnimation::PLAYER_WALK_RIGHT, Component::AnimationGroup({12, 13, 14, 15, 16, 17})},
+            {EntityAnimation::PLAYER_WALK_LEFT,  Component::AnimationGroup({18, 19, 20, 21, 22, 23})}
     };;
 
-    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH, PlayerAnimation::PLAYER_IDLE_START, 0, animations);
+    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH, EntityDirection::DOWN,
+            EntityAnimation::PLAYER_IDLE_DOWN, 0, animations);
 }
 
 Component::CLightSource EntitySpawner::createLightSource(Component::CTransform& playerTransform, const std::string& layerName)

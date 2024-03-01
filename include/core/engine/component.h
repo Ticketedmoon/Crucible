@@ -95,9 +95,12 @@ namespace Component
     struct CAnimation
     {
         std::string animationSpriteSheetPath;
-        PlayerAnimation currentAnimation;
+
+        EntityDirection entityDirection;
+        EntityAnimation currentAnimation;
+
         uint32_t currentAnimationFrameIdx;
-        std::unordered_map<PlayerAnimation, AnimationGroup> animations;
+        std::unordered_map<EntityAnimation, AnimationGroup> animations;
         uint32_t spriteSheetWidth{6};
 
         bool has{};

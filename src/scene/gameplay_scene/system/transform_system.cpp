@@ -70,26 +70,36 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
     auto& animation = e.getComponent<Component::CAnimation>();
 
     // TODO @Refactor
-    animation.currentAnimation = PlayerAnimation::PLAYER_IDLE_START;
+    animation.currentAnimation = animation.entityDirection == EntityDirection::DOWN
+            ? EntityAnimation::PLAYER_IDLE_DOWN
+            : animation.entityDirection == EntityDirection::UP
+                ? EntityAnimation::PLAYER_IDLE_UP
+                : animation.entityDirection == EntityDirection::RIGHT
+                    ? EntityAnimation::PLAYER_IDLE_RIGHT
+                    : EntityAnimation::PLAYER_IDLE_LEFT;
 
     if (controllable.isMovingDown)
     {
+        animation.entityDirection = EntityDirection::DOWN;
         cTransform.position->y += PLAYER_SPEED;
-        animation.currentAnimation = PlayerAnimation::PLAYER_WALK_DOWN_START;
+        animation.currentAnimation = EntityAnimation::PLAYER_WALK_DOWN;
     }
     if (controllable.isMovingUp)
     {
+        animation.entityDirection = EntityDirection::UP;
         cTransform.position->y -= PLAYER_SPEED;
-        animation.currentAnimation = PlayerAnimation::PLAYER_WALK_UP_START;
+        animation.currentAnimation = EntityAnimation::PLAYER_WALK_UP;
     }
     if (controllable.isMovingLeft)
     {
+        animation.entityDirection = EntityDirection::LEFT;
         cTransform.position->x -= PLAYER_SPEED;
-        animation.currentAnimation = PlayerAnimation::PLAYER_WALK_LEFT_START;
+        animation.currentAnimation = EntityAnimation::PLAYER_WALK_LEFT;
     }
     if (controllable.isMovingRight)
     {
+        animation.entityDirection = EntityDirection::RIGHT;
         cTransform.position->x += PLAYER_SPEED;
-        animation.currentAnimation = PlayerAnimation::PLAYER_WALK_RIGHT_START;
+        animation.currentAnimation = EntityAnimation::PLAYER_WALK_RIGHT;
     }
 }

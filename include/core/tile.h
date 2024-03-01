@@ -11,13 +11,25 @@
 #include <utility>
 #include <memory>
 
-enum class PlayerAnimation
+enum class EntityAnimation
 {
-    PLAYER_WALK_DOWN_START,
-    PLAYER_WALK_UP_START,
-    PLAYER_WALK_RIGHT_START,
-    PLAYER_WALK_LEFT_START,
-    PLAYER_IDLE_START
+    PLAYER_WALK_DOWN,
+    PLAYER_WALK_UP,
+    PLAYER_WALK_RIGHT,
+    PLAYER_WALK_LEFT,
+
+    PLAYER_IDLE_DOWN,
+    PLAYER_IDLE_UP,
+    PLAYER_IDLE_RIGHT,
+    PLAYER_IDLE_LEFT,
+};
+
+enum class EntityDirection
+{
+        DOWN,
+        UP,
+        RIGHT,
+        LEFT
 };
 
 namespace Crucible
