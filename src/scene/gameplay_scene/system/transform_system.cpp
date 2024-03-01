@@ -68,15 +68,7 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
 {
     auto& controllable = e.getComponent<Component::CControllable>();
     auto& animation = e.getComponent<Component::CAnimation>();
-
-    // TODO @Refactor
-    animation.currentAnimation = animation.entityDirection == EntityDirection::DOWN
-            ? EntityAnimation::PLAYER_IDLE_DOWN
-            : animation.entityDirection == EntityDirection::UP
-                ? EntityAnimation::PLAYER_IDLE_UP
-                : animation.entityDirection == EntityDirection::RIGHT
-                    ? EntityAnimation::PLAYER_IDLE_RIGHT
-                    : EntityAnimation::PLAYER_IDLE_LEFT;
+    bool isMoving = controllable.isMovingDown || controllable.isMovingUp || controllable.isMovingRight || controllable.isMovingLeft;
 
     if (controllable.isMovingDown)
     {
@@ -101,5 +93,25 @@ void TransformSystem::resolveControllerMovementForEntity(const Entity& e, Compon
         animation.entityDirection = EntityDirection::RIGHT;
         cTransform.position->x += PLAYER_SPEED;
         animation.currentAnimation = EntityAnimation::PLAYER_WALK_RIGHT;
+    }
+
+    if (!isMoving)
+    {
+        std::unordered_set<EntityAnimation> idleAnimations{
+            EntityAnimation::PLAYER_IDLE_DOWN, EntityAnimation::PLAYER_IDLE_UP,
+            EntityAnimation::PLAYER_IDLE_RIGHT, EntityAnimation::PLAYER_IDLE_LEFT};
+
+        if (animation.currentAnimationFrameIdx > 0 && !idleAnimations.contains(animation.currentAnimation))
+        {
+            animation.currentAnimationFrameIdx = 0;
+        }
+
+        animation.currentAnimation = animation.entityDirection == EntityDirection::DOWN
+                ? EntityAnimation::PLAYER_IDLE_DOWN
+                : animation.entityDirection == EntityDirection::UP
+                        ? EntityAnimation::PLAYER_IDLE_UP
+                        : animation.entityDirection == EntityDirection::RIGHT
+                                ? EntityAnimation::PLAYER_IDLE_RIGHT
+                                : EntityAnimation::PLAYER_IDLE_LEFT;
     }
 }

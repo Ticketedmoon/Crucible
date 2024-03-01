@@ -31,8 +31,8 @@ void EntitySpawner::createPlayer()
             {EntityAnimation::PLAYER_WALK_UP,    Component::AnimationGroup({6, 7, 8, 9, 10, 11})},
             {EntityAnimation::PLAYER_WALK_RIGHT, Component::AnimationGroup({12, 13, 14, 15, 16, 17})},
             {EntityAnimation::PLAYER_WALK_LEFT,  Component::AnimationGroup({18, 19, 20, 21, 22, 23})},
-            {EntityAnimation::PLAYER_IDLE_DOWN,  Component::AnimationGroup({24, 25, 26, 27, 28, 29}, {0, 1.0f/0.8f})},
-            {EntityAnimation::PLAYER_IDLE_UP,    Component::AnimationGroup({30, 31, 32, 33, 34, 35}, {0, 1.0f/0.35f})},
+            {EntityAnimation::PLAYER_IDLE_DOWN,  Component::AnimationGroup({24, 25, 26, 27, 28, 29}, {0, 1.0f/1.25f})},
+            {EntityAnimation::PLAYER_IDLE_UP,    Component::AnimationGroup({30, 31, 32, 33, 34, 35}, {0, 1.0f/0.65f})},
             {EntityAnimation::PLAYER_IDLE_RIGHT, Component::AnimationGroup({36, 37, 38, 39, 40, 41}, {0, 1.0f/0.8f})},
             {EntityAnimation::PLAYER_IDLE_LEFT,  Component::AnimationGroup({42, 43, 44, 45, 46, 47}, {0, 1.0f/0.8f})},
     };

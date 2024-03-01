@@ -6,6 +6,7 @@
 #include <cmath>
 #include <cassert>
 #include <cmath>
+#include <unordered_set>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
