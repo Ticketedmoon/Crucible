@@ -22,20 +22,22 @@ void TransformSystem::execute()
         if (entity.hasComponent<Component::CPathFollower>())
         {
             auto& cPathFollower = entity.getComponent<Component::CPathFollower>();
-
+            auto& cAnimation = entity.getComponent<Component::CAnimation>();
             if (m_gameClock.getElapsedTime().asMilliseconds() < cPathFollower.gameTimeTicker.timeUntilUpdate)
             {
+                handleIdleAnimation(cAnimation);
                 continue;
             }
 
-            moveToNextWaypoint(entityTransform, cPathFollower);
+            moveToNextWaypoint(entityTransform, cPathFollower, cAnimation);
         }
     }
 }
 
 void TransformSystem::moveToNextWaypoint(
         Component::CTransform& entityTransform,
-        Component::CPathFollower& cPathFollower) const
+        Component::CPathFollower& cPathFollower,
+        Component::CAnimation& cAnimation) const
 {
     Waypoint waypoint = cPathFollower.path[cPathFollower.destinationIndex];
     float distanceToWaypoint = distance(waypoint.position, *entityTransform.position);
@@ -53,6 +55,25 @@ void TransformSystem::moveToNextWaypoint(
         waypoint = cPathFollower.path[cPathFollower.destinationIndex];
     }
 
+    // Determine direction
+    float r = std::atan2(waypoint.position.y - entityTransform.position->y, waypoint.position.x - entityTransform.position->x);
+    double deg = -r / M_PI * 180.f;
+    deg += deg < 0.0f ? 360.0f : 0.0f;
+
+    float DIRECTION_DEGREE_TOLERANCE = 30.0f;
+
+    // TODO @Refactor
+    //      We don't want to use CControllable here since this isn't a controllable entity.
+    //      The degree values are hard-coded, we should refactor this code and improve maintainability.
+    const Component::CControllable controllable{
+        deg > 90-DIRECTION_DEGREE_TOLERANCE && deg < 90+DIRECTION_DEGREE_TOLERANCE,
+        deg > 270-DIRECTION_DEGREE_TOLERANCE && deg < 270+DIRECTION_DEGREE_TOLERANCE,
+        deg > 180-DIRECTION_DEGREE_TOLERANCE && deg < 180+DIRECTION_DEGREE_TOLERANCE,
+        ((deg > 0-DIRECTION_DEGREE_TOLERANCE && deg < 0+DIRECTION_DEGREE_TOLERANCE)
+        || (deg > 360-DIRECTION_DEGREE_TOLERANCE && deg < 360+DIRECTION_DEGREE_TOLERANCE))
+    };
+
+    handleMovementAnimation(controllable, cAnimation);
     moveToTargetPosition(entityTransform, waypoint.position, GUARD_SPEED);
 }
 
