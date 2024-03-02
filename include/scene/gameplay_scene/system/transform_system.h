@@ -28,6 +28,13 @@ class TransformSystem : public System
         static void resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform);
         static float distance(Crucible::Vec2 p1, Crucible::Vec2 p2);
         void moveToNextWaypoint(Component::CTransform& entityTransform, Component::CPathFollower& cPathFollower) const;
+        static void handleIdleAnimation(Component::CAnimation& animation);
+        static void handleControllableEntityMovement(Component::CTransform& cTransform, const Component::CControllable& controllable);
+        static void handleMovementAnimation(const Component::CControllable& controllable, Component::CAnimation& animation);
+        static void moveToTargetPosition(
+                Component::CTransform& entityTransform,
+                const Crucible::Vec2& targetPosition,
+                float entitySpeed);
 
     private:
         static inline const float PLAYER_SPEED = 3.0f;
