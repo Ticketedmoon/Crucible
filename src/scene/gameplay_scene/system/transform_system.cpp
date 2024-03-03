@@ -103,13 +103,23 @@ void TransformSystem::handleControllableEntityMovement(
         Component::CTransform& cTransform,
         const Component::CControllable& controllable)
 {
-    Crucible::Vec2 newPos = *cTransform.position;
-    newPos.y += controllable.isMovingDown ? PLAYER_SPEED : 0;
-    newPos.y -= controllable.isMovingUp ? PLAYER_SPEED : 0;
-    newPos.x += controllable.isMovingRight ? PLAYER_SPEED : 0;
-    newPos.x -= controllable.isMovingLeft ? PLAYER_SPEED : 0;
+    float speed = PLAYER_SPEED;
 
-    moveToTargetPosition(cTransform, newPos, PLAYER_SPEED);
+    Crucible::Vec2 newPos = *cTransform.position;
+    newPos.y += controllable.isMovingDown ? speed : 0;
+    newPos.y -= controllable.isMovingUp ? speed : 0;
+    newPos.x += controllable.isMovingRight ? speed : 0;
+    newPos.x -= controllable.isMovingLeft ? speed : 0;
+
+    bool isDiagonalDownwardMovement = controllable.isMovingDown && (controllable.isMovingLeft || controllable.isMovingRight);
+    bool isDiagonalUpwardMovement = controllable.isMovingUp && (controllable.isMovingLeft || controllable.isMovingRight);
+
+    if (isDiagonalDownwardMovement || isDiagonalUpwardMovement)
+    {
+        speed += DIAGONAL_MOVEMENT_SPEED_OFFSET;
+    }
+
+    moveToTargetPosition(cTransform, newPos, speed);
 }
 
 void TransformSystem::moveToTargetPosition(

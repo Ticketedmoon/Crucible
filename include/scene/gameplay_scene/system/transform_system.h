@@ -42,6 +42,7 @@ class TransformSystem : public System
     private:
         static inline const float PLAYER_SPEED = 3.0f;
         static inline const float GUARD_SPEED = 1.6f;
+        static inline const float DIAGONAL_MOVEMENT_SPEED_OFFSET = 0.65f;
 
         EntityManager& m_entityManager;
         sf::Clock& m_gameClock;
