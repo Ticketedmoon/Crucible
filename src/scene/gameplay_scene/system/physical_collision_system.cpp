@@ -36,21 +36,22 @@ void PhysicalCollisionSystem::resolvePhysicalCollisions(Entity& entity, Entity& 
     auto& otherEntityCollider = otherEntity.getComponent<Component::CCollider>();
 
     sf::FloatRect overlap;
-    if (isCollidingAABB(entityTile, otherEntityTile.tile.vertices->getBounds(), overlap))
+    if (!isCollidingAABB(entityTile, otherEntityTile.tile.vertices->getBounds(), overlap))
     {
-        // if entityA can collide with projectiles, and collision with entity B (projectile) induces a kill state
-        if (entityCollider.collidableEntities.contains(Crucible::EntityType::PROJECTILE)
-            && otherEntityCollider.shouldKill)
-        {
-            // destroy player
-            entity.destroy();
-            // destroy projectile
-            otherEntity.destroy();
-            return;
-        }
-
-        resolveCollisionByManifold(entityTile, entityTransform, *otherEntityTransform.position, overlap);
+        return;
     }
+
+    // if entityA can collide with projectiles, and collision with entity B (projectile) induces a kill state
+    if (entityCollider.collidableEntities.contains(Crucible::EntityType::PROJECTILE)
+            && otherEntityCollider.shouldKill)
+    {
+        // destroy player
+        entity.destroy();
+        // destroy projectile
+        otherEntity.destroy();
+        return;
+    }
+    resolveCollisionByManifold(entityTile, entityTransform, *otherEntityTransform.position, overlap);
 }
 
 void PhysicalCollisionSystem::checkForOtherCollidableEntities(std::vector<Entity>& entities, Entity& entity)

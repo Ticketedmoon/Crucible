@@ -14,6 +14,7 @@
 #include "animation_system.h"
 #include "render_system.h"
 #include "transform_system.h"
+#include "lifespan_system.h"
 #include "physical_collision_system.h"
 #include "lighting_system.h"
 #include "ray_appender_system.h"

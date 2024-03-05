@@ -163,6 +163,9 @@ void EntitySpawner::createProjectile(Crucible::Vec2 startPosition, Crucible::Vec
         std::cos(r) * speed,
         std::sin(r) * speed};
     entity.addComponent<Component::CProjectile>(projectileDirectionVec);
+
+    constexpr uint16_t TOTAL_TTL_FOR_PROJECTILE = 300;
+    entity.addComponent<Component::CLifeSpan>(TOTAL_TTL_FOR_PROJECTILE);
 }
 
 Component::CLightSource EntitySpawner::createLightSource(Component::CTransform& playerTransform, const std::string& layerName)

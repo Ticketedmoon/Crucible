@@ -19,6 +19,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
     auto& animationComponents = std::get<std::vector<Component::CAnimation>>(m_pool);
     auto& magicWieldComponents = std::get<std::vector<Component::CMagicCaster>>(m_pool);
     auto& projectileComponents = std::get<std::vector<Component::CProjectile>>(m_pool);
+    auto& lifespanComponents = std::get<std::vector<Component::CLifeSpan>>(m_pool);
 
     transformComponents.reserve(maxNumEntities);
     controllableComponents.reserve(maxNumEntities);
@@ -28,6 +29,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
     pathFollowerComponents.reserve(maxNumEntities);
     animationComponents.reserve(maxNumEntities);
     projectileComponents.reserve(maxNumEntities);
+    lifespanComponents.reserve(maxNumEntities);
 
     for (size_t i = 0; i < maxNumEntities; i++)
     {
@@ -43,6 +45,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
         animationComponents.insert(animationComponents.begin() + i, {{}, {}, {}, {}, {}, false});
         magicWieldComponents.insert(magicWieldComponents.begin() + i, {{}, {}, false});
         projectileComponents.insert(projectileComponents.begin() + i, {{}, false});
+        lifespanComponents.insert(lifespanComponents.begin() + i, {{}, false});
     }
 
     assert(std::tuple_size_v<EntityComponentVectorTuple> == TOTAL_RESERVED_COMPONENT_TYPE_GROUPS);

@@ -92,6 +92,8 @@ void GameplayScene::registerSystems()
             std::make_shared<PhysicalCollisionSystem>(gameEngine, m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
             std::make_shared<AnimationSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+    m_systemManager.registerSystem(
+            std::make_shared<LifespanSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
 
     // Lighting
     m_systemManager.registerSystem(

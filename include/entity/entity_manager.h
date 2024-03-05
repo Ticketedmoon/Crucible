@@ -32,6 +32,20 @@ class EntityManager
             return std::vector(filteredEntities.begin(), filteredEntities.end());
         };
 
+        template<typename T>
+        std::vector<T> getComponentsByEntityIds()
+        {
+            std::vector<T> components;
+            std::ranges::filter_view filteredEntities = m_entities |
+                    std::ranges::views::filter([components](Entity& e) {
+                        if (e.hasComponent<T>())
+                        {
+                            components.emplace_back(e.getComponent<T>());
+                        }
+                    });
+            return components;
+        };
+
     private:
         void removeDeadEntities(std::vector<Entity>& entities);
 

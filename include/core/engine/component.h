@@ -106,6 +106,13 @@ namespace Component
         bool has{};
     };
 
+    struct CLifeSpan
+    {
+        sf::Int32 ttlFrames;
+
+        bool has{};
+    };
+
     // TODO MOVE ME
     struct AnimationGroup {
         std::vector<uint32_t> animationIndexes;
