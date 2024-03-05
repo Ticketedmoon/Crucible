@@ -42,7 +42,10 @@ void PhysicalCollisionSystem::resolvePhysicalCollisions(Entity& entity, Entity& 
         if (entityCollider.collidableEntities.contains(Crucible::EntityType::PROJECTILE)
             && otherEntityCollider.shouldKill)
         {
+            // destroy player
             entity.destroy();
+            // destroy projectile
+            otherEntity.destroy();
             return;
         }
 
