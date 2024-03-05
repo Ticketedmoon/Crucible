@@ -1,7 +1,9 @@
 #include "physical_collision_system.h"
 
-PhysicalCollisionSystem::PhysicalCollisionSystem(GameEngine& gameEngine, EntityManager& entityManager)
-    : m_gameEngine(gameEngine), m_entityManager(entityManager)
+PhysicalCollisionSystem::PhysicalCollisionSystem(
+        EntityManager& entityManager,
+        Crucible::GameProperties& gameProperties)
+        : m_entityManager(entityManager), m_gameProperties(gameProperties)
 {
 
 }
@@ -103,7 +105,7 @@ void PhysicalCollisionSystem::resolvePhysicalCollisionsForObjectLayer(const Enti
             if (entity.hasComponent<Component::CControllable>()
                     && isCollidingAABB(entityTile, vArr->getBounds(), overlap))
             {
-                m_gameEngine.changeScene(Scene::Type::VICTORY_SCREEN, std::make_shared<VictoryScene>(m_gameEngine));
+                m_gameProperties.isLevelCompleted = true;
             }
         }
 

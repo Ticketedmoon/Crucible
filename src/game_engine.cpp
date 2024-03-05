@@ -134,7 +134,7 @@ void GameEngine::createGameWindow()
         window.setFramerateLimit(Crucible::APP_FRAME_RATE);
     }
 
-    m_renderTexture.create(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT);
-    m_renderSprite.setTexture(m_renderTexture.getTexture());
-    m_renderSprite.setTextureRect(sf::IntRect(0, 0, Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
+    renderTexture.create(Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT);
+    renderSprite.setTexture(renderTexture.getTexture());
+    renderSprite.setTextureRect(sf::IntRect(0, 0, Crucible::WINDOW_WIDTH, Crucible::WINDOW_HEIGHT));
 }

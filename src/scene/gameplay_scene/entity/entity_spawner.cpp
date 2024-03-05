@@ -120,7 +120,7 @@ void EntitySpawner::createGuard(
 
     e.addComponent<Component::CAnimation>(PLAYER_SPRITE_SHEET_PATH, EntityDirection::DOWN,
             EntityAnimation::PLAYER_IDLE_DOWN, 0, animations);
-    e.addComponent<Component::CMagicCaster>(m_gameClock.getElapsedTime().asMilliseconds(), *position);
+    e.addComponent<Component::CMagicCaster>(m_gameClock.getElapsedTime().asMilliseconds());
 }
 
 void EntitySpawner::createProjectile(Crucible::Vec2 startPosition, Crucible::Vec2 targetPosition)

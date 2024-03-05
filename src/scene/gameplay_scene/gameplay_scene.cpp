@@ -14,18 +14,18 @@ GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
 void GameplayScene::update()
 {
     m_entityManager.update();
-    m_systemManager.update();
+    m_systemManager.update(gameProperties);
 }
 
 void GameplayScene::render()
 {
-    gameEngine.m_renderTexture.clear();
+    gameEngine.renderTexture.clear();
     m_systemManager.render();
-    gameEngine.m_renderTexture.display();
-    gameEngine.m_renderSprite.setTexture(gameEngine.m_renderTexture.getTexture());
+    gameEngine.renderTexture.display();
+    gameEngine.renderSprite.setTexture(gameEngine.renderTexture.getTexture());
 
     gameEngine.window.clear();
-    gameEngine.window.draw(gameEngine.m_renderSprite, sf::RenderStates(sf::BlendAdd));
+    gameEngine.window.draw(gameEngine.renderSprite, sf::RenderStates(sf::BlendAdd));
     gameEngine.window.display();
 }
 
@@ -87,9 +87,11 @@ void GameplayScene::registerSystems()
 {
     // Standard
     m_systemManager.registerSystem(
-            std::make_shared<TransformSystem>(m_entityManager, gameEngine.gameClock), SystemManager::SystemType::UPDATE);
+            std::make_shared<TransformSystem>(m_entityManager, gameEngine.gameClock),
+            SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
-            std::make_shared<PhysicalCollisionSystem>(gameEngine, m_entityManager), SystemManager::SystemType::UPDATE);
+            std::make_shared<PhysicalCollisionSystem>(m_entityManager, gameProperties),
+            SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
             std::make_shared<AnimationSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
@@ -101,10 +103,11 @@ void GameplayScene::registerSystems()
     m_systemManager.registerSystem(
             std::make_shared<LightCollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
-            std::make_shared<LightingSystem>(m_entityManager, m_entitySpawner, gameEngine.gameClock), SystemManager::SystemType::UPDATE);
+            std::make_shared<LightingSystem>(m_entityManager, m_entitySpawner, gameEngine.gameClock),
+            SystemManager::SystemType::UPDATE);
 
     // Render
     m_systemManager.registerSystem(
-            std::make_shared<GameplayRenderSystem>(gameEngine.m_renderTexture, m_entityManager, m_textureManager),
-                    SystemManager::SystemType::RENDER);
+            std::make_shared<GameplayRenderSystem>(gameEngine, m_entityManager, m_textureManager, gameProperties),
+            SystemManager::SystemType::RENDER);
 }

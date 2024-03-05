@@ -34,8 +34,8 @@ class GameEngine
     public:
         sf::RenderWindow window;
 
-        sf::RenderTexture m_renderTexture;
-        sf::Sprite m_renderSprite;
+        sf::RenderTexture renderTexture;
+        sf::Sprite renderSprite;
 
         sf::Clock gameClock;
 

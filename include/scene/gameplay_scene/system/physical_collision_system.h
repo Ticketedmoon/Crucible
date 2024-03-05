@@ -18,7 +18,9 @@
 class PhysicalCollisionSystem : public System
 {
     public:
-        explicit PhysicalCollisionSystem(GameEngine& gameEngine, EntityManager& entityManager);
+        explicit PhysicalCollisionSystem(
+                EntityManager& entityManager,
+                Crucible::GameProperties& gameProperties);
 
         void execute() override;
 
@@ -52,8 +54,8 @@ class PhysicalCollisionSystem : public System
                 const sf::FloatRect& overlap, const Crucible::Vec2& result);
 
     private:
-        GameEngine& m_gameEngine;
         EntityManager& m_entityManager;
+        Crucible::GameProperties& m_gameProperties;
 };
 
 #endif //CRUCIBLE_PHYSICAL_COLLISION_SYSTEM_H

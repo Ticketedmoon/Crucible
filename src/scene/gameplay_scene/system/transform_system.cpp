@@ -40,6 +40,11 @@ void TransformSystem::execute()
     }
 }
 
+bool TransformSystem::canExecute(const Crucible::GameProperties& gameProperties)
+{
+    return !gameProperties.isLevelCompleted;
+}
+
 void TransformSystem::moveToNextWaypoint(
         Component::CTransform& entityTransform,
         Component::CPathFollower& cPathFollower,

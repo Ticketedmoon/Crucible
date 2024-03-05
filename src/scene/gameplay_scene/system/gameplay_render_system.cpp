@@ -1,8 +1,12 @@
-#include "render_system.h"
+#include "gameplay_render_system.h"
 
-GameplayRenderSystem::GameplayRenderSystem(sf::RenderTarget& renderTarget, EntityManager& entityManager,
-        TextureManager& textureManager)
-    : m_renderTarget(renderTarget), m_entityManager(entityManager), m_textureManager(textureManager)
+GameplayRenderSystem::GameplayRenderSystem(
+        GameEngine& gameEngine,
+        EntityManager& entityManager,
+        TextureManager& textureManager,
+        Crucible::GameProperties& gameProperties)
+        : m_gameEngine(gameEngine), m_entityManager(entityManager), m_textureManager(textureManager),
+          m_gameProperties(gameProperties)
 {
     configureOverlays();
 }
@@ -26,10 +30,11 @@ void GameplayRenderSystem::centreViewOnPlayer()
     std::vector<Entity>& players = m_entityManager.getEntitiesByEntityType(Crucible::EntityType::PLAYER);
     if (!players.empty())
     {
+        sf::RenderTexture& renderTexture = m_gameEngine.renderTexture;
         // Reset the view
-        m_renderTarget.setView(m_renderTarget.getDefaultView());
+        renderTexture.setView(renderTexture.getDefaultView());
         // Set to Player Centre
-        ViewManager::centerViewOnEntity(m_renderTarget, players.at(0), Crucible::PLAYER_ZOOM_FACTOR);
+        ViewManager::centerViewOnEntity(renderTexture, players.at(0), Crucible::PLAYER_ZOOM_FACTOR);
     }
 }
 
@@ -40,7 +45,7 @@ void GameplayRenderSystem::drawMap()
         if (Crucible::SHOULD_CULL_TILES)
         {
             const std::unordered_map<std::string, sf::VertexArray>& tileVerticesInView
-                    = ViewManager::getTileVerticesInView(m_renderTarget, layer, LevelManager::activeLevel.tileSets);
+                    = ViewManager::getTileVerticesInView(m_gameEngine.renderTexture, layer, LevelManager::activeLevel.tileSets);
             drawTiles(tileVerticesInView);
         }
         else
@@ -55,7 +60,7 @@ void GameplayRenderSystem::drawTiles(const std::unordered_map<std::string, sf::V
     for (const TileSet& tileSet: LevelManager::activeLevel.tileSets)
     {
         const sf::RenderStates& renderStates = sf::RenderStates(m_textureManager.getTexture(tileSet.path).get());
-        m_renderTarget.draw(tileData.at(tileSet.path), renderStates);
+        m_gameEngine.renderTexture.draw(tileData.at(tileSet.path), renderStates);
     }
 }
 
@@ -71,33 +76,66 @@ void GameplayRenderSystem::drawEntities()
         {
             auto& cLightSource = e.getComponent<Component::CLightSource>();
             sf::VertexArray& lightVertices = cLightSource.lightVertices;
-            m_renderTarget.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::TriangleFan, lightSrcRenderStates);
+            m_gameEngine.renderTexture.draw(&lightVertices[0], lightVertices.getVertexCount(), sf::TriangleFan, lightSrcRenderStates);
         }
 
         if (e.hasComponent<Component::CTile>())
         {
             auto& cTile = e.getComponent<Component::CTile>();
             sf::RenderStates renderStates{cTile.texture.get()};
-            m_renderTarget.draw(*cTile.tile.vertices, renderStates);
+            m_gameEngine.renderTexture.draw(*cTile.tile.vertices, renderStates);
         }
     }
 }
 
 void GameplayRenderSystem::drawOverlays()
 {
-    m_renderTarget.draw(m_darkOverlay, sf::BlendMultiply);
+    updateOverlayForLevelCompletion();
+
+    m_gameEngine.renderTexture.draw(m_darkOverlay, sf::BlendMultiply);
     std::vector<Entity>& players = m_entityManager.getEntitiesByEntityType(Crucible::EntityType::PLAYER);
     if (players.empty())
     {
         return;
     }
 
+    // TODO Update me when 2nd player implemented
     auto& transform = players.at(0).getComponent<Component::CTransform>();
 
     m_playerLightOverlay.setPosition(
             transform.position->x + transform.dimensions.x/2 - PLAYER_LIGHT_OVERLAY_RADIUS,
             transform.position->y + transform.dimensions.y/2 - PLAYER_LIGHT_OVERLAY_RADIUS);
-    m_renderTarget.draw(m_playerLightOverlay, sf::BlendAdd);
+    m_gameEngine.renderTexture.draw(m_playerLightOverlay, sf::BlendAdd);
+}
+
+void GameplayRenderSystem::updateOverlayForLevelCompletion()
+{
+    if (m_gameProperties.isLevelCompleted)
+    {
+        sf::Color newDarkOverlayFillColor = m_darkOverlay.getFillColor();
+        sf::Color newPlayerOverlayFillColor = m_playerLightOverlay.getFillColor();
+
+        if (m_darkOverlay.getFillColor().a > 0)
+        {
+            lowerOverlayOpacity(m_darkOverlay);
+        }
+        else if (m_playerLightOverlay.getFillColor().a > 0)
+        {
+            lowerOverlayOpacity(m_playerLightOverlay);
+        }
+        else
+        {
+            // @temporary
+            m_gameEngine.changeScene(Scene::Type::VICTORY_SCREEN, std::make_shared<VictoryScene>(m_gameEngine));
+        }
+    }
+}
+
+void GameplayRenderSystem::lowerOverlayOpacity(sf::Shape& overlayShape)
+{
+    sf::Color overlayColor = overlayShape.getFillColor();
+    overlayColor.a -= overlayColor.a == 1 ? 1 : 2;
+    overlayShape.setFillColor(overlayColor);
 }
 
 void GameplayRenderSystem::drawGuiData()

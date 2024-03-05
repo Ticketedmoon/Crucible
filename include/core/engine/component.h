@@ -94,8 +94,6 @@ namespace Component
     {
         sf::Int32 timeUntilNextProjectileFireMs;
 
-        Crucible::Vec2 castStartPosition;
-
         bool has{};
     };
 
@@ -128,7 +126,6 @@ namespace Component
 
         uint32_t currentAnimationFrameIdx;
         std::unordered_map<EntityAnimation, AnimationGroup> animations;
-        uint32_t spriteSheetWidth{6};
 
         bool has{};
     };

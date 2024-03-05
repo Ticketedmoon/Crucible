@@ -15,7 +15,7 @@
 
 #include "system.h"
 #include "entity/entity_manager.h"
-#include "scene/gameplay_scene/system/render_system.h"
+#include "scene/gameplay_scene/system/gameplay_render_system.h"
 
 class TransformSystem : public System
 {
@@ -23,6 +23,8 @@ class TransformSystem : public System
         explicit TransformSystem(EntityManager& entityManager, sf::Clock& gameClock);
 
         void execute() override;
+
+        bool canExecute(const Crucible::GameProperties& gameProperties) override;
 
     private:
         static void resolveControllerMovementForEntity(const Entity& e, Component::CTransform& cTransform);

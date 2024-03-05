@@ -1,10 +1,13 @@
 #include "system_manager.h"
 
-void SystemManager::update()
+void SystemManager::update(Crucible::GameProperties& gameProperties)
 {
     for (std::shared_ptr<System>& system : m_systemsToUpdate)
     {
-        system->execute();
+        if (system->canExecute(gameProperties))
+        {
+            system->execute();
+        }
     }
 }
 

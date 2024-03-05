@@ -9,19 +9,19 @@ VictoryScene::VictoryScene(GameEngine& engine) : Scene(engine)
 void VictoryScene::update()
 {
     m_entityManager.update();
-    m_systemManager.update();
+    m_systemManager.update(gameProperties);
 }
 
 void VictoryScene::render()
 {
-    gameEngine.m_renderTexture.clear(LEVEL_BACKGROUND_COLOR);
+    gameEngine.renderTexture.clear(LEVEL_BACKGROUND_COLOR);
 
     m_systemManager.render();
-    gameEngine.m_renderTexture.display();
-    gameEngine.m_renderSprite.setTexture(gameEngine.m_renderTexture.getTexture());
+    gameEngine.renderTexture.display();
+    gameEngine.renderSprite.setTexture(gameEngine.renderTexture.getTexture());
 
     gameEngine.window.clear();
-    gameEngine.window.draw(gameEngine.m_renderSprite);
+    gameEngine.window.draw(gameEngine.renderSprite);
     gameEngine.window.display();
 }
 
@@ -47,5 +47,5 @@ void VictoryScene::registerSystems()
 {
     // Render
     m_systemManager.registerSystem(
-            std::make_shared<VictoryRenderSystem>(gameEngine.m_renderTexture, m_entityManager), SystemManager::SystemType::RENDER);
+            std::make_shared<VictoryRenderSystem>(gameEngine.renderTexture, m_entityManager), SystemManager::SystemType::RENDER);
 }

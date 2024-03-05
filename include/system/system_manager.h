@@ -18,7 +18,7 @@ class SystemManager
                 RENDER
         };
 
-        void update();
+        void update(Crucible::GameProperties& gameProperties);
         void render();
 
         void registerSystem(const std::shared_ptr<System>& system, SystemType type);

@@ -43,7 +43,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
         lightSourceComponents.insert(lightSourceComponents.begin() + i, {{}, {}, {}, false});
         pathFollowerComponents.insert(pathFollowerComponents.begin() + i, {{}, {}, false});
         animationComponents.insert(animationComponents.begin() + i, {{}, {}, {}, {}, {}, false});
-        magicWieldComponents.insert(magicWieldComponents.begin() + i, {{}, {}, false});
+        magicWieldComponents.insert(magicWieldComponents.begin() + i, {{}, false});
         projectileComponents.insert(projectileComponents.begin() + i, {{}, false});
         lifespanComponents.insert(lifespanComponents.begin() + i, {{}, false});
     }

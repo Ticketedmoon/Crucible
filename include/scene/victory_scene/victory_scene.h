@@ -28,6 +28,8 @@ class VictoryScene : public Scene
 
         EntityManager m_entityManager;
         SystemManager m_systemManager;
+
+        Crucible::GameProperties gameProperties;
 };
 
 

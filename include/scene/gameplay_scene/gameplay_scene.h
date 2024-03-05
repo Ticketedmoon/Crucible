@@ -12,7 +12,7 @@
 
 #include "system.h"
 #include "animation_system.h"
-#include "render_system.h"
+#include "gameplay_render_system.h"
 #include "transform_system.h"
 #include "lifespan_system.h"
 #include "physical_collision_system.h"
@@ -43,6 +43,8 @@ class GameplayScene : public Scene
         TextureManager m_textureManager;
         SystemManager m_systemManager;
         LevelManager m_levelManager;
+
+        Crucible::GameProperties gameProperties;
 };
 
 
