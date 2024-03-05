@@ -14,10 +14,9 @@ void LifespanSystem::execute()
         if (cLifeSpan.ttlFrames == 0)
         {
             e.destroy();
+            continue;
         }
-        else
-        {
-            cLifeSpan.ttlFrames--;
-        }
+
+        cLifeSpan.ttlFrames--;
     }
 }
