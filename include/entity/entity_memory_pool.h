@@ -11,8 +11,8 @@
 #include <cassert>
 #include <utility>
 
-const inline uint8_t TOTAL_EXPECTED_COMPONENT_TYPES = 7;
-const inline uint8_t TOTAL_RESERVED_COMPONENT_TYPE_GROUPS = 7;
+const inline uint8_t TOTAL_EXPECTED_COMPONENT_TYPES = 9;
+const inline uint8_t TOTAL_RESERVED_COMPONENT_TYPE_GROUPS = 9;
 
 typedef std::tuple<
         std::vector<Component::CTransform>,
@@ -21,7 +21,9 @@ typedef std::tuple<
         std::vector<Component::CTile>,
         std::vector<Component::CLightSource>,
         std::vector<Component::CPathFollower>,
-        std::vector<Component::CAnimation>
+        std::vector<Component::CAnimation>,
+        std::vector<Component::CMagicCaster>,
+        std::vector<Component::CProjectile>
 > EntityComponentVectorTuple;
 
 static size_t MAX_NUM_ENTITIES = 100000;
@@ -39,6 +41,8 @@ class EntityMemoryPool
         }
 
         [[nodiscard]] Entity addEntity(Crucible::EntityType type) const;
+
+        bool isEntityAlive(size_t entityId);
 
         void removeEntity(size_t entityId);
 

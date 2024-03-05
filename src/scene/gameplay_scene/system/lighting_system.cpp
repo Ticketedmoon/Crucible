@@ -1,6 +1,7 @@
 #include "lighting_system.h"
 
-LightingSystem::LightingSystem(EntityManager& entityManager) : m_entityManager(entityManager)
+LightingSystem::LightingSystem(EntityManager& entityManager, EntitySpawner& entitySpawner, sf::Clock& gameClock)
+    : m_entityManager(entityManager), m_entitySpawner(entitySpawner), m_gameClock(gameClock)
 {
 
 }
@@ -12,16 +13,17 @@ void LightingSystem::execute()
     {
         auto& entityLightSource = entity.getComponent<Component::CLightSource>();
         auto& entityTransform = entity.getComponent<Component::CTransform>();
+        auto& entityMagicWielder = entity.getComponent<Component::CMagicCaster>();
 
         entityLightSource.lightVertices.clear();
 
         // Combination of CORE rays and ADDITIONAL rays
         std::vector<Crucible::LightRayIntersect> rayIntersections = findAllRayIntersectionPoints(
-                Crucible::RayType::CORE, entityLightSource, entityTransform);
+                Crucible::RayType::CORE, entityLightSource, entityTransform, entityMagicWielder);
 
         // Add additional Rays
         std::vector<Crucible::LightRayIntersect> additionalRayIntersections = findAllRayIntersectionPoints(
-                Crucible::RayType::ADDITIONAL, entityLightSource, entityTransform);
+                Crucible::RayType::ADDITIONAL, entityLightSource, entityTransform, entityMagicWielder);
         rayIntersections.insert(rayIntersections.end(), additionalRayIntersections.begin(), additionalRayIntersections.end());
 
         sortIntersectionsByAngleAscending(entityTransform, rayIntersections);
@@ -52,7 +54,8 @@ void LightingSystem::sortIntersectionsByAngleAscending(
 std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionPoints(
         Crucible::RayType rayType,
         Component::CLightSource& entityLightSource,
-        const Component::CTransform& entityTransform)
+        const Component::CTransform& entityTransform,
+        Component::CMagicCaster& entityBow)
 {
     std::vector<Crucible::LightRayIntersect> collisionPoints;
 
@@ -71,17 +74,19 @@ std::vector<Crucible::LightRayIntersect> LightingSystem::findAllRayIntersectionP
 
         if (intersectList[0].entityType == Crucible::EntityType::PLAYER)
         {
+            if (m_gameClock.getElapsedTime().asMilliseconds() > entityBow.timeUntilNextProjectileFireMs)
+            {
+                // spawn projectile
+                m_entitySpawner.createProjectile(*entityTransform.position, intersect.collisionPoint);
+                // wait 3 seconds
+                entityBow.timeUntilNextProjectileFireMs = m_gameClock.getElapsedTime().asMilliseconds() + sf::Int32(3000);
+            }
+
             // Add intersect that is not player
             intersect = *std::ranges::find_if(intersectList,
                     [](const auto& intersect) {
                         return intersect.entityType != Crucible::EntityType::PLAYER;
                     });
-
-            // @Temporary
-            if (Crucible::SHOULD_EXIT_APP_WHEN_CAUGHT_BY_GUARD)
-            {
-                exit(0);
-            }
         }
 
         collisionPoints.emplace_back(intersect);

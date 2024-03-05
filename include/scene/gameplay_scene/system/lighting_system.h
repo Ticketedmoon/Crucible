@@ -12,7 +12,7 @@
 class LightingSystem : public System
 {
     public:
-        explicit LightingSystem(EntityManager& entityManager);
+        explicit LightingSystem(EntityManager& entityManager, EntitySpawner& entitySpawner, sf::Clock& gameClock);
 
         void execute() override;
 
@@ -20,7 +20,8 @@ class LightingSystem : public System
         std::vector<Crucible::LightRayIntersect> findAllRayIntersectionPoints(
                 Crucible::RayType rayType,
                 Component::CLightSource& entityLightSource,
-                const Component::CTransform& entityTransform);
+                const Component::CTransform& entityTransform,
+                Component::CMagicCaster& cBow);
         void addVerticesForLightCollisions(Component::CLightSource& entityLightSource,
                 const Component::CTransform& entityTransform, const std::vector<Crucible::LightRayIntersect>& intersections) ;
         void sortLightIntersectionsByDistanceToEntity(const Component::CTransform& entityTransform,
@@ -32,6 +33,8 @@ class LightingSystem : public System
         static inline const sf::Color& LIGHTING_COLOR{255, 255, 0};
 
         EntityManager& m_entityManager;
+        EntitySpawner& m_entitySpawner;
+        sf::Clock& m_gameClock;
 };
 
 

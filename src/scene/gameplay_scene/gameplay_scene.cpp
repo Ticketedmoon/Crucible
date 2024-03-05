@@ -1,8 +1,7 @@
 #include "gameplay_scene/gameplay_scene.h"
 
 GameplayScene::GameplayScene(GameEngine& engine) : Scene(engine),
-    m_entitySpawner(m_entityManager, m_textureManager),
-    m_levelManager(m_textureManager)
+    m_entitySpawner(m_entityManager, m_textureManager, engine.gameClock), m_levelManager(m_textureManager)
 {
     registerActions();
     registerSystems();
@@ -100,7 +99,7 @@ void GameplayScene::registerSystems()
     m_systemManager.registerSystem(
             std::make_shared<LightCollisionSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
     m_systemManager.registerSystem(
-            std::make_shared<LightingSystem>(m_entityManager), SystemManager::SystemType::UPDATE);
+            std::make_shared<LightingSystem>(m_entityManager, m_entitySpawner, gameEngine.gameClock), SystemManager::SystemType::UPDATE);
 
     // Render
     m_systemManager.registerSystem(

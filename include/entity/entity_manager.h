@@ -33,6 +33,9 @@ class EntityManager
         };
 
     private:
+        void removeDeadEntities(std::vector<Entity>& entities);
+
+    private:
         std::vector<Entity> m_entities;
         std::vector<std::pair<Crucible::EntityType, Entity>> m_entitiesToAdd;
         std::unordered_map<Crucible::EntityType, std::vector<Entity>> m_entitiesByType;

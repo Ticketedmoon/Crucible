@@ -20,14 +20,12 @@ namespace Crucible
     static inline constexpr uint8_t TILE_SIZE = 16;
     static const bool USE_VERTICAL_SYNC = true;
     static const bool SHOULD_CULL_TILES = false;
-    // @Temporary
-    static const bool SHOULD_EXIT_APP_WHEN_CAUGHT_BY_GUARD = false;
 
     static const inline float PLAYER_ZOOM_FACTOR = 0.5;
     static const inline float DEFAULT_SFX_VOLUME = 50.0f;
 
     static const inline std::vector<Crucible::Vec2> PLAYER_SPAWN_LOCATIONS{
-            {14.5 * Crucible::TILE_SIZE, 20.5 * Crucible::TILE_SIZE},
+            {32.5 * Crucible::TILE_SIZE, 42.5 * Crucible::TILE_SIZE},
             {48.5 * Crucible::TILE_SIZE, 42.5 * Crucible::TILE_SIZE}
     };
 
@@ -37,6 +35,7 @@ namespace Crucible
     {
         PLAYER,
         GUARD,
+        PROJECTILE,
         LEVEL_OBJECT,
         NONE
     };

@@ -29,6 +29,13 @@ void EntityManager::update()
         }
     }
 
+    removeDeadEntities(m_entities);
+
+    for (auto& item: m_entitiesByType)
+    {
+        removeDeadEntities(item.second);
+    }
+
     m_entitiesToAdd.clear();
 }
 
@@ -48,3 +55,15 @@ std::vector<Entity>& EntityManager::getEntitiesByEntityType(Crucible::EntityType
 {
     return m_entitiesByType.at(entityType);
 }
+
+void EntityManager::removeDeadEntities(std::vector<Entity>& entities)
+{
+    const auto& callback = std::remove_if(
+            entities.begin(),
+            entities.end(),
+            [](Entity& entity) {
+                return !EntityMemoryPool::instance().isEntityAlive(entity.getId());
+            });
+    entities.erase(callback, entities.end());
+}
+

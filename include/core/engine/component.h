@@ -8,6 +8,8 @@
 #include "vec2.h"
 #include <SFML/System/Vector3.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Time.hpp>
+#include <unordered_set>
 #include "common_constants.h"
 #include "vertex.h"
 #include "ray.h"
@@ -48,7 +50,9 @@ namespace Component
 
     struct CCollider
     {
-        bool immovable{};
+        std::unordered_set<Crucible::EntityType> collidableEntities;
+
+        bool shouldKill{false};
 
         bool has{};
     };
@@ -82,6 +86,22 @@ namespace Component
         sf::VertexArray lightVertices;
 
         std::string lightingObjectLayerName;
+
+        bool has{};
+    };
+
+    struct CMagicCaster
+    {
+        sf::Int32 timeUntilNextProjectileFireMs;
+
+        Crucible::Vec2 castStartPosition;
+
+        bool has{};
+    };
+
+    struct CProjectile
+    {
+        Crucible::Vec2 projectileDirectionVector;
 
         bool has{};
     };

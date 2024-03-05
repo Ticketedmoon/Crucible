@@ -17,6 +17,8 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
     auto& lightSourceComponents = std::get<std::vector<Component::CLightSource>>(m_pool);
     auto& pathFollowerComponents = std::get<std::vector<Component::CPathFollower>>(m_pool);
     auto& animationComponents = std::get<std::vector<Component::CAnimation>>(m_pool);
+    auto& magicWieldComponents = std::get<std::vector<Component::CMagicCaster>>(m_pool);
+    auto& projectileComponents = std::get<std::vector<Component::CProjectile>>(m_pool);
 
     transformComponents.reserve(maxNumEntities);
     controllableComponents.reserve(maxNumEntities);
@@ -25,6 +27,7 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
     lightSourceComponents.reserve(maxNumEntities);
     pathFollowerComponents.reserve(maxNumEntities);
     animationComponents.reserve(maxNumEntities);
+    projectileComponents.reserve(maxNumEntities);
 
     for (size_t i = 0; i < maxNumEntities; i++)
     {
@@ -38,6 +41,8 @@ EntityMemoryPool::EntityMemoryPool(size_t maxNumEntities)
         lightSourceComponents.insert(lightSourceComponents.begin() + i, {{}, {}, {}, false});
         pathFollowerComponents.insert(pathFollowerComponents.begin() + i, {{}, {}, false});
         animationComponents.insert(animationComponents.begin() + i, {{}, {}, {}, {}, {}, false});
+        magicWieldComponents.insert(magicWieldComponents.begin() + i, {{}, {}, false});
+        projectileComponents.insert(projectileComponents.begin() + i, {{}, false});
     }
 
     assert(std::tuple_size_v<EntityComponentVectorTuple> == TOTAL_RESERVED_COMPONENT_TYPE_GROUPS);
@@ -60,4 +65,9 @@ Entity EntityMemoryPool::addEntity(Crucible::EntityType type) const
 void EntityMemoryPool::removeEntity(size_t entityId)
 {
     m_alive[entityId] = false;
+}
+
+bool EntityMemoryPool::isEntityAlive(size_t entityId)
+{
+    return m_alive[entityId];
 }

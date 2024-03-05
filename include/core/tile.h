@@ -22,6 +22,8 @@ enum class EntityAnimation
     PLAYER_IDLE_UP,
     PLAYER_IDLE_RIGHT,
     PLAYER_IDLE_LEFT,
+
+    SHADOW_MAGIC_CAST
 };
 
 enum class EntityDirection

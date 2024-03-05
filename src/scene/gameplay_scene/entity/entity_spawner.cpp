@@ -1,7 +1,7 @@
 #include "scene/gameplay_scene/entity/entity_spawner.h"
 
-EntitySpawner::EntitySpawner(EntityManager& entityManager, TextureManager& textureManager)
-    : m_entityManager(entityManager), m_textureManager(textureManager)
+EntitySpawner::EntitySpawner(EntityManager& entityManager, TextureManager& textureManager, sf::Clock& gameClock)
+    : m_entityManager(entityManager), m_textureManager(textureManager), m_gameClock(gameClock)
 {
 }
 
@@ -9,9 +9,8 @@ void EntitySpawner::createPlayer()
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::PLAYER);
 
-    Crucible::Vec2 playerDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE * 2};
     std::shared_ptr<Crucible::Vec2> position = std::make_shared<Crucible::Vec2>(Crucible::PLAYER_SPAWN_LOCATIONS[0]);
-
+    Crucible::Vec2 playerDimensions{Crucible::TILE_SIZE, Crucible::TILE_SIZE * 2};
     auto& playerTransform = e.addComponent<Component::CTransform>(position, playerDimensions);
 
     std::shared_ptr<sf::VertexArray> vertices = std::make_shared<sf::VertexArray>(sf::Quads);
@@ -24,7 +23,7 @@ void EntitySpawner::createPlayer()
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
             vertices);
 
-    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(LevelManager::PLAYER_SPRITE_SHEET_PATH);
+    std::shared_ptr<sf::Texture>& texture = m_textureManager.addTexture(PLAYER_SPRITE_SHEET_PATH);
 
     std::unordered_map<EntityAnimation, Component::AnimationGroup> animations{
             {EntityAnimation::PLAYER_WALK_DOWN,  Component::AnimationGroup({0, 1, 2, 3, 4, 5})},
@@ -37,14 +36,22 @@ void EntitySpawner::createPlayer()
             {EntityAnimation::PLAYER_IDLE_LEFT,  Component::AnimationGroup({42, 43, 44, 45, 46, 47}, {0, 1.0f/0.8f})},
     };
 
-    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH, EntityDirection::DOWN,
+    e.addComponent<Component::CAnimation>(PLAYER_SPRITE_SHEET_PATH, EntityDirection::DOWN,
             EntityAnimation::PLAYER_IDLE_DOWN, 0, animations);
     e.addComponent<Component::CControllable>();
-    e.addComponent<Component::CCollider>();
+
+    std::unordered_set<Crucible::EntityType> collidableEntities{
+            Crucible::EntityType::LEVEL_OBJECT,
+            Crucible::EntityType::GUARD,
+            Crucible::EntityType::PROJECTILE
+    };
+    e.addComponent<Component::CCollider>(collidableEntities);
     e.addComponent<Component::CTile>(playerTile, texture);
 }
 
-void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, const std::string& pathingObjectLayerName)
+void EntitySpawner::createGuard(
+        const std::string& lightingObjectLayerName,
+        const std::string& pathingObjectLayerName)
 {
     auto e = m_entityManager.addEntity(Crucible::EntityType::GUARD);
     std::unordered_map<std::string, ObjectLayer>& pathingObjectLayerNameToObjectLayer
@@ -86,17 +93,19 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
             {static_cast<unsigned int>(position->x), static_cast<unsigned int>(position->y)},
             vertices);
 
-    const std::string& mainTilesetPath = LevelManager::activeLevel.tileSets[0].path;
-    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(mainTilesetPath);
-
     Component::CLightSource cLightSource = createLightSource(transform, lightingObjectLayerName);
-
     e.addComponent<Component::CLightSource>(cLightSource);
-    e.addComponent<Component::CCollider>();
+
+
+    std::unordered_set<Crucible::EntityType> collidableEntities{
+            Crucible::EntityType::LEVEL_OBJECT,
+            Crucible::EntityType::PLAYER
+    };
+    e.addComponent<Component::CCollider>(collidableEntities);
 
     // FIXME this is temporary, use different texture
-    std::shared_ptr<sf::Texture>& p_texture = m_textureManager.getTexture(LevelManager::PLAYER_SPRITE_SHEET_PATH);
-    e.addComponent<Component::CTile>(guardTile, p_texture);
+    std::shared_ptr<sf::Texture>& texture = m_textureManager.getTexture(PLAYER_SPRITE_SHEET_PATH);
+    e.addComponent<Component::CTile>(guardTile, texture);
 
     std::unordered_map<EntityAnimation, Component::AnimationGroup> animations{
             {EntityAnimation::PLAYER_WALK_DOWN,  Component::AnimationGroup({0, 1, 2, 3, 4, 5})},
@@ -109,8 +118,51 @@ void EntitySpawner::createGuard(const std::string& lightingObjectLayerName, cons
             {EntityAnimation::PLAYER_IDLE_LEFT,  Component::AnimationGroup({42, 43, 44, 45, 46, 47}, {0, 1.0f/0.8f})},
     };
 
-    e.addComponent<Component::CAnimation>(LevelManager::PLAYER_SPRITE_SHEET_PATH, EntityDirection::DOWN,
+    e.addComponent<Component::CAnimation>(PLAYER_SPRITE_SHEET_PATH, EntityDirection::DOWN,
             EntityAnimation::PLAYER_IDLE_DOWN, 0, animations);
+    e.addComponent<Component::CMagicCaster>(m_gameClock.getElapsedTime().asMilliseconds(), *position);
+}
+
+void EntitySpawner::createProjectile(Crucible::Vec2 startPosition, Crucible::Vec2 targetPosition)
+{
+    auto entity = m_entityManager.addEntity(Crucible::EntityType::PROJECTILE);
+
+    Crucible::Vec2 dim{Crucible::TILE_SIZE * 2, 28};
+    entity.addComponent<Component::CTransform>(std::make_shared<Crucible::Vec2>(startPosition), dim);
+
+    std::unordered_set<Crucible::EntityType> collidableEntities{
+            Crucible::EntityType::PLAYER
+    };
+    entity.addComponent<Component::CCollider>(collidableEntities, true);
+
+    std::shared_ptr<sf::VertexArray> verts = std::make_shared<sf::VertexArray>(sf::Quads, 4);
+    (*verts)[0] = {{startPosition.x, startPosition.y}};
+    (*verts)[1] = {{startPosition.x + dim.x, startPosition.y}};
+    (*verts)[2] = {{startPosition.x + dim.x, startPosition.y + dim.y}};
+    (*verts)[3] = {{startPosition.x, startPosition.y + dim.y}};
+
+    sf::Vector2u uPosition{static_cast<uint32_t>(startPosition.x), static_cast<uint32_t>(startPosition.y)};
+    Tile entityTile{uPosition, verts};
+
+    std::shared_ptr<sf::Texture>& texture = m_textureManager.addTexture(SHADOW_BALL_SPRITE_SHEET_PATH);
+    entity.addComponent<Component::CTile>(entityTile, texture);
+
+    std::unordered_map<EntityAnimation, Component::AnimationGroup> animations{
+            {EntityAnimation::SHADOW_MAGIC_CAST, Component::AnimationGroup({0})},
+    };
+
+    // FIXME CTile and CAnimation have overlapping responsibilities.
+    //       We shouldn't need to path the texturePath twice.
+    entity.addComponent<Component::CAnimation>(SHADOW_BALL_SPRITE_SHEET_PATH, EntityDirection::DOWN,
+            EntityAnimation::SHADOW_MAGIC_CAST, 0, animations);
+
+    float r = std::atan2(targetPosition.y - startPosition.y, targetPosition.x - startPosition.x);
+    float speed = 3.0f;
+
+    Crucible::Vec2 projectileDirectionVec{
+        std::cos(r) * speed,
+        std::sin(r) * speed};
+    entity.addComponent<Component::CProjectile>(projectileDirectionVec);
 }
 
 Component::CLightSource EntitySpawner::createLightSource(Component::CTransform& playerTransform, const std::string& layerName)

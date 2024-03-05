@@ -21,7 +21,6 @@ class LevelManager
         explicit LevelManager(TextureManager& textureManager);
 
     public:
-        static inline const std::string PLAYER_SPRITE_SHEET_PATH = "resources/assets/texture/player/player_crucible_16x32_6pr_idle.png";
         static inline const std::string TILESET_ROOT_PATH = "resources/maps/catacomb/";
 
         // Can this be acquired programmatically like the tilesets?
@@ -38,7 +37,6 @@ class LevelManager
     private:
         void loadMapData(nlohmann::json data);
         void loadTileSets(nlohmann::json data);
-        void loadTexture(const std::string& tileSheetFilePath);
         void loadTexturesForLevel();
 
         void addObjectsToLayer(const nlohmann::json& data, size_t layerIdx, ObjectLayer& objectLayer);

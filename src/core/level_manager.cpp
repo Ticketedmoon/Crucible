@@ -15,10 +15,9 @@ LevelManager::LevelManager(TextureManager& textureManager) : m_textureManager(te
 
 void LevelManager::loadTexturesForLevel()
 {
-    loadTexture(PLAYER_SPRITE_SHEET_PATH);
     for (const TileSet& tileSet : activeLevel.tileSets)
     {
-        loadTexture(tileSet.path);
+        m_textureManager.addTexture(tileSet.path);
     }
 }
 
@@ -283,12 +282,4 @@ uint32_t LevelManager::getPositionForTile(uint32_t x, uint32_t y)
     uint32_t row = activeLevel.width * y;
     uint32_t positionForTile = row + x;
     return positionForTile;
-}
-
-void LevelManager::loadTexture(const std::string& tileSheetFilePath)
-{
-    if (!m_textureManager.hasTexture(tileSheetFilePath))
-    {
-        m_textureManager.addTexture(tileSheetFilePath);
-    }
 }

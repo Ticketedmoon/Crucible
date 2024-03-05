@@ -10,13 +10,13 @@ void PhysicalCollisionSystem::execute()
 {
     std::vector<Entity> entities = m_entityManager.getEntities();
 
-    for (const Entity& entity: entities)
+    for (Entity& entity: entities)
     {
         if (entity.hasComponent<Component::CCollider>())
         {
             auto& entityCollider = entity.getComponent<Component::CCollider>();
             checkForLevelObjectLayerCollisions(entity, entityCollider);
-            checkForOtherCollidableEntities(entities, entity, entityCollider);
+            checkForOtherCollidableEntities(entities, entity);
         }
 
         // TODO Consider moving me elsewhere
@@ -26,26 +26,33 @@ void PhysicalCollisionSystem::execute()
     }
 }
 
-void PhysicalCollisionSystem::resolvePhysicalCollisions(Component::CTile& entityTile,
-        Component::CTransform& entityTransform, Component::CCollider entityCollider,
-        const Crucible::Vec2& otherRectPos, const std::shared_ptr<sf::VertexArray>& otherTileVertices)
+void PhysicalCollisionSystem::resolvePhysicalCollisions(Entity& entity, Entity& otherEntity)
 {
-    if (entityCollider.immovable)
-    {
-        return;
-    }
+    auto& entityTile = entity.getComponent<Component::CTile>();
+    auto& entityTransform = entity.getComponent<Component::CTransform>();
+    auto& entityCollider = entity.getComponent<Component::CCollider>();
+    auto& otherEntityTile = otherEntity.getComponent<Component::CTile>();
+    auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
+    auto& otherEntityCollider = otherEntity.getComponent<Component::CCollider>();
 
     sf::FloatRect overlap;
-    if (isCollidingAABB(entityTile, otherTileVertices->getBounds(), overlap))
+    if (isCollidingAABB(entityTile, otherEntityTile.tile.vertices->getBounds(), overlap))
     {
-        resolveCollision(entityTile, entityTransform, otherRectPos, overlap);
+        // if entityA can collide with projectiles, and collision with entity B (projectile) induces a kill state
+        if (entityCollider.collidableEntities.contains(Crucible::EntityType::PROJECTILE)
+            && otherEntityCollider.shouldKill)
+        {
+            entity.destroy();
+            return;
+        }
+
+        resolveCollisionByManifold(entityTile, entityTransform, *otherEntityTransform.position, overlap);
     }
 }
 
-void PhysicalCollisionSystem::checkForOtherCollidableEntities(std::vector<Entity>& entities,
-        const Entity& entity, Component::CCollider& entityCollider)
+void PhysicalCollisionSystem::checkForOtherCollidableEntities(std::vector<Entity>& entities, Entity& entity)
 {
-    for (const Entity& otherEntity: entities)
+    for (Entity& otherEntity: entities)
     {
         if (entity.getId() == otherEntity.getId())
         {
@@ -55,34 +62,27 @@ void PhysicalCollisionSystem::checkForOtherCollidableEntities(std::vector<Entity
 
         if (otherEntity.hasComponent<Component::CCollider>())
         {
-            auto& entityTile = entity.getComponent<Component::CTile>();
-            auto& entityTransform = entity.getComponent<Component::CTransform>();
-            auto& otherEntityTile = otherEntity.getComponent<Component::CTile>();
-            auto& otherEntityTransform = otherEntity.getComponent<Component::CTransform>();
-
-            resolvePhysicalCollisions(entityTile,
-                    entityTransform,
-                    entityCollider,
-                    *otherEntityTransform.position,
-                    otherEntityTile.tile.vertices);
+            resolvePhysicalCollisions(entity, otherEntity);
         }
     }
 }
 void PhysicalCollisionSystem::checkForLevelObjectLayerCollisions(const Entity& entity, Component::CCollider& entityCollider)
 {
+    if (!entityCollider.collidableEntities.contains(Crucible::EntityType::LEVEL_OBJECT))
+    {
+        return;
+    }
+
     ObjectLayer& collisionLayerForPlayerOne
         = LevelManager::activeLevel.layerNameToObjectLayer.at(LevelManager::COLLISION_LAYER_PLAYER_A);
 //    ObjectLayer lightingObjectLayerB
 //            = LevelManager::activeLevel.layerNameToObjectLayer.at(LevelManager::COLLISION_LAYER_PLAYER_B);
 
-    resolvePhysicalCollisionsForObjectLayer(entityCollider, entity, collisionLayerForPlayerOne);
+    resolvePhysicalCollisionsForObjectLayer(entity, collisionLayerForPlayerOne);
     //resolvePhysicalCollisionsForObjectLayer(entityCollider, entity, lightingObjectLayerB);
 }
 
-void PhysicalCollisionSystem::resolvePhysicalCollisionsForObjectLayer(
-        Component::CCollider& entityCollider,
-        const Entity& entity,
-        ObjectLayer& objectLayer)
+void PhysicalCollisionSystem::resolvePhysicalCollisionsForObjectLayer(const Entity& entity, ObjectLayer& objectLayer)
 {
     Component::CTile entityTile = entity.getComponent<Component::CTile>();
     Component::CTransform entityTransform = entity.getComponent<Component::CTransform>();
@@ -104,12 +104,13 @@ void PhysicalCollisionSystem::resolvePhysicalCollisionsForObjectLayer(
         }
 
         sf::Vertex v = (*vArr)[0];
-        resolvePhysicalCollisions(
-                entityTile,
-                entityTransform,
-                entityCollider,
-                {v.position.x, v.position.y},
-                vArr);
+
+        // TODO Centralise this block for collision manifold resolution
+        sf::FloatRect overlap;
+        if (isCollidingAABB(entityTile, vArr->getBounds(), overlap))
+        {
+            resolveCollisionByManifold(entityTile, entityTransform, {v.position.x, v.position.y}, overlap);
+        }
     }
 }
 
@@ -158,8 +159,11 @@ void PhysicalCollisionSystem::updateShapeVertexPositions(const Component::CTrans
     tileVertices[4].position = {entityTransform.position->x, entityTransform.position->y};
 }
 
-void PhysicalCollisionSystem::resolveCollision(Component::CTile& entityTile, Component::CTransform& entityTransform,
-        const Crucible::Vec2& otherEntityPositionVec, const sf::FloatRect& overlap)
+void PhysicalCollisionSystem::resolveCollisionByManifold(
+        Component::CTile& entityTile,
+        Component::CTransform& entityTransform,
+        const Crucible::Vec2& otherEntityPositionVec,
+        const sf::FloatRect& overlap)
 {
     sf::VertexArray& tileVertices = *entityTile.tile.vertices;
     float xDiff = std::abs(tileVertices[0].position.x - tileVertices[1].position.x) / 2;

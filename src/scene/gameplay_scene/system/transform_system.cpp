@@ -31,6 +31,12 @@ void TransformSystem::execute()
 
             moveToNextWaypoint(entityTransform, cPathFollower, cAnimation);
         }
+
+        if (entity.hasComponent<Component::CProjectile>())
+        {
+            auto& cProjectile  = entity.getComponent<Component::CProjectile>();
+            *entityTransform.position += cProjectile.projectileDirectionVector;
+        }
     }
 }
 

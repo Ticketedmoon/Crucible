@@ -28,26 +28,17 @@ class PhysicalCollisionSystem : public System
                 const sf::FloatRect& otherObjectBounds,
                 sf::FloatRect& overlap);
 
-        void resolveCollision(Component::CTile& entityTile, Component::CTransform& entityTransform,
+        void resolveCollisionByManifold(Component::CTile& entityTile, Component::CTransform& entityTransform,
                 const Crucible::Vec2& otherEntityPositionVec, const sf::FloatRect& overlap);
 
-        void resolvePhysicalCollisionsForObjectLayer(
-                Component::CCollider& entityCollider,
-                const Entity& entity,
-                ObjectLayer& objectLayer);
+        void resolvePhysicalCollisionsForObjectLayer(const Entity& entity, ObjectLayer& objectLayer);
 
-        void resolvePhysicalCollisions(Component::CTile& entityTile,
-                Component::CTransform& entityTransform,
-                Component::CCollider entityCollider,
-                const Crucible::Vec2& otherRectPos,
-                const std::shared_ptr<sf::VertexArray>& otherTileVertices);
+        void resolvePhysicalCollisions(Entity& entity, Entity& otherEntity);
 
         void checkForLevelObjectLayerCollisions(const Entity& entity,
                 Component::CCollider& entityCollider);
 
-        void checkForOtherCollidableEntities(std::vector<Entity>& entities,
-                const Entity& entity,
-                Component::CCollider& entityCollider);
+        void checkForOtherCollidableEntities(std::vector<Entity>& entities, Entity& entity);
 
         void updateShapeVertexPositions(const Component::CTransform& entityTransform,
                 Component::CTile& entityTile);
